@@ -1,0 +1,739 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_001.tpw
+#! Purpose:     METABASE: PREFIX and SUFFIX output routines
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.07.26:  Roberto Artigas
+#!  *   Separated the PREFIX/SUFFIX options #GROUPs to their own source file.
+#! 2017.09.29   Roberto Artigas
+#!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%UtilityPrefix,%pBaseName)                                               #! RA.2019.07.07.SUN: Added
+#IF(%UtilityChekTable)
+  #MESSAGE('Creating: ' & %UtilityNameTable, 0)
+  #CREATE(%UtilityNameTableOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: %UtilityNameTableOut
+-- Utility: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%UtilitySuffix,%pBaseName)                                               #! RA.2019.07.07.SUN: Added
+#IF(%UtilityChekTable)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Utility: %TheDate - %TheTime
+-- EOF: %UtilityNameTableOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%UtilityNameTableOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %UtilityNameTableOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! TABLE create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTableCreatePrefix,%pBaseName)
+#IF(%CreateChekTable)
+  #MESSAGE('Creating: ' & %CreateNameTable, 0)
+  #CREATE(%CreateNameTableOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE TABLES] %CreateNameTableOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTableCreateSuffix,%pBaseName)
+#IF(%CreateChekTable)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE TABLES] %CreateNameTableOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameTableOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameTableOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! TABLE drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTableDropItPrefix,%pBaseName)
+#IF(%DropItChekTable)
+  #MESSAGE('Creating: ' & %DropItNameTable, 0)
+  #CREATE(%DropItNameTableOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP TABLES] %DropItNameTableOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTableDropItSuffix,%pBaseName)
+#IF(%DropItChekTable)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP TABLES] %DropItNameTableOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameTableOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameTableOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! SEQUENCE create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseSequenceCreatePrefix,%pBaseName)
+#IF(%CreateChekSequence)
+  #MESSAGE('Creating: ' & %CreateNameSequence, 0)
+  #CREATE(%CreateNameSequenceOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE SEQUENCE] %CreateNameSequenceOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseSequenceCreateSuffix,%pBaseName)
+#IF(%CreateChekSequence)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE SEQUENCE] %CreateNameSequenceOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameSequenceOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameSequenceOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! SEQUENCE drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseSequenceDropItPrefix,%pBaseName)
+#IF(%DropItChekSequence)
+  #MESSAGE('Creating: ' & %DropItNameSequence, 0)
+  #CREATE(%DropItNameSequenceOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP SEQUENCE] %DropItNameSequenceOut
+-- Created: %TheDate - %TheTime
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseSequenceDropItSuffix,%pBaseName)
+#IF(%DropItChekSequence)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP SEQUENCE] %DropItNameSequenceOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameSequenceOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameSequenceOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! KEY PRIMARY create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseKeyPrimaryCreatePrefix,%pBaseName)
+#IF(%CreateChekKeyPrimary)
+  #MESSAGE('Creating: ' & %CreateNameKeyPrimary, 0)
+  #CREATE(%CreateNameKeyPrimaryOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE KEY PRIMARY] %CreateNameKeyPrimaryOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseKeyPrimaryCreateSuffix,%pBaseName)
+#IF(%CreateChekKeyPrimary)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE KEY PRIMARY] %CreateNameKeyPrimaryOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameKeyPrimaryOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameKeyPrimaryOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! KEY PRIMARY drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseKeyPrimaryDropItPrefix,%pBaseName)
+#IF(%DropItChekKeyPrimary)
+  #MESSAGE('Creating: ' & %DropItNameKeyPrimary, 0)
+  #CREATE(%DropItNameKeyPrimaryOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP KEY PRIMARY] %DropItNameKeyPrimaryOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseKeyPrimaryDropItSuffix,%pBaseName)
+#IF(%DropItChekKeyPrimary)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP KEY PRIMARY] %DropItNameKeyPrimaryOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameKeyPrimaryOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameKeyPrimaryOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! INDEX UNIQUE create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexUniqueCreatePrefix,%pBaseName)
+#IF(%CreateChekIndexUnique)
+  #MESSAGE('Creating: ' & %CreateNameIndexUnique, 0)
+  #CREATE(%CreateNameIndexUniqueOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE INDEX UNIQUE] %CreateNameIndexUniqueOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexUniqueCreateSuffix,%pBaseName)
+#IF(%CreateChekIndexUnique)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE INDEX UNIQUE] %CreateNameIndexUniqueOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameIndexUniqueOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameIndexUnique & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! INDEX UNIQUE drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexUniqueDropItPrefix,%pBaseName)
+#IF(%DropItChekIndexUnique)
+  #MESSAGE('Creating: ' & %DropItNameIndexUnique, 0)
+  #CREATE(%DropItNameIndexUniqueOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP INDEX UNIQUE] %DropItNameIndexUniqueOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexUniqueDropItSuffix,%pBaseName)
+#IF(%DropItChekIndexUnique)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP INDEX UNIQUE] %DropItNameIndexUniqueOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameIndexUniqueOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameIndexUniqueOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! INDEX NOT UNIQUE create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexNotUniquePrefix,%pBaseName)
+#IF(%CreateChekIndexNotUnique)
+  #MESSAGE('Creating: ' & %CreateNameIndexNotUnique, 0)
+  #CREATE(%CreateNameIndexNotUniqueOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE INDEX NOT UNIQUE] %CreateNameIndexNotUniqueOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexNotUniqueSuffix,%pBaseName)
+#IF(%CreateChekIndexNotUnique)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE INDEX NOT UNIQUE] %CreateNameIndexNotUniqueOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameIndexNotUniqueOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameIndexNotUnique & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! INDEX NOT UNIQUE drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexNotUniqueDropItPrefix,%pBaseName)
+#IF(%DropItChekIndexNotUnique)
+  #MESSAGE('Creating: ' & %DropItNameIndexNotUnique, 0)
+  #CREATE(%DropItNameIndexNotUniqueOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP INDEX NOT UNIQUE] %DropItNameIndexNotUniqueOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseIndexNotUniqueDropItSuffix,%pBaseName)
+#IF(%DropItChekIndexNotUnique)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP INDEX NOT UNIQUE] %DropItNameIndexNotUniqueOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameIndexNotUniqueOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameIndexNotUniqueOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RELATION create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseRelationCreatePrefix,%pBaseName)
+#IF(%CreateChekRelation)
+  #MESSAGE('Creating: ' & %CreateNameRelation, 0)
+  #CREATE(%CreateNameRelationOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE RELATION] %CreateNameRelationOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseRelationCreateSuffix,%pBaseName)
+#IF(%CreateChekRelation)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE RELATION] %CreateNameRelationOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameRelationOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameRelationOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RELATION drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseRelationDropItPrefix,%pBaseName)
+#IF(%DropItChekRelation)
+  #MESSAGE('Creating: ' & %DropItNameRelation, 0)
+  #CREATE(%DropItNameRelationOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP RELATION] %DropItNameRelationOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseRelationDropItSuffix,%pBaseName)
+#IF(%DropItChekRelation)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP RELATION] %DropItNameRelationOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameRelationOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameRelationOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! GRANT create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseGrantCreatePrefix,%pBaseName)
+#IF(%CreateChekGrant)
+  #MESSAGE('Creating: ' & %CreateNameGrant, 0)
+  #CREATE(%CreateNameGrantOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE GRANT] %CreateNameGrantOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseGrantCreateSuffix,%pBaseName)
+#IF(%CreateChekGrant)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE GRANT] %CreateNameGrantOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameGrantOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameGrantOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! GRANT drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseGrantDropItPrefix,%pBaseName)
+#IF(%DropItChekGrant)
+  #MESSAGE('Creating: ' & %DropItNameGrant, 0)
+  #CREATE(%DropItNameGrantOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP GRANT] %DropItNameGrantOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseGrantDropItSuffix,%pBaseName)
+#IF(%DropItChekGrant)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP GRANT] %DropItNameGrantOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameGrantOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameGrantOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------         #! RA.2019.07.28: Trigger PREFIX/SUFFIX added
+#!---------------------------------------------------------------------         #! TRIGGER create
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerCreatePrefix,%pBaseName)
+#IF(%CreateChekTrigger)
+  #MESSAGE('Creating: ' & %CreateNameTrigger, 0)
+  #CREATE(%CreateNameTriggerOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE TRIGGER] %CreateNameTriggerOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerCreateSuffix,%pBaseName)
+#IF(%CreateChekTrigger)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE TRIGGER] %CreateNameTriggerOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameTriggerOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameTriggerOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! TRIGGER drop
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerDropItPrefix,%pBaseName)
+#IF(%DropItChekTrigger)
+  #MESSAGE('Creating: ' & %DropItNameTrigger, 0)
+  #CREATE(%DropItNameTriggerOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP TRIGGER] %DropItNameTriggerOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerDropItSuffix,%pBaseName)
+#IF(%DropItChekTrigger)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP TRIGGER] %DropItNameTriggerOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameTriggerOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameTriggerOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%CombinedCreatePrefix,%pBaseName)
+#IF(%CreateChekCombined)
+  #MESSAGE('Creating: ' & %CreateNameCombined, 0)
+  #CREATE(%CreateNameCombinedOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [CREATE COMBINED] %CreateNameCombinedOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%CombinedCreateSuffix,%pBaseName)
+#IF(%CreateChekCombined)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [CREATE COMBINED] %CreateNameCombinedOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%CreateNameCombinedOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %CreateNameCombinedOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! TRIGGER drop
+#!---------------------------------------------------------------------
+#GROUP(%CombinedDropItPrefix,%pBaseName)
+#IF(%DropItChekCombined)
+  #MESSAGE('Creating: ' & %DropItNameCombined, 0)
+  #CREATE(%DropItNameCombinedOut)
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+--
+-- BOF: [DROP COMBINED] %DropItNameCombinedOut
+-- Created: %TheDate - %TheTime
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%CombinedDropItSuffix,%pBaseName)
+#IF(%DropItChekCombined)
+
+  #IF(%Comments)
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('MIMER')
+    #ELSE
+
+--
+-- Created: %TheDate - %TheTime
+-- EOF: [DROP COMBINED] %DropItNameCombinedOut
+--
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDIF
+  #CLOSE(%DropItNameCombinedOut)
+  #MESSAGE('', 0)
+  #RUN('NOTEPAD.EXE "' & %DropItNameCombinedOut & '"')
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

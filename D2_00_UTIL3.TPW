@@ -1,0 +1,176 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2UTIL3.tpw
+#! Purpose:     Utilites to deal with dictionaries
+#! Author:      Copyright © 1999-2011 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#CODE(MB_FindMismatchedColumnNames,'2018.06.03: [DCT2SQL-MG] Find Mistmatched Column External names')
+#!--------------------------------------------------------------------
+#! Changes:
+#! 2018.06.03.SUN   Michael Gorman
+#!  *   Give me some code to show this Mismatched column names
+#!--------------------------------------------------------------------
+  #Declare(%TempKeyColumn)
+  #Declare(%TempTableName)
+  #FOR(%File)
+    #SET(%TempTableName,%File)
+  #IF(SUB(%TempTableName,1,2) = 'A_')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,2) = 'A2')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,2) = 'A3')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,2) = 'A4')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,2) = 'A5')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,3) = 'AUT')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'TagFile')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,6) = 'TagSet')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'Convert')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,3) = 'SIE')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,5) = 'LIMIT')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'SourceF')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'OutlayT')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'Outlayt')
+    #Cycle
+  #ELSIF(SUB(%TempTableName,1,7) = 'DBMSSet')
+    #Cycle
+        #ENDIF
+  #FOR(%Key),Where(%KeyPrimary=1)
+           #FOR(%KeyField)
+           #FIX(%Field,%KeyField)
+           #SET(%TempKeyColumn,SUB(%FieldName,2,LEN(CLIP(%FieldName))-2))
+           #IF(Instring('|',%TempKeyColumn,1,1))
+             #SET(%TempKeyColumn,CLIP(SUB(%TempKeyColumn,1,(Instring('|',%TempKeyColumn,1,1)-1))))
+           #ENDIF          
+           #IF(lower(%FieldId) <> lower(%TempKeyColumn))
+#!EMBED(%DCT2SQL_BegMistmatch,'Before: Mistmatch CHECK done')
+! MisMatch: %TempTableName with %Field %FieldStatement vs [%fieldId] [%TempKeyColumn]
+#!EMBED(%DCT2SQL_BegMistmatch,'Before: Mistmatch CHECK done')
+          #ENDIF
+      #ENDFOR
+    #ENDFOR
+  #ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+GROUP(%CopyrightMISMATCHED)
+  #BOXED('Version 1.0 [ 2018.06.01 ]'),AT(,,278),PROP(PROP:FontStyle,700)
+    #!DISPLAY(''),AT(,,,1)
+    #DISPLAY('MISTMATCHED EXTERNAL PKEY names in use for ABC.'  ),AT(10)
+    #DISPLAY('Copyright © 2001-2099 by Roberto Artigas y Soler.'),AT(10)
+    #DISPLAY('All copyrights reserved world wide.'              ),AT(10)
+    #DISPLAY('E-MAIL: roberto.artigas.dev@gmail.com'            ),AT(10)
+  #ENDBOXED
+#!
+#GROUP(%MITLicenseLOCKCHECK)
+#TAB('MISTMATCHED'),PROP(PROP:FontStyle,700)
+  #INSERT(%CopyrightMISMATCHED) 
+  #INSERT(%MITLicenseDCT2SQL)
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#EXTENSION(zFindMismatchedColumnNames,'2018.06.03: [DCT2SQL-MG] Find Mistmatched Column External names'),PROCEDURE
+#!INSERT(%Preamble)                                                              #! Basic copyright message
+#DISPLAY('')
+#DISPLAY('')
+#DISPLAY('')
+#DISPLAY('')
+#DISPLAY('')
+#DISPLAY('')
+#DISPLAY('')
+#SHEET,AT(,,288),HSCROLL
+#!INSERT(%MITLicenseLOCKCHECK)
+#TAB('General')
+  #BOXED('FindMismatchedColumnNames'),AT(,,280)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY('Find Mistmatched Column External Names.')
+    #!DISPLAY('')
+    #!DISPLAY('This has been tested with the ABC template chains.')
+  #ENDBOXED
+  #BOXED('Hidden Variables'),AT(,,280),HIDE
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('MistmatchCount:',@N3),%MistmatchCount,DEFAULT(0)
+    #PROMPT('TempKeyColumn: ',@s120),%TempTableName
+    #PROMPT('TempTableName: ',@s120),%TempKeyColumn
+  #ENDBOXED
+#ENDTAB
+#ENDSHEET
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!  #Declare(%TempKeyColumn)
+#!  #Declare(%TempTableName)
+#!---------------------------------------------------------------------
+#AT(%DataSection),PRIORITY(5)
+#SET(%MistmatchCount,0)
+#!EMBED(%DCT2SQL_BegMistmatch,'Before: Mistmatch CHECK done')
+
+! LIST: Items that do not match between the PRIMARY key and the EXTERNAL name.
+  #FOR(%File)
+    #!----------------------------------!
+    #! Ignore certain file DRIVER types !
+    #!----------------------------------!
+    #CASE(%FileDriver)
+    #OF  ('ASCII')
+    #OROF('BASIC')
+    #OROF('DOS')
+    #OROF('MEMORY')
+      #CYCLE
+    #ENDCASE
+    #!---------------------------!
+    #! Ignore certain FILE types !
+    #!---------------------------!
+    #CASE(%FileType)
+    #OF  ('VIEW')
+    #OROF('ALIAS')
+      #CYCLE
+    #ENDCASE
+    #!-------------------------------------!
+    #! Ignore FILES with NO FIELDS in them !
+    #!-------------------------------------!
+    #IF(NOT ITEMS(%Field))
+      #CYCLE
+    #ENDIF
+    #!
+    #CASE(UPPER(%File))
+    #OF  ('LIMIT')
+      #CYCLE
+    #ENDCASE
+    #!
+    #SET(%TempTableName,%File)
+    #FOR(%Key),Where(%KeyPrimary=1) 
+      #FOR(%KeyField)
+           #FIX(%Field,%KeyField)
+           #SET(%TempKeyColumn,SUB(%FieldName,2,LEN(CLIP(%FieldName))-2))
+           #IF(Instring('|',%TempKeyColumn,1,1))
+             #SET(%TempKeyColumn,CLIP(SUB(%TempKeyColumn,1,(Instring('|',%TempKeyColumn,1,1)-1))))
+           #ENDIF          
+           #IF(lower(%FieldId) <> lower(%TempKeyColumn))
+            #SET(%MistmatchCount,%MistmatchCount + 1)
+! MisMatch: %TempTableName with %Field %FieldStatement vs [%fieldId] [%TempKeyColumn]
+          #ENDIF
+      #ENDFOR
+    #ENDFOR
+  #ENDFOR
+! TOTAL: There are %MistmatchCount items that do not match between the PRIMARY key and the EXTERNAL name.
+
+#!EMBED(%DCT2SQL_EndMistmatch,'After: Mistmatch CHECK done')
+#ENDAT
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

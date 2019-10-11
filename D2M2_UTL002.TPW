@@ -1,0 +1,403 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_UTL002.tpw
+#! Purpose:     UTILITY: Sort dictionary tables by PREFIX order
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2018.07.07   Roberto Artigas
+#!  *   Template utility creation.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2UTL002)
+#TAB('UTIL_PREFIX'),PROP(PROP:FontStyle,700)
+#INSERT(%MITLicense)
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#UTILITY(D2M2_UTIL_PREFIX, '2019.07.17: [UTIL] Table PREFIX Order')
+#!-----------------------------------------------------------------------------
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#INSERT(%PreambleUtility)                                                       #! Basic copyright message
+#INSERT(%VariablesUtility000)                                                   #! RA.2019.07.25.THU: Added 
+#INSERT(%VariablesUtility002)                                                   #! RA.2019.07.07.SUN: Added 
+#INSERT(%VariablesSetup002)                                                     #! RA.2019.08.04.SUN: Aliases here!
+#!---------------------------------------------------------------------
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%ShowExplainUtilPREFIX)
+  #INSERT(%MITLicenseD2M2UTL002)
+  #INSERT(%MetabaseTabSelection)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#SET(%UtilityChekTable                    , %TRUE)
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseName & '_PREFIX_SORT_ORDER.TXT')
+#SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
+#!
+#CALL(%UtilityPrefix                      , %BaseName)
+#CALL(%BuildSetOrderFiles002)
+#CALL(%BuildConsolidatedFiles002)
+#CALL(%SortCompleteFiles002)
+#!
+#IF(%TRUE)
+#SET(%AuditLines, 0)
+-- BEGIN -- %[1]NULL SEQ %[1]NULL KEY-FLD %[0]NULL PREFIX %[4]NULL FILENAME %[042]NULL FULLPATH %[42]NULL FILE-OPTIONS
+--
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+-- PROCESSED: %@N04@(%CFilesCount) %[0]NULL %@N03B@(%CFilesParCount)-%@N03B@(%CFilesChiCount) %[0]NULL %[10]FilePrefix %[0]NULL %[50]CFilesName %[0]NULL %[50]CFilesFullPath %[0]NULL %FileUserOptions
+#INSERT(%AuditFieldsAndKeys000)
+    #SET(%AuditLines, %AuditLines + 1)
+    #IF(%AuditLines % 20 = 0 AND ITEMS(%CFiles) <> %AuditLines)
+--    
+-- %[10]NULL SEQ %[1]NULL KEY-FLD %[0]NULL PREFIX %[4]NULL FILENAME %[042]NULL FULLPATH %[42]NULL FILE-OPTIONS
+--
+    #ENDIF
+  #ENDFOR
+--  
+-- ENDED -- %[1]NULL SEQ %[1]NULL KEY-FLD %[0]NULL PREFIX %[4]NULL FILENAME %[042]NULL FULLPATH %[42]NULL FILE-OPTIONS
+#ENDIF
+#!
+#IF(%FALSE)
+#DECLARE(%DefaultLines)
+#SET(%DefaultLines, 0)
+
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+#INSERT(%GenerateInsertSQL                , %BaseName)
+    #SET(%DefaultLines, %DefaultLines + 1)
+    #IF(%DefaultLines % 20 = 0)
+-- @N04@(%DefaultLines)      
+    #ENDIF
+  #ENDFOR  
+
+#ENDIF
+#!
+#CALL(%UtilitySuffix                      , %BaseName)
+#!
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilPREFIX)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextPREFIX))
+    #DECLARE(%ExplainTextPREFIX)
+  #ENDIF
+  #SET(%ExplainTextPREFIX, '')
+  #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This generic utility will list the tables in the order to add the default data')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & ' so you do not have any constraint errors.')
+   #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
+  #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilPREFIX)
+#INSERT(%ExplainUtilPREFIX)
+#TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('OFF: Sort files in PREFIX order. ON: Sort files in NAME order.', CHECK), %opt002SortFileName, AT(10)
+    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.', CHECK), %opt000AuditFields, AT(10)
+    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.', CHECK), %opt000AuditKeys, AT(10)
+  #ENDBOXED
+  #BOXED('Instructions'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextPREFIX),AT(,,436,44)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! BUILD QUALIFIED WITH ALIASES
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VariablesSetup002)                                                      #! Setup output file names
+#PREPARE
+#INSERT(%SelectQualifiedWithAlias)                                              #! RA.2019.08.04.SUN: Aliases here!
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! BUILD SET ORDER TABLES
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%BuildSetOrderFiles002)
+#!---- WTH? ---
+#!---- %%optUseAllFiles=[ %optUseAllFiles ]
+#!FREE(%NFilesSort)                                                              #! Name order for files
+#!
+#!#FOR(%File)                                                                   #! Read all the files
+#!  #ADD(%NFilesSort,%File)                                                     #! Name sort them by
+#!#ENDFOR                                                                       #! processing them all
+#!
+#! RA.2019.08.04: IF did not set individualy, THEN I got the correct list.
+#! RA.2019.07.04: Added option to select files to do SQL generation.
+#IF (%optUseAllFiles)
+#!  #FOR (%File)
+#!    #ADD (%NFilesSort, %File)
+#!  #ENDFOR
+#ELSE
+  #FREE(%NFilesSort)                                                            #! Name order for files
+  #FOR (%optFileSelection)
+    #ADD (%NFilesSort, %optFileSelection)
+-- ADD: %optFileSelection
+  #ENDFOR
+#ENDIF
+#!
+#FREE(%NFiles)                                                                  #! Valid file items here
+#FOR(%NFilesSort)                                                               #! VALID FILE: FOR
+  #FIX(%File,%NFilesSort)
+  #!
+  #IF(INSTRING('DB002:',UPPER(%FileName),1,1))
+    #CYCLE
+  #ENDIF
+  #IF(INSTRING('DB003:',UPPER(%FileName),1,1))
+    #CYCLE
+  #ENDIF
+  #!
+  #!----------------------------------!
+  #! Ignore certain file DRIVER types !
+  #!----------------------------------!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('MEMORY')                                                               #! RA.2018.04.12 - Ignored
+  #! RA.2019.08.04: You cannot seem to add a RASQL(NO) option to an ALIAS table
+  #! RA.2019.07.07: IF I do NOT ignore the ALIAS below, THEN you will need to do an additional check
+  #!                to see if the alias'ed file contains the RASQL(NO). Just ignore topspeed files for now.
+  #!                Evertyhing should be an ODBC driver in what I am TESTING in this dictionary.
+  #OROF('TOPSPEED')                                                             #! RA.2019.07.07 - Ignored
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [DRIVER type %FileDriver]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!---------------------------!
+  #! Ignore certain FILE types !
+  #!---------------------------!
+  #CASE(%FileType)
+  #OF  ('VIEW')
+  #!OROF('ALIAS')                                                                 #! RA.2019.08.04: Added
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE type %FileType]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!-------------------------------------!
+  #! Ignore FILES with NO FIELDS in them !
+  #!-------------------------------------!
+#!  #IF(NOT ITEMS(%Field))                                                        #! RA.2001.12.01
+#!    #IF(%TraceDetail)
+#!---- IGNORED: "%File" [No fields]
+#!    #ENDIF
+#!    #CYCLE                                                                      #! RA.2001.12.01
+#!  #ENDIF                                                                        #! RA.2001.12.01
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFileOptions)
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE options say NO]
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!---------------------------!
+  #! We pass FILE requirements !
+  #!---------------------------!
+  #ADD(%SFiles,ITEMS(%SFiles) + 1)                                              #! This FILE is processed
+  #SET(%SFilesCount         ,ITEMS(%SFiles))                                    #! Table ID number
+  #SET(%SFilesName          ,%File)                                             #! Table Name
+  #SET(%SFilesFullPath      ,%FileName)                                         #! Table Full Path Name
+  #CALL(%ReplaceSubString,%SFilesFullPath,'''','')
+  #SET(%SFilesAlias         ,'')                                                #! Alias Name
+#!
+  #IF(%FileType='ALIAS')
+    #SET(%SFilesAlias       ,%AliasFile)                                        #! Alias Name    
+  #ENDIF
+#!
+#!
+#ENDFOR                                                                         #! VALID FILE: #ENDFOR
+#IF(%FALSE)
+
+-- Processed Files -- BEGIN : BuildSetOrderFiles002 : %%optUseAllFiles=[ %optUseAllFiles ]
+  #FOR(%SFiles)
+    #FIX(%File, %SFilesName)
+-- PROCESSED: %@N04@(%SFilesCount) %[50]SFilesName %[50]SFilesAlias [%[10]FilePrefix] %[10]FileDriver %SFilesFullPath
+  #ENDFOR
+-- Processed Files -- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------         #! RA.2019.07.07.SUN: Added
+#GROUP(%VariablesUtility002)
+#PREPARE
+#DECLARE(%opt002SortFileName              ,LONG)                                #! RA.2019.07.18: Added
+#SET(%opt002SortFileName                  ,FALSE)
+#!
+#DECLARE(%SFiles),MULTI                             #!,UNIQUE
+#DECLARE(%SFilesCount       ,%SFiles)               #! ID: Table Count
+#DECLARE(%SFilesName        ,%SFiles)               #! Table Name
+#DECLARE(%SFilesFullPath    ,%SFiles)               #! Table Full Path Name
+#DECLARE(%SFilesAlias       ,%SFiles)               #! Alias Name
+#!DECLARE(%SFilesParCount    ,%SFiles)               #! Parent count
+#!DECLARE(%SFilesChiCount    ,%SFiles)               #! Child Count
+#!DECLARE(%SFilesParFmId     ,%SFiles)               #! From Id (Parent)
+#!DECLARE(%SFilesParFmName   ,%SFiles)               #! From Name (Parent)
+#!DECLARE(%SFilesChiToId     ,%SFiles)               #! To Id (Child)
+#!DECLARE(%SFilesChiToName   ,%SFiles)               #! To Name (Child)
+#!
+#DECLARE(%CFiles),MULTI                             #!,UNIQUE
+#DECLARE(%CFilesCount       ,%CFiles)               #! ID: Table Count
+#DECLARE(%CFilesName        ,%CFiles)               #! Table Name
+#DECLARE(%CFilesFullPath    ,%CFiles)               #! Table Full Path Name
+#DECLARE(%CFilesParCount    ,%CFiles)               #! Parent count
+#DECLARE(%CFilesChiCount    ,%CFiles)               #! Child Count
+#DECLARE(%CFilesSort        ,%CFiles)               #! Calculated sort
+#DECLARE(%CFilesSortText    ,%CFiles)               #! Calculated sort text
+#!
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#GROUP(%BuildConsolidatedFiles002)
+#FOR(%SFiles)
+  #FIX(%File, %SFilesName)
+#!  #IF(%FileType='ALIAS')
+#!    #CYCLE
+#!  #ENDIF
+  #ADD(%CFiles,ITEMS(%CFiles) + 1)                                              #! This FILE is processed
+  #SET(%CFilesCount         ,ITEMS(%CFiles))                                    #! Table ID number
+  #SET(%CFilesName          ,%File)                                             #! Table Name
+  #SET(%CFilesFullPath      ,%FileName)                                         #! Table Full Path Name
+  #CALL(%ReplaceSubString,%CFilesFullPath,'''','')
+  #SET(%CFilesParCount      ,ITEMS(%Key))                                       #! Parent count
+  #SET(%CFilesChiCount      ,ITEMS(%Field))                                     #! Child Count
+  #SET(%CFilesSort          ,0)                                                 #! Calculated sort
+  #IF(~%opt002SortFileName)
+    #SET(%CFilesSortText    ,FORMAT(%FilePrefix,@S10) & ' ' & %CFilesName)      #! PREFIX, FILE
+  #ELSE
+    #SET(%CFilesSortText    ,                                 %CFilesName)      #!         FILE
+  #ENDIF
+#ENDFOR
+#!---------------------------------------------------------------------
+#GROUP(%SortCompleteFiles002)
+#!
+#EQUATE (%DoSort,1)
+#EQUATE (%I,0)
+#!
+#EQUATE (%w1CFilesCount           ,'')                    #! ID: Table Count
+#EQUATE (%w1CFilesName            ,'')                    #! Table Name
+#EQUATE (%w1CFilesFullPath        ,'')                    #! Table Full Path Name
+#EQUATE (%w1CFilesParCount        ,'')                    #! Parent count
+#EQUATE (%w1CFilesChiCount        ,'')                    #! Child Count
+#EQUATE (%w1CFilesSort            ,'')                    #! Calculated sort
+#EQUATE (%w1CFilesSortText        ,'')                    #! Calculated sort text
+#!
+#EQUATE (%w2CFilesCount           ,'')                    #! ID: Table Count
+#EQUATE (%w2CFilesName            ,'')                    #! Table Name
+#EQUATE (%w2CFilesFullPath        ,'')                    #! Table Full Path Name
+#EQUATE (%w2CFilesParCount        ,'')                    #! Parent count
+#EQUATE (%w2CFilesChiCount        ,'')                    #! Child Count
+#EQUATE (%w2CFilesSort            ,'')                    #! Calculated sort
+#EQUATE (%w2CFilesSortText        ,'')                    #! Calculated sort text
+#!
+#LOOP,WHILE(%DoSort)
+  #SET(%DoSort,0)
+  #LOOP,FOR(%I,2,ITEMS(%CFiles))
+    #SELECT(%CFiles,%I-1)
+#!
+#!  #SET(%CFilesCount             ,%CFilesCount       )   #! ID: Table Count
+#!  #SET(%CFilesName              ,%CFilesName        )   #! Table Name
+#!  #SET(%CFilesFullPath          ,%CFilesFullPath    )   #! Table Full Path Name
+#!  #SET(%CFilesParCount          ,%CFilesParCount    )   #! Parent count
+#!  #SET(%CFilesChiCount          ,%CFilesChiCount    )   #! Child Count
+#!  #SET(%CFilesSort              ,%CFilesSort        )   #! Calculated sort
+#!  #SET(%CFilesSortText          ,%CFilesSortText    )   #! Calculated sort text
+#!
+    #SET(%w1CFilesCount           ,%CFilesCount       )   #! ID: Table Count
+    #SET(%w1CFilesName            ,%CFilesName        )   #! Table Name
+    #SET(%w1CFilesFullPath        ,%CFilesFullPath    )   #! Table Full Path Name
+    #SET(%w1CFilesParCount        ,%CFilesParCount    )   #! Parent count
+    #SET(%w1CFilesChiCount        ,%CFilesChiCount    )   #! Child Count
+    #SET(%w1CFilesSort            ,%CFilesSort        )   #! Calculated sort
+    #SET(%w1CFilesSortText        ,%CFilesSortText    )   #! Calculated sort text
+    #SELECT(%CFiles,%I)
+    #SET(%w2CFilesCount           ,%CFilesCount       )   #! ID: Table Count
+    #SET(%w2CFilesName            ,%CFilesName        )   #! Table Name
+    #SET(%w2CFilesFullPath        ,%CFilesFullPath    )   #! Table Full Path Name
+    #SET(%w2CFilesParCount        ,%CFilesParCount    )   #! Parent count
+    #SET(%w2CFilesChiCount        ,%CFilesChiCount    )   #! Child Count
+    #SET(%w2CFilesSort            ,%CFilesSort        )   #! Calculated sort
+    #SET(%w2CFilesSortText        ,%CFilesSortText    )   #! Calculated sort text
+#!
+    #IF(%w1CFilesSortText > %w2CFilesSortText)
+      #SET(%DoSort,1)
+      #SET(%CFilesCount           ,%w1CFilesCount     )   #! ID: Table Count
+      #SET(%CFilesName            ,%w1CFilesName      )   #! Table Name
+      #SET(%CFilesFullPath        ,%w1CFilesFullPath  )   #! Table Full Path Name
+      #SET(%CFilesParCount        ,%w1CFilesParCount  )   #! Parent count
+      #SET(%CFilesChiCount        ,%w1CFilesChiCount  )   #! Child Count
+      #SET(%CFilesSort            ,%w1CFilesSort      )   #! Calculated sort
+      #SET(%CFilesSortText        ,%w1CFilesSortText  )   #! Calculated sort text
+      #SELECT(%CFiles,%I-1)
+      #SET(%CFilesCount           ,%w2CFilesCount     )   #! ID: Table Count
+      #SET(%CFilesName            ,%w2CFilesName      )   #! Table Name
+      #SET(%CFilesFullPath        ,%w2CFilesFullPath  )   #! Table Full Path Name
+      #SET(%CFilesParCount        ,%w2CFilesParCount  )   #! Parent count
+      #SET(%CFilesChiCount        ,%w2CFilesChiCount  )   #! Child Count
+      #SET(%CFilesSort            ,%w2CFilesSort      )   #! Calculated sort
+      #SET(%CFilesSortText        ,%w2CFilesSortText  )   #! Calculated sort text
+    #ENDIF
+  #ENDLOOP
+#ENDLOOP
+#!
+#! RA.2019.07.07: Resequence the file count after the sort.
+#EQUATE (%CountMe  , 0)
+#FOR(%CFiles)
+  #FIX(%File, %CFilesName)
+  #SET(%CountMe    , %CountMe + 1)
+  #SET(%CFilesCount, %CountMe)
+#ENDFOR
+#!
+#IF(%FALSE)
+
+---- Sorted PREFIX Files ---- BEGIN : SortCompleteFiles002
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+---- PROCESSED: %@N04@(%CFilesCount) %[50]CFilesName %@N03@(%CFilesCount) (%[4]CFilesParCount) (%[4]CFilesChiCount) %[60]CFilesSortText [%[6]FilePrefix] "%CFilesFullPath"
+  #ENDFOR
+---- Sorted PREFIX Files ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

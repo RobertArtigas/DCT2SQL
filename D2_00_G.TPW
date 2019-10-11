@@ -1,0 +1,3882 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! Filename:    d2g.tpw
+#! Purpose:     Major generic groups
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2017.10.29   Roberto Artigas
+#!  *   Addtional functions to simply building the lists and searching them.
+#! 2007.04.27   Roberto Artigas
+#!  *   New ORACLE list of reserved words. 86 keywords added.
+#!  *   New POSTGRES list of reserved words. 50 keywords added.
+#! 2006.03.17   Roberto Artigas
+#!  *   Added new reserved words according to ISO/IEC 9075-14:2006(E)
+#! 2002.11.13   Roberto Artigas Jr
+#!  *   Added reserved words for several backends. They are...
+#!      DB2v7, MySQLv4, Oracle9i, PostgreSQLv7, SQL2000
+#! 2002.06.28   Roberto Artigas Jr
+#!  *   Added reserved words for SAP SQL backend
+#! 2002.03.08   Roberto Artigas Jr
+#!  *   Added new SQL items to reserved list
+#! 2001.12.30   Lew Strock
+#!  *   Added reserve words for Pervasive PSQL
+#! 2001.10.27   Roberto Artigas Jr
+#!  *   More MySQL documentation reading more keywords added
+#! 2001.10.24   Roberto Artigas Jr
+#!  *   Per Bruce Johnson - Keywords: ACCESS, APPLICATION
+#! 2001.10.22   Roberto Artigas Jr
+#!  *   Interbase docs from http://www.ibphoenix.com/ibp_download.html#DOCS
+#!      Added Interbase only reserved SQL words.
+#! 2001.10.21   Roberto Artigas Jr
+#!  *   Added new SQL items to reserved list
+#! 2001.10.17   Roberto Artigas Jr
+#!  *   Added new PROP: items to reserved list
+#! 2001.07.27   Roberto Artigas Jr
+#!  *   Broke appart into smaller pieces
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2G)
+#TAB('D2G'),PROP(PROP:FontStyle,700)
+  #BOXED('MIT License'),AT(,,278),PROP(PROP:FontStyle,700)
+    #DISPLAY('')
+    #DISPLAY('Copyright © 1999 by Roberto Artigas y Soler.'),PROP(PROP:FontStyle,700)
+    #DISPLAY('')
+    #DISPLAY('Permission is hereby granted, free of charge, to any person ')
+    #DISPLAY('obtaining a copy of this software and associated documentation ')
+    #DISPLAY('files (the "Software"), to deal in the software without ')
+    #DISPLAY('restriction, including without limitation the rights to use, ')
+    #DISPLAY('copy, modify, merge, publish, distribute, sublicense, and/or sell ')
+    #DISPLAY('copies of the Software, and to permit persons to whom the Software ')
+    #DISPLAY('is furnished to do so, subject to the following conditions: ')
+    #DISPLAY('')
+    #DISPLAY('The above copyright notice and this permission notice shall be '),PROP(PROP:FontStyle,700)
+    #DISPLAY('included in all copies or substantial portions of the Software.'),PROP(PROP:FontStyle,700)
+    #DISPLAY('')
+    #DISPLAY('THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, ')
+    #DISPLAY('EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF ')
+    #DISPLAY('MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND ')
+    #DISPLAY('NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT ')
+    #DISPLAY('HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, ')
+    #DISPLAY('WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, ')
+    #DISPLAY('OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER ')
+    #DISPLAY('DEALINGS IN THE SOFTWARE.')
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!--------------------------------------------------------------------!
+#! 2001.01.18.THU - Roberto Artigas Jr          IMPORTANT PLEASE READ !
+#!--------------------------------------------------------------------!
+#! This group contains the code necessary to build a searchable list  !
+#! of SQL reserved words. This is used to make sure field, key, and   !
+#! table names are not in conflict with SQL reserved words.           !
+#!--------------------------------------------------------------------!
+#! NOTE: These SQL reserved words are in alphabetically order.        !
+#! And after spending numerous hours typing all these SQL reserved    !
+#! words into this template, they better remain in order.             !
+#!--------------------------------------------------------------------!
+#! NOTE: There are probably SQL VENDOR SPECIFIC reserved words that   !
+#! I do not know about. If you know of some, please let me know.      !
+#! That way I can keep this list of reserved words up to date.        !
+#!--------------------------------------------------------------------!
+#! ALSO: I am a realist. I can pretty much say with a great amount of !
+#! certainty, that once having seen this list, most individuals are   !
+#! not going to type in their own to achieve the same functionality.  !
+#! If you use this list at least have the courtesy of giving credit   !
+#! to Roberto Artigas Jr for having typed all of this in. Leave this  !
+#! documentation block intact and give credit where credit is due.    !
+#!--------------------------------------------------------------------!
+#GROUP(%SqlReservedWords)
+  #DECLARE(%SqlWordCount)
+  #DECLARE(%SqlWordItem)
+  #DECLARE(%SqlWordList),MULTI,UNIQUE
+  #ADD(%SqlWordList,'A')                                    #! 'A'
+  #ADD(%SqlWordList,'ABORT')                                #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'ABS')
+  #ADD(%SqlWordList,'ABSENT')                               #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'ABSOLUTE')
+  #ADD(%SqlWordList,'ABSTIME')
+  #ADD(%SqlWordList,'ACCEPT')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ACCESS')                               #! RAYS.2001.10.24
+  #ADD(%SqlWordList,'ACORDING')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'ACOS')
+  #ADD(%SqlWordList,'ACQUIRE')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ACTION')
+  #ADD(%SqlWordList,'ACTIVE')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'ADA')
+  #ADD(%SqlWordList,'ADD')
+  #ADD(%SqlWordList,'ADD_MONTHS')
+  #ADD(%SqlWordList,'ADMIN')
+  #ADD(%SqlWordList,'AFTER')
+  #ADD(%SqlWordList,'AGGREGATE')
+  #ADD(%SqlWordList,'ALIAS')
+  #ADD(%SqlWordList,'ALL')
+  #ADD(%SqlWordList,'ALLOCATE')
+  #ADD(%SqlWordList,'ALLOW')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ALTER')
+  #ADD(%SqlWordList,'ALWAYS')
+  #ADD(%SqlWordList,'ALLOCATE')
+  #ADD(%SqlWordList,'ANALYSE')                              #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'ANALYZE')                              #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'AND')
+  #ADD(%SqlWordList,'ANSI')
+  #ADD(%SqlWordList,'ANSI_NULLS')
+  #ADD(%SqlWordList,'ANY')
+  #ADD(%SqlWordList,'APPLICATION')                          #! RAYS.2001.10.24
+  #ADD(%SqlWordList,'ARE')
+  #ADD(%SqlWordList,'ARRAY')
+  #ADD(%SqlWordList,'ARRAYLEN')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ARCHIVE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ARCHIVELOG')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'AS')
+  #ADD(%SqlWordList,'ASC')
+  #ADD(%SqlWordList,'ASCENDING')                            #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'ASCII')
+  #ADD(%SqlWordList,'ASCII_CHAR')
+  #ADD(%SqlWordList,'ASCII_CODE')
+  #ADD(%SqlWordList,'ASENSITIVE')
+  #ADD(%SqlWordList,'ASIN')
+  #ADD(%SqlWordList,'ASSERT')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ASSERTION')
+  #ADD(%SqlWordList,'ASSIGN')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ASSIGNMENT')
+  #ADD(%SqlWordList,'ATAN')
+  #ADD(%SqlWordList,'ATAN2')
+  #ADD(%SqlWordList,'ATOMIC')                               #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'ASUTIME')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ASYMMETRIC')
+  #ADD(%SqlWordList,'ASYNC')
+  #ADD(%SqlWordList,'AT')
+  #ADD(%SqlWordList,'ATOMIC')
+  #ADD(%SqlWordList,'ATTRIBUTE')
+  #ADD(%SqlWordList,'AUDIT')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'AUTHID')
+  #ADD(%SqlWordList,'AUTHORIZATION')
+  #ADD(%SqlWordList,'AUTO')
+  #ADD(%SqlWordList,'AUTOCOMMIT')                           #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'AUTO_INCREMENT')
+  #ADD(%SqlWordList,'AUTODLL')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'AUTOSHRINK')
+  #ADD(%SqlWordList,'AUX')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'AUXILIARY')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'AVG')
+  #ADD(%SqlWordList,'AVG_ROW_LENGTH')
+  #ADD(%SqlWordList,'B')                                    #! 'B'
+  #ADD(%SqlWordList,'BACK')
+  #ADD(%SqlWordList,'BACKUP')                               #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'BACKWARD')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'BASED')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'BASENAME')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'BASE64')                               #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'BASE_NAME')                            #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'BASE_TABLE')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'BDB')                                  #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'BECOME')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'BEFORE')
+  #ADD(%SqlWordList,'BEGIN')
+  #ADD(%SqlWordList,'BERKLEYDB')                            #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'BETWEEN')
+  #ADD(%SqlWordList,'BFILE')
+  #ADD(%SqlWordList,'BIGINT')
+  #ADD(%SqlWordList,'BINARY')
+  #ADD(%SqlWordList,'BINARY_INTEGER')
+  #ADD(%SqlWordList,'BIT')
+  #ADD(%SqlWordList,'BIT_ADD')
+  #ADD(%SqlWordList,'BIT_AND')                              #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'BIT_LENGTH')
+  #ADD(%SqlWordList,'BIT_OR')                               #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'BIT_ORD')
+  #ADD(%SqlWordList,'BITVAR')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'BLOB')
+  #ADD(%SqlWordList,'BLOBEDIT')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'BLOCK')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'BODY')
+  #ADD(%SqlWordList,'BOOL')
+  #ADD(%SqlWordList,'BOOLEAN')
+  #ADD(%SqlWordList,'BOTH')
+  #ADD(%SqlWordList,'BOX')
+  #ADD(%SqlWordList,'BREADTH')
+  #ADD(%SqlWordList,'BREAK')                                #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'BROWSE')                               #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'BUFFER')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'BUFFERPOOL')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'BULK')
+  #ADD(%SqlWordList,'BULKCOPY')
+  #ADD(%SqlWordList,'BY')
+  #ADD(%SqlWordList,'C')                                    #! 'C'
+  #ADD(%SqlWordList,'CACHE')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CALL')
+  #ADD(%SqlWordList,'CALLED')
+  #ADD(%SqlWordList,'CANCEL')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'CAPTURE')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'CARDINALITY')
+  #ADD(%SqlWordList,'CASCADE')
+  #ADD(%SqlWordList,'CASCADED')
+  #ADD(%SqlWordList,'CASE')
+  #ADD(%SqlWordList,'CAST')
+  #ADD(%SqlWordList,'CATALOG')
+  #ADD(%SqlWordList,'CATALOGEXTRACT')                       #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'CATALOGLOAD')                          #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'CATALOG_NAME')
+  #ADD(%SqlWordList,'CCSID')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'CEIL')
+  #ADD(%SqlWordList,'CEILING')
+  #ADD(%SqlWordList,'CHAIN')
+  #ADD(%SqlWordList,'CHANGE')                               #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'CHAR')
+  #ADD(%SqlWordList,'CHAR_BASE')
+  #ADD(%SqlWordList,'CHAR_INDEX')
+  #ADD(%SqlWordList,'CHAR_LENGTH')
+  #ADD(%SqlWordList,'CHAR16')
+  #ADD(%SqlWordList,'CHAR2')
+  #ADD(%SqlWordList,'CHAR4')
+  #ADD(%SqlWordList,'CHAR8')
+  #ADD(%SqlWordList,'CHARACTER')
+  #ADD(%SqlWordList,'CHARACTER_LENGTH')
+  #ADD(%SqlWordList,'CHARACTER_SET_CATALOG')
+  #ADD(%SqlWordList,'CHARACTER_SET_NAME')
+  #ADD(%SqlWordList,'CHARACTER_SET_SCHEMA')
+  #ADD(%SqlWordList,'CHARACTERISTICS')
+  #ADD(%SqlWordList,'CHANGE')
+  #ADD(%SqlWordList,'CHECK')
+  #ADD(%SqlWordList,'CHECK_POINT_LEN')                      #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CHECK_POINT_LENGTH')                   #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CHECKED')
+  #ADD(%SqlWordList,'CHECKPOINT')                           #! RAYS.2002.11.12 / SQL2000
+  #ADD(%SqlWordList,'CHECKSUM')
+  #ADD(%SqlWordList,'CHOOSE')
+  #ADD(%SqlWordList,'CHR')
+  #ADD(%SqlWordList,'CIDR')
+  #ADD(%SqlWordList,'CIRCLE')
+  #ADD(%SqlWordList,'CLASS')
+  #ADD(%SqlWordList,'CLASS_ORIGIN')
+  #ADD(%SqlWordList,'CLOB')
+  #ADD(%SqlWordList,'CLOSE')
+  #ADD(%SqlWordList,'CLUSTER')
+  #ADD(%SqlWordList,'CLUSTERS')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'CLUSTERED')
+  #ADD(%SqlWordList,'COALESCE')
+  #ADD(%SqlWordList,'COBOL')
+  #ADD(%SqlWordList,'CODESET')                              #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'CODETYPE')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'COLAUTH')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'COLLATE')
+  #ADD(%SqlWordList,'COLLATION')
+  #ADD(%SqlWordList,'COLLATION_CATALOG')
+  #ADD(%SqlWordList,'COLLATION_NAME')
+  #ADD(%SqlWordList,'COLLATION_SCHEMA')
+  #ADD(%SqlWordList,'COLLECT')
+  #ADD(%SqlWordList,'COLLECTION')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'COLLID')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'COLUMN')
+  #ADD(%SqlWordList,'COLUMN_NAME')
+  #ADD(%SqlWordList,'COLUMNS')
+  #ADD(%SqlWordList,'COMMAND_FUNCTION')
+  #ADD(%SqlWordList,'COMMAND_FUNCTION_CODE')
+  #ADD(%SqlWordList,'COMMENT')
+  #ADD(%SqlWordList,'COMMIT')
+  #ADD(%SqlWordList,'COMMITTED')
+  #ADD(%SqlWordList,'COMPILE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'COMPILETIME')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'COMPLETION')
+  #ADD(%SqlWordList,'COMPRESS')
+  #ADD(%SqlWordList,'COMPUTE')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'COMPUTED')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CONCAT')
+  #ADD(%SqlWordList,'CONCURRENT')                           #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'CONDITION_NUMBER')
+  #ADD(%SqlWordList,'CONDITIONAL')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CONNECT')
+  #ADD(%SqlWordList,'CONNECTION')
+  #ADD(%SqlWordList,'CONNECTION_NAME')
+  #ADD(%SqlWordList,'CONSTANT')
+  #ADD(%SqlWordList,'CONSTRAINT')
+  #ADD(%SqlWordList,'CONSTRAINT_CATALOG')
+  #ADD(%SqlWordList,'CONSTRAINT_NAME')
+  #ADD(%SqlWordList,'CONSTRAINT_SCHEMA')
+  #ADD(%SqlWordList,'CONSTRAINTS')
+  #ADD(%SqlWordList,'CONSTRUCTOR')
+  #ADD(%SqlWordList,'CONTAINING')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CONTAINS')
+  #ADD(%SqlWordList,'CONTAINSTABLE')                        #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'CONTENT')                              #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'CONTENTS')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'CONTINUE')
+  #ADD(%SqlWordList,'CONTROLFILE')                          #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'CONVERSION')                           #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'CONVERT')
+  #ADD(%SqlWordList,'CORR')
+  #ADD(%SqlWordList,'COPY')                                 #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'CORRESPONDING')
+  #ADD(%SqlWordList,'COS')
+  #ADD(%SqlWordList,'COSH')
+  #ADD(%SqlWordList,'COT')
+  #ADD(%SqlWordList,'COUNT')
+  #ADD(%SqlWordList,'COUNT_BIG')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'COVAR_POP')
+  #ADD(%SqlWordList,'COVAR_SAMP')
+  #ADD(%SqlWordList,'CRASH')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'CREATE')
+  #ADD(%SqlWordList,'CREATEDB')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'CREATETAB')                            #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'CREATEUSER')                           #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'CROSS')
+  #ADD(%SqlWordList,'CS')                                   #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'CSTRING')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'CUBE')
+  #ADD(%SqlWordList,'CUME_DIST')
+  #ADD(%SqlWordList,'CURDATE')
+  #ADD(%SqlWordList,'CURRENT')
+  #ADD(%SqlWordList,'CURRENT_DATE')
+  #ADD(%SqlWordList,'CURRENT_DEFAULT_TRANSFORM_GROUP')
+  #ADD(%SqlWordList,'CURRENT_LC_PATH')                      #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'CURRENT_PATH')
+  #ADD(%SqlWordList,'CURRENT_ROLE')
+  #ADD(%SqlWordList,'CURRENT_SERVER')                       #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'CURRENT_TIME')
+  #ADD(%SqlWordList,'CURRENT_TIMESTAMP')
+  #ADD(%SqlWordList,'CURRENT_TIMEZONE')                     #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'CURRENT_TRANSFORM_GROUP_FOR_TYPE')
+  #ADD(%SqlWordList,'CURRENT_USER')
+  #ADD(%SqlWordList,'CURRVAL')
+  #ADD(%SqlWordList,'CURTIME')
+  #ADD(%SqlWordList,'CURSOR')
+  #ADD(%SqlWordList,'CURSOR_NAME')
+  #ADD(%SqlWordList,'CYCLE')
+  #ADD(%SqlWordList,'D')                                    #! 'D'
+  #ADD(%SqlWordList,'DATA')
+  #ADD(%SqlWordList,'DATA_BASE')                            #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DATABASE')
+  #ADD(%SqlWordList,'DATABASES')
+  #ADD(%SqlWordList,'DATAEXTRACT')                          #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DATAFILE')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DATALOAD')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DATAUPDATE')                           #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DATE')
+  #ADD(%SqlWordList,'DATE_FORMAT')
+  #ADD(%SqlWordList,'DATEADD')
+  #ADD(%SqlWordList,'DATEDIFF')
+  #ADD(%SqlWordList,'DATENAME')
+  #ADD(%SqlWordList,'DATEPART')
+  #ADD(%SqlWordList,'DATETIME')
+  #ADD(%SqlWordList,'DATETIME_INTERVAL_CODE')
+  #ADD(%SqlWordList,'DATETIME_INTERVAL_PRECISION')
+  #ADD(%SqlWordList,'DAY')
+  #ADD(%SqlWordList,'DAY_HOUR')
+  #ADD(%SqlWordList,'DAY_MINUTE')
+  #ADD(%SqlWordList,'DAY_SECOND')
+  #ADD(%SqlWordList,'DAYNAME')
+  #ADD(%SqlWordList,'DAYOFMONTH')
+  #ADD(%SqlWordList,'DAYOFWEEK')
+  #ADD(%SqlWordList,'DAYOFYEAR')
+  #ADD(%SqlWordList,'DAYS')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DB')                                   #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DB2')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DB2GENERAL')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DB2SQL')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DBA')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DBCC')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'DBEXTRACT')                            #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DBINFO')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DBLOAD')                               #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'DBO')
+  #ADD(%SqlWordList,'DBSPACE')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DB_KEY')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'DEALLOCATE')
+  #ADD(%SqlWordList,'DEBUG')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'DEBUFOFF')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DEBUFON')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DEC')
+  #ADD(%SqlWordList,'DECIMAL')
+  #ADD(%SqlWordList,'DECLARE')
+  #ADD(%SqlWordList,'DEFAULT')
+  #ADD(%SqlWordList,'DEFERRABLE')
+  #ADD(%SqlWordList,'DEFERRED')
+  #ADD(%SqlWordList,'DEFINED')
+  #ADD(%SqlWordList,'DEFINER')
+  #ADD(%SqlWordList,'DEFINITION')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DEGREE')
+  #ADD(%SqlWordList,'DELAY')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DELAYED')
+  #ADD(%SqlWordList,'DELAY_KEY_WRITE')
+  #ADD(%SqlWordList,'DELETE')
+  #ADD(%SqlWordList,'DELIMITER')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'DELIMITERS')                           #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'DELTA')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DENSE_RANK')
+  #ADD(%SqlWordList,'DENY')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'DEPTH')
+  #ADD(%SqlWordList,'DEREF')
+  #ADD(%SqlWordList,'DERIVED')
+  #ADD(%SqlWordList,'DESC')
+  #ADD(%SqlWordList,'DESCENDING')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'DESCRIBE')
+  #ADD(%SqlWordList,'DESCRIPTOR')
+  #ADD(%SqlWordList,'DESTROY')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'DESTROYED')
+  #ADD(%SqlWordList,'DESTRUCTOR')
+  #ADD(%SqlWordList,'DETECTION')
+  #ADD(%SqlWordList,'DETERMINISTIC')
+  #ADD(%SqlWordList,'DIAGNOSTICS')
+  #ADD(%SqlWordList,'DIALECT')
+  #ADD(%SqlWordList,'DICTIONARY')
+  #ADD(%SqlWordList,'DIGITS')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DISABLE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DISALLOW')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DISCONNECT')
+  #ADD(%SqlWordList,'DISK')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DISMOUNT')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DISPATCH')
+  #ADD(%SqlWordList,'DISPLAY')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'DISPOSE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'DISTINCT')
+  #ADD(%SqlWordList,'DISTINCTROW')
+  #ADD(%SqlWordList,'DISTRIBUTED')                          #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'DO')
+  #ADD(%SqlWordList,'DOCUMENT')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'DOMAIN')
+  #ADD(%SqlWordList,'DOUBLE')
+  #ADD(%SqlWordList,'DROP')
+  #ADD(%SqlWordList,'DSSIZE')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'DUMMY')                                #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'DUMP')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'DUMPFILE')                             #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'DYNAMIC')
+  #ADD(%SqlWordList,'DYNAMIC_FUNCTION')
+  #ADD(%SqlWordList,'DYNAMIC_FUNCTION_CODE')
+  #ADD(%SqlWordList,'E')                                    #! 'E'
+  #ADD(%SqlWordList,'EACH')
+  #ADD(%SqlWordList,'EBCDIC')                               #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'ECHO')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'EDIT')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'EDITPROC')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ELEMENT')                              #! RAYS.2002.03.08
+  #ADD(%SqlWordList,'ELSE')
+  #ADD(%SqlWordList,'ELSEIF')
+  #ADD(%SqlWordList,'ELSIF')
+  #ADD(%SqlWordList,'ELT')
+  #ADD(%SqlWordList,'ENABLE')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ENCLOSED')                             #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'ENCODING')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'ENCRYPT')
+  #ADD(%SqlWordList,'ENCRYPTED')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'END')
+  #ADD(%SqlWordList,'END-EXEC')
+  #ADD(%SqlWordList,'EQUALS')
+  #ADD(%SqlWordList,'ERASE')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ERRLVL')                               #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'ESCAPE')
+  #ADD(%SqlWordList,'ESCAPED')
+  #ADD(%SqlWordList,'EMPTY   ')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'ENCLOSED')
+  #ADD(%SqlWordList,'ENCODING')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'ENTRY')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ENTRY_POINT')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'ENUM')
+  #ADD(%SqlWordList,'EUR')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'EVENT')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'EVENTS')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'EVERY')
+  #ADD(%SqlWordList,'EX')                                   #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'EXCEPT')
+  #ADD(%SqlWordList,'EXCEPTION')
+  #ADD(%SqlWordList,'EXCEPTION_INIT')                       #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'EXCEPTIONS')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'EXCLUDE')
+  #ADD(%SqlWordList,'EXCLUSIVE')
+  #ADD(%SqlWordList,'EXEC')
+  #ADD(%SqlWordList,'EXECUTE')
+  #ADD(%SqlWordList,'EXISTING')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'EXISTS')
+  #ADD(%SqlWordList,'EXIT')
+  #ADD(%SqlWordList,'EXP')
+  #ADD(%SqlWordList,'EXPLAIN')
+  #ADD(%SqlWordList,'EXTENDS')
+  #ADD(%SqlWordList,'EXTENT')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'EXTERN')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'EXTERNAL')
+  #ADD(%SqlWordList,'EXTERNALLY')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'EXTRACT')
+  #ADD(%SqlWordList,'F')                                    #! 'F'
+  #ADD(%SqlWordList,'FALSE')
+  #ADD(%SqlWordList,'FASTLOAD')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'FETCH')
+  #ADD(%SqlWordList,'FENCED')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'FIELDPROC')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'FIELDS')
+  #ADD(%SqlWordList,'FILE')
+  #ADD(%SqlWordList,'FILEGROWTH')
+  #ADD(%SqlWordList,'FILENAME')
+  #ADD(%SqlWordList,'FILLFACTOR')
+  #ADD(%SqlWordList,'FILTER')
+  #ADD(%SqlWordList,'FINAL')
+  #ADD(%SqlWordList,'FIND')
+  #ADD(%SqlWordList,'FIRST')
+  #ADD(%SqlWordList,'FIXED')                                #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'FLOAT')
+  #ADD(%SqlWordList,'FLOAT4')
+  #ADD(%SqlWordList,'FLOAT8')
+  #ADD(%SqlWordList,'FLOOR')
+  #ADD(%SqlWordList,'FLUSH')
+  #ADD(%SqlWordList,'FOLLOWING')
+  #ADD(%SqlWordList,'FOR')
+  #ADD(%SqlWordList,'FORALL')
+  #ADD(%SqlWordList,'FORCE')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'FOREIGN')
+  #ADD(%SqlWordList,'FORM')                                 #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'FORMAT')
+  #ADD(%SqlWordList,'FORMATED')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'FORTRAN')
+  #ADD(%SqlWordList,'FORWARD')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'FOUND')
+  #ADD(%SqlWordList,'FREE')
+  #ADD(%SqlWordList,'FREE_IT')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'FREELIST')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'FREELISTS')                            #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'FREETEXT')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'FREETEXTTABLE')                        #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'FREEZE')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'FROM')
+  #ADD(%SqlWordList,'FROM_DAYS')
+  #ADD(%SqlWordList,'FROM_UNIXTIME')
+  #ADD(%SqlWordList,'FULL')
+  #ADD(%SqlWordList,'FULLTEXT')                             #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'FUNCTION')
+  #ADD(%SqlWordList,'G')                                    #! 'G'
+  #ADD(%SqlWordList,'GDSCODE')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'GEMINI')
+  #ADD(%SqlWordList,'GENERAL')
+  #ADD(%SqlWordList,'GENERATED')
+  #ADD(%SqlWordList,'GENERATOR')                            #! RAYS.2001.10.21
+  #ADD(%SqlWordList,'GENERIC')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'GENE_ID')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'GET')
+  #ADD(%SqlWordList,'GETDATE')
+  #ADD(%SqlWordList,'GLOBAL')
+  #ADD(%SqlWordList,'GO')
+  #ADD(%SqlWordList,'GOTO')
+  #ADD(%SqlWordList,'GRANT')
+  #ADD(%SqlWordList,'GRANTED')
+  #ADD(%SqlWordList,'GRANTS')
+  #ADD(%SqlWordList,'GRAPHIC')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'GREATEST')
+  #ADD(%SqlWordList,'GROUP')
+  #ADD(%SqlWordList,'GROUPS')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'GROUP_COMMIT_WAIT')                    #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'GROUP_COMMIT_WAIT_TIME')               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'GROUPING')
+  #ADD(%SqlWordList,'H')                                    #! 'H'
+  #ADD(%SqlWordList,'HANDLER')                              #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'HAVING')
+  #ADD(%SqlWordList,'HEAP')
+  #ADD(%SqlWordList,'HELP')
+  #ADD(%SqlWordList,'HEX')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'HIERARCHY')
+  #ADD(%SqlWordList,'HIGH_PRIORITY')
+  #ADD(%SqlWordList,'HILO')                                 #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'HOLD')
+  #ADD(%SqlWordList,'HOLDLOCK')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'HOST')
+  #ADD(%SqlWordList,'HOSTS')
+  #ADD(%SqlWordList,'HOUR')
+  #ADD(%SqlWordList,'HOUR_MINUTE')
+  #ADD(%SqlWordList,'HOUR_SECOND')
+  #ADD(%SqlWordList,'HOURS')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'I')                                    #! 'I'
+  #ADD(%SqlWordList,'ID')
+  #ADD(%SqlWordList,'IDENTIFIED')
+  #ADD(%SqlWordList,'IDENTITY_INSERT')                      #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'IDENTITY')
+  #ADD(%SqlWordList,'IDENTITYCOL')                          #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'IF')
+  #ADD(%SqlWordList,'IFNULL')
+  #ADD(%SqlWordList,'IGNORE')
+  #ADD(%SqlWordList,'ILIKE')                                #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'IMAGE')
+  #ADD(%SqlWordList,'IMMEDIATE')
+  #ADD(%SqlWordList,'IMMUTABLE')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'IMPLEMENTATION')
+  #ADD(%SqlWordList,'IMPLICIT')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'IN')
+  #ADD(%SqlWordList,'INACTIVE')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'INCLUDING')                            #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'INCREMENT')
+  #ADD(%SqlWordList,'INDEX')
+  #ADD(%SqlWordList,'INDEXES')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'INDICATOR')
+  #ADD(%SqlWordList,'INET')
+  #ADD(%SqlWordList,'INFILE')
+  #ADD(%SqlWordList,'INFIX')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'INHERITS')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'INIT')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'INITCAP')
+  #ADD(%SqlWordList,'INITIAL')                              #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'INITIALIZE')
+  #ADD(%SqlWordList,'INITIALLY')
+  #ADD(%SqlWordList,'INITRANS')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'INNER')
+  #ADD(%SqlWordList,'INNODB')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'INOUT')
+  #ADD(%SqlWordList,'INPUT')
+  #ADD(%SqlWordList,'INPUT_TYPE')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'INSENSITIVE')
+  #ADD(%SqlWordList,'INSERT')
+  #ADD(%SqlWordList,'INSERT_ID')
+  #ADD(%SqlWordList,'INSTALLATION')                         #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'INSTANCE')
+  #ADD(%SqlWordList,'INSTANTIABLE')
+  #ADD(%SqlWordList,'INSTEAD')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'INSTR')
+  #ADD(%SqlWordList,'INSTRB')
+  #ADD(%SqlWordList,'INT')
+  #ADD(%SqlWordList,'INT1')
+  #ADD(%SqlWordList,'INT2')
+  #ADD(%SqlWordList,'INT3')
+  #ADD(%SqlWordList,'INT4')
+  #ADD(%SqlWordList,'INT8')
+  #ADD(%SqlWordList,'INTEGER')
+  #ADD(%SqlWordList,'INTEGRITY')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'INTERFACE')
+  #ADD(%SqlWordList,'INTERNAL')                             #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'INTERSECT')
+  #ADD(%SqlWordList,'INTERVAL')
+  #ADD(%SqlWordList,'INTO')
+  #ADD(%SqlWordList,'INVOKER')
+  #ADD(%SqlWordList,'IS')
+  #ADD(%SqlWordList,'ISAM')
+  #ADD(%SqlWordList,'ISFOREIGNKEY')
+  #ADD(%SqlWordList,'ISNULL')                               #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'ISO')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'ISOBID')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'ISOLATION')
+  #ADD(%SqlWordList,'ISQL')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'ISRULE')
+  #ADD(%SqlWordList,'ISTRIGGER')
+  #ADD(%SqlWordList,'ISUSERTABLE')
+  #ADD(%SqlWordList,'ISVIEW')
+  #ADD(%SqlWordList,'ITERATE')
+  #ADD(%SqlWordList,'J')                                    #! 'J'
+  #ADD(%SqlWordList,'JAVA')
+  #ADD(%SqlWordList,'JIS')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'JOIN')
+  #ADD(%SqlWordList,'K')                                    #! 'K'
+  #ADD(%SqlWordList,'KEY')
+  #ADD(%SqlWordList,'KEY_MEMBER')
+  #ADD(%SqlWordList,'KEY_TYPE')
+  #ADD(%SqlWordList,'KEYS')
+  #ADD(%SqlWordList,'KILL')
+  #ADD(%SqlWordList,'L')                                    #! 'L'
+  #ADD(%SqlWordList,'LABEL')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LANCOMPILER')                          #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'LANGUAGE')
+  #ADD(%SqlWordList,'LARGE')
+  #ADD(%SqlWordList,'LAST')
+  #ADD(%SqlWordList,'LAST_DAY')
+  #ADD(%SqlWordList,'LAST_INSERT_ID')
+  #ADD(%SqlWordList,'LATERAL')
+  #ADD(%SqlWordList,'LAYER')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'LCASE')
+  #ADD(%SqlWordList,'LC_CTYPE')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LC_MESSAGES')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LC_TYPE')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LEADING')
+  #ADD(%SqlWordList,'LEAVE')
+  #ADD(%SqlWordList,'LEFT')
+  #ADD(%SqlWordList,'LENGTH')
+  #ADD(%SqlWordList,'LENGTHB')
+  #ADD(%SqlWordList,'LESS')
+  #ADD(%SqlWordList,'LEV')                                  #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LEVEL')
+  #ADD(%SqlWordList,'LIKE')
+  #ADD(%SqlWordList,'LIMIT')
+  #ADD(%SqlWordList,'LIMITED')
+  #ADD(%SqlWordList,'LINENO')                               #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'LINES')
+  #ADD(%SqlWordList,'LINK')                                 #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'LINKTYPE')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LISTEN')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'LISTS')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'LN')
+  #ADD(%SqlWordList,'LOAD')
+  #ADD(%SqlWordList,'LOCAL')
+  #ADD(%SqlWordList,'LOCALTIME')
+  #ADD(%SqlWordList,'LOCALTIMESTAMP')
+  #ADD(%SqlWordList,'LOCATE')
+  #ADD(%SqlWordList,'LOCATION')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'LOCATOR')
+  #ADD(%SqlWordList,'LOCATORS')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LOCK')
+  #ADD(%SqlWordList,'LOCKSIZE')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LOG')
+  #ADD(%SqlWordList,'LOG10')
+  #ADD(%SqlWordList,'LOGIN')                                #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'LOGFILE')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LOG_BUFFER_SIZE')                      #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LOG_BUF_SIZE')                         #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LOGS')
+  #ADD(%SqlWordList,'LOHI')                                 #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'LONG')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LONGBLOB')
+  #ADD(%SqlWordList,'LONGFILE')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'LONGTEXT')
+  #ADD(%SqlWordList,'LOOP')
+  #ADD(%SqlWordList,'LOWER')
+  #ADD(%SqlWordList,'LOW_PRIORITY')
+  #ADD(%SqlWordList,'LPAD')
+  #ADD(%SqlWordList,'LSEG')
+  #ADD(%SqlWordList,'LTRIM')
+  #ADD(%SqlWordList,'M')                                    #! 'M'
+  #ADD(%SqlWordList,'MACADDR')
+  #ADD(%SqlWordList,'MANAGE')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MANUAL')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MAP')
+  #ADD(%SqlWordList,'MATCH')
+  #ADD(%SqlWordList,'MATCHES')
+  #ADD(%SqlWordList,'MASTER_LOG_SEQ')                       #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'MASTER_SERVER_ID')                     #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'MAX')
+  #ADD(%SqlWordList,'MAX_ROWS')
+  #ADD(%SqlWordList,'MAX_SEGMENT')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MAXDATAFILES')                         #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXEXTENTS')                           #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'MAXIMUM')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MAXIMUM_SEGMENT')                      #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MAXINSTANCES')                         #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXLOGFILES')                          #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXLOGHISTORY')                        #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXLOGMEMBERS')                        #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXTRANS')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MAXVALUE')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MD5')
+  #ADD(%SqlWordList,'MDY')
+  #ADD(%SqlWordList,'MEDIUMBLOB')
+  #ADD(%SqlWordList,'MEDIUMINT')
+  #ADD(%SqlWordList,'MEDIUMTEXT')
+  #ADD(%SqlWordList,'MEMBER')                               #! RAYS.2002.03.08
+  #ADD(%SqlWordList,'MERGE')
+  #ADD(%SqlWordList,'METHOD')
+  #ADD(%SqlWordList,'MESSAGE')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MESSAGE_LENGTH')
+  #ADD(%SqlWordList,'MESSAGE_OCTET_LENGTH')
+  #ADD(%SqlWordList,'MESSAGE_TEXT')
+  #ADD(%SqlWordList,'METHOD')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'MICROSECOND')                          #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'MICROSECONDS')                         #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'MIDDLEINT')
+  #ADD(%SqlWordList,'MIN')
+  #ADD(%SqlWordList,'MIN_ROWS')
+  #ADD(%SqlWordList,'MINEXTENTS')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MINIMUM')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MINUS')
+  #ADD(%SqlWordList,'MINUTE')
+  #ADD(%SqlWordList,'MINUTE_SECOND')
+  #ADD(%SqlWordList,'MINUTES')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'MINVALUE')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MLSLABEL')
+  #ADD(%SqlWordList,'MOD')
+  #ADD(%SqlWordList,'MODE')
+  #ADD(%SqlWordList,'MODFILES')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'MODIFIABLE')                           #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'MODIFIES')
+  #ADD(%SqlWordList,'MODIFY')
+  #ADD(%SqlWordList,'MODULE')
+  #ADD(%SqlWordList,'MODULE_NAME')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'MONEY')
+  #ADD(%SqlWordList,'MONTH')
+  #ADD(%SqlWordList,'MONTHNAME')
+  #ADD(%SqlWordList,'MONTHS')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'MONTHS_BETWEEN')
+  #ADD(%SqlWordList,'MORE')
+  #ADD(%SqlWordList,'MOUNT')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'MOVE')                                 #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'MRG_MYISAM')                           #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'MYISAM')
+  #ADD(%SqlWordList,'MULTISET')                             #! RAYS.2002.03.08
+  #ADD(%SqlWordList,'MUMPS')
+  #ADD(%SqlWordList,'N')                                    #! 'N'
+  #ADD(%SqlWordList,'NAME')
+  #ADD(%SqlWordList,'NAMED')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'NAMES')
+  #ADD(%SqlWordList,'NAMESPACE')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'NATIONAL')
+  #ADD(%SqlWordList,'NATURAL')
+  #ADD(%SqlWordList,'NATURALN')
+  #ADD(%SqlWordList,'NCHAR')
+  #ADD(%SqlWordList,'NCHARACTER')
+  #ADD(%SqlWordList,'NCLOB')
+  #ADD(%SqlWordList,'NESTING')
+  #ADD(%SqlWordList,'NEW')
+  #ADD(%SqlWordList,'NEXT')
+  #ADD(%SqlWordList,'NEXTVAL')
+  #ADD(%SqlWordList,'NHEADER')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'NIL')                                  #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'NO')
+  #ADD(%SqlWordList,'NOARCHIVELOG')                         #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOAUDIT')                              #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'NOAUTO')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'NOCACHE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOCHECK')
+  #ADD(%SqlWordList,'NOCOMPRESS')                           #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'NOCOPY')
+  #ADD(%SqlWordList,'NOCREATEDB')                           #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'NOCREATEUSER')                         #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'NOCYCLE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NODENAME')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'NODENUMBER')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'NOMAXVALUE')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOMINVALUE')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NONCLUSTERED')
+  #ADD(%SqlWordList,'NONE')
+  #ADD(%SqlWordList,'NOORDER')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NORESETLOGS')                          #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NORMAL')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOSORT')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOT')
+  #ADD(%SqlWordList,'NOTFOUND')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NOTHING')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'NOTIFY')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'NOTNULL')                              #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'NOW')
+  #ADD(%SqlWordList,'NOWAIT')
+  #ADD(%SqlWordList,'NULL')
+  #ADD(%SqlWordList,'NULLABLE')
+  #ADD(%SqlWordList,'NULLIF')
+  #ADD(%SqlWordList,'NULLS')
+  #ADD(%SqlWordList,'NUMBER')
+  #ADD(%SqlWordList,'NUMBER_BASE')
+  #ADD(%SqlWordList,'NUMERIC')
+  #ADD(%SqlWordList,'NUMPARTS')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'NUM_LOG_BUFS')                         #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'NUM_LOG_BUFFERS')                      #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'NVARCHAR')
+  #ADD(%SqlWordList,'NVARCHAR2')
+  #ADD(%SqlWordList,'O')                                    #! 'O'
+  #ADD(%SqlWordList,'OBID')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'OBJECT')
+  #ADD(%SqlWordList,'OBJECT_ID')
+  #ADD(%SqlWordList,'OBJECTPROPERTY')
+  #ADD(%SqlWordList,'OCIROWID')
+  #ADD(%SqlWordList,'OCTET_LENGTH')
+  #ADD(%SqlWordList,'ODBC')
+  #ADD(%SqlWordList,'OF')
+  #ADD(%SqlWordList,'OFF')
+  #ADD(%SqlWordList,'OFFLINE')                              #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'OFFSET')                               #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'OFFSETS')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'OID')
+  #ADD(%SqlWordList,'OIDS')                                 #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'OLD')
+  #ADD(%SqlWordList,'ON')
+  #ADD(%SqlWordList,'ONLINE')                               #! RAYS.2002.11.13 / Oracle9i
+  #ADD(%SqlWordList,'ONLY')
+  #ADD(%SqlWordList,'OPAQUE')
+  #ADD(%SqlWordList,'OPEN')
+  #ADD(%SqlWordList,'OPENDATASOURCE')                       #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'OPENQUERY')                            #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'OPENROWSET')                           #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'OPENXML')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'OPERATION')
+  #ADD(%SqlWordList,'OPERATOR')
+  #ADD(%SqlWordList,'OPERATORS')
+  #ADD(%SqlWordList,'OPTIMAL')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'OPTIMIZATION')                         #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'OPTIMIZE')
+  #ADD(%SqlWordList,'OPTION')
+  #ADD(%SqlWordList,'OPTIONS')
+  #ADD(%SqlWordList,'OPTIONALLY')
+  #ADD(%SqlWordList,'OR')
+  #ADD(%SqlWordList,'ORACLE')                               #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'ORDER')
+  #ADD(%SqlWordList,'ORDERING')
+  #ADD(%SqlWordList,'ORDINALITY')
+  #ADD(%SqlWordList,'ORGANIZATION')
+  #ADD(%SqlWordList,'OTHERS')
+  #ADD(%SqlWordList,'OTHERWISE')                            #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'OUT')
+  #ADD(%SqlWordList,'OUTER')
+  #ADD(%SqlWordList,'OUTFIELDS')                            #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'OUTFILE')
+  #ADD(%SqlWordList,'OUTPUT')
+  #ADD(%SqlWordList,'OUTPUT_TYPE')                          #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'OVER')
+  #ADD(%SqlWordList,'OVERFLOW')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'OVERLAPS')
+  #ADD(%SqlWordList,'OVERLAY')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'OVERLAYS')
+  #ADD(%SqlWordList,'OVERRIDING')
+  #ADD(%SqlWordList,'OWN')                                  #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'OWNER')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'P')                                    #! 'P'
+  #ADD(%SqlWordList,'PACK_KEYS')
+  #ADD(%SqlWordList,'PACKAGE')
+  #ADD(%SqlWordList,'PAD')
+  #ADD(%SqlWordList,'PAGE')
+  #ADD(%SqlWordList,'PAGELENGTH')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'PAGES')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'PAGE_SIZE')                            #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'OVERRIDING')
+  #ADD(%SqlWordList,'PARALLEL')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'PARAMETER')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'PARAMETER_MODE')
+  #ADD(%SqlWordList,'PARAMETER_NAME')
+  #ADD(%SqlWordList,'PARAMETER_ORDINAL_POSITION')
+  #ADD(%SqlWordList,'PARAMETER_SPECIFIC_CATALOG')
+  #ADD(%SqlWordList,'PARAMETER_SPECIFIC_NAME')
+  #ADD(%SqlWordList,'PARAMETER_SPECIFIC_SCHEMA')
+  #ADD(%SqlWordList,'PARAMETERS')
+  #ADD(%SqlWordList,'PART')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PARTIAL')
+  #ADD(%SqlWordList,'PARTITION')
+  #ADD(%SqlWordList,'PASCAL')
+  #ADD(%SqlWordList,'PASSING')                              #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'PASSWORD')
+  #ADD(%SqlWordList,'PASTE')
+  #ADD(%SqlWordList,'PATH')                                 #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'PATINDEX')
+  #ADD(%SqlWordList,'PCTFREE')
+  #ADD(%SqlWordList,'PCTINCREASE')                          #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'PCTUSED')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'PENDANT')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'PERCENT')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'PERCENTILE_CONT')
+  #ADD(%SqlWordList,'PERCENTILE_DISC')
+  #ADD(%SqlWordList,'PERCENT_RANK')
+  #ADD(%SqlWordList,'PERIOD_ADD')
+  #ADD(%SqlWordList,'PERIOD_DIFF')
+  #ADD(%SqlWordList,'PI')
+  #ADD(%SqlWordList,'PIECESIZE')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PLACING')
+  #ADD(%SqlWordList,'PLAN')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'PLI')
+  #ADD(%SqlWordList,'PLS_INTEGER')
+  #ADD(%SqlWordList,'POINT')
+  #ADD(%SqlWordList,'POLYGON')
+  #ADD(%SqlWordList,'POS')                                  #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'POSITION')
+  #ADD(%SqlWordList,'POSITIVE')
+  #ADD(%SqlWordList,'POSITIVEN')
+  #ADD(%SqlWordList,'POSTFIX')
+  #ADD(%SqlWordList,'POST_EVENT')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'POW')
+  #ADD(%SqlWordList,'POWER')
+  #ADD(%SqlWordList,'PRAGMA')
+  #ADD(%SqlWordList,'PRECEDING')
+  #ADD(%SqlWordList,'PRECISION')
+  #ADD(%SqlWordList,'PREFIX')
+  #ADD(%SqlWordList,'PREORDER')
+  #ADD(%SqlWordList,'PREPARE')
+  #ADD(%SqlWordList,'PRESERVE')
+  #ADD(%SqlWordList,'PRIMARY')
+  #ADD(%SqlWordList,'PRINT')                                #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'PRIOR')
+  #ADD(%SqlWordList,'PRIQTY')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PRIVATE')
+  #ADD(%SqlWordList,'PRIVILEGES')
+  #ADD(%SqlWordList,'PROC')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'PROCEDURAL')                           #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'PROCEDURE')
+  #ADD(%SqlWordList,'PROCESS')
+  #ADD(%SqlWordList,'PROCESSLIST')
+  #ADD(%SqlWordList,'PROFILE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'PROGRAM')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PROTECTED')
+  #ADD(%SqlWordList,'PSID')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PUBLIC')
+  #ADD(%SqlWordList,'PURGE')                                #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'Q')                                    #! 'Q'
+  #ADD(%SqlWordList,'QUARTER')
+  #ADD(%SqlWordList,'QUIT')                                 #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'QUOTA')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'QUOTED')
+  #ADD(%SqlWordList,'QUOTED_IDENTIFIER')
+  #ADD(%SqlWordList,'QUERYNO')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'R')                                    #! 'R'
+  #ADD(%SqlWordList,'RADIANS')
+  #ADD(%SqlWordList,'RAID0')                                #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'RAID_CHUNKS')                          #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'RAID_CHUNKSIZE')                       #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'RAID_TYPE')                            #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'RAISE')
+  #ADD(%SqlWordList,'RAISERROR')
+  #ADD(%SqlWordList,'RAND')
+  #ADD(%SqlWordList,'RANGE')
+  #ADD(%SqlWordList,'RANK')
+  #ADD(%SqlWordList,'RAW')
+  #ADD(%SqlWordList,'RAW_PARTITIONS')                       #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RDB$DB_KEY')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'READ')
+  #ADD(%SqlWordList,'READS')
+  #ADD(%SqlWordList,'READTEXT')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'REAL')
+  #ADD(%SqlWordList,'RECHECK')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'RECONFIGURE')                          #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'RECORD')
+  #ADD(%SqlWordList,'RECORD_VERSION')                       #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RECOVER')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'RECOVERY')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RECURSIVE')
+  #ADD(%SqlWordList,'REF')
+  #ADD(%SqlWordList,'REFERENCE')                            #! RAYS.2018.09.14: SQLANYWHERE
+  #ADD(%SqlWordList,'REFERENCES')
+  #ADD(%SqlWordList,'REFERENCING')
+  #ADD(%SqlWordList,'REGEXP')
+  #ADD(%SqlWordList,'REGR_AVGX')
+  #ADD(%SqlWordList,'REGR_AVGY')
+  #ADD(%SqlWordList,'REGR_COUNT')
+  #ADD(%SqlWordList,'REGR_INTERCEPT')
+  #ADD(%SqlWordList,'REGR_R2')
+  #ADD(%SqlWordList,'REGR_SLOPE')
+  #ADD(%SqlWordList,'REGR_SXX')
+  #ADD(%SqlWordList,'REGR_SXY')
+  #ADD(%SqlWordList,'REGR_SYY')
+  #ADD(%SqlWordList,'REINDEX')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'REJECT')                               #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'RELATE')
+  #ADD(%SqlWordList,'RELATIVE')
+  #ADD(%SqlWordList,'RELEASE')
+  #ADD(%SqlWordList,'RELOAD')
+  #ADD(%SqlWordList,'RELOAD')
+  #ADD(%SqlWordList,'RELTIME')
+  #ADD(%SqlWordList,'REMR')                                 #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'RENAME')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'REPEAT')
+  #ADD(%SqlWordList,'REPEATABLE')
+  #ADD(%SqlWordList,'REPLACE')
+  #ADD(%SqlWordList,'REPLICATE')
+  #ADD(%SqlWordList,'REPLICATION')                          #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'REQUIRE')                              #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'RESERV')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RESERVING')                            #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RESET')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RESETLOGS')                            #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'RESIGNAL')
+  #ADD(%SqlWordList,'RESOURCE')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RESTORE')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'RESTRICT')
+  #ADD(%SqlWordList,'RESTRICTED')                           #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'RESULT')
+  #ADD(%SqlWordList,'RETAIN')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RETURN')
+  #ADD(%SqlWordList,'RETURNING')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'RETURNS')                              #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'RETURNED_CARDINALITY')
+  #ADD(%SqlWordList,'RETURNED_LENGTH')
+  #ADD(%SqlWordList,'RETURNED_OCTET_LENGTH')
+  #ADD(%SqlWordList,'RETURNED_SQLSTATE')
+  #ADD(%SqlWordList,'RETURNING_VALUES')                     #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'RETURNS')
+  #ADD(%SqlWordList,'REUSE')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'REVERSE')
+  #ADD(%SqlWordList,'REVOKE')
+  #ADD(%SqlWordList,'RIGHT')
+  #ADD(%SqlWordList,'RLIKE')
+  #ADD(%SqlWordList,'ROLE')
+  #ADD(%SqlWordList,'ROLES')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ROLLBACK')
+  #ADD(%SqlWordList,'ROLLUP')
+  #ADD(%SqlWordList,'ROOT')
+  #ADD(%SqlWordList,'ROQ')                                  #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'ROUND')
+  #ADD(%SqlWordList,'ROUTINE')
+  #ADD(%SqlWordList,'ROUTINE_CATALOG')
+  #ADD(%SqlWordList,'ROUTINE_NAME')
+  #ADD(%SqlWordList,'ROUTINE_SCHEMA')
+  #ADD(%SqlWordList,'ROW')
+  #ADD(%SqlWordList,'ROW_COUNT')
+  #ADD(%SqlWordList,'ROW_NUMBER')
+  #ADD(%SqlWordList,'ROWCOUNT')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'ROWGUIDCOL')                           #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'ROWID')
+  #ADD(%SqlWordList,'ROWLABEL')                             #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'ROWNUM')
+  #ADD(%SqlWordList,'ROWTYPE')
+  #ADD(%SqlWordList,'ROWS')
+  #ADD(%SqlWordList,'RRN')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RPAD')
+  #ADD(%SqlWordList,'RTRIM')
+  #ADD(%SqlWordList,'RULE')
+  #ADD(%SqlWordList,'RUN')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RUNTIME')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'S')                                    #! 'S'
+  #ADD(%SqlWordList,'SAVE')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'SAVEPOINT')
+  #ADD(%SqlWordList,'SCALE')
+  #ADD(%SqlWordList,'SCAN')
+  #ADD(%SqlWordList,'SCHEDULE')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SCHEMA')
+  #ADD(%SqlWordList,'SCHEMA_NAME')
+  #ADD(%SqlWordList,'SCN')                                  #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'SCOPE')
+  #ADD(%SqlWordList,'SCOPE_CATALOG')
+  #ADD(%SqlWordList,'SCOPE_NAME')
+  #ADD(%SqlWordList,'SCOPE_SCHEMA')
+  #ADD(%SqlWordList,'SCRATCHPAD')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SCROLL')
+  #ADD(%SqlWordList,'SEARCH')
+  #ADD(%SqlWordList,'SEC_TO_TIME')
+  #ADD(%SqlWordList,'SECOND')
+  #ADD(%SqlWordList,'SECONDS')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SECQTY')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SECTION')
+  #ADD(%SqlWordList,'SECURITY')
+  #ADD(%SqlWordList,'SEGMENT')                              #! RAYS.2001.10.21
+  #ADD(%SqlWordList,'SELECT')
+  #ADD(%SqlWordList,'SELF')
+  #ADD(%SqlWordList,'SENSITIVE')
+  #ADD(%SqlWordList,'SEPARATE')
+  #ADD(%SqlWordList,'SEPARATOR')                            #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'SEQNO')                                #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'SEQUENCE')
+  #ADD(%SqlWordList,'SERIAL')
+  #ADD(%SqlWordList,'SERIALIZABLE')
+  #ADD(%SqlWordList,'SERVERDB')                             #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'SERVER_NAME')
+  #ADD(%SqlWordList,'SESSION')
+  #ADD(%SqlWordList,'SESSION_USER')
+  #ADD(%SqlWordList,'SET')
+  #ADD(%SqlWordList,'SETOF')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'SETS')
+  #ADD(%SqlWordList,'SETUSER')
+  #ADD(%SqlWordList,'SHADOW')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SHARE')
+  #ADD(%SqlWordList,'SHARED')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SHELL')                                #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SHOW')
+  #ADD(%SqlWordList,'SHUTDOWN')
+  #ADD(%SqlWordList,'SIGNAL')
+  #ADD(%SqlWordList,'SIMILAR')
+  #ADD(%SqlWordList,'SIMPLE')
+  #ADD(%SqlWordList,'SIN')
+  #ADD(%SqlWordList,'SINGLE')
+  #ADD(%SqlWordList,'SINGULAR')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SINH')
+  #ADD(%SqlWordList,'SIZE')
+  #ADD(%SqlWordList,'SMALLDATETIME')
+  #ADD(%SqlWordList,'SMALLFLOAT')
+  #ADD(%SqlWordList,'SMALLINT')
+  #ADD(%SqlWordList,'SMALLMONEY')
+  #ADD(%SqlWordList,'SNAPSHOT')                             #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SOME')
+  #ADD(%SqlWordList,'SONAME')
+  #ADD(%SqlWordList,'SORT')
+  #ADD(%SqlWordList,'SOUNDEX')
+  #ADD(%SqlWordList,'SOURCE')
+  #ADD(%SqlWordList,'SP_BINDRULE')
+  #ADD(%SqlWordList,'SP_DBOPTION')
+  #ADD(%SqlWordList,'SPACE')
+  #ADD(%SqlWordList,'SPECIFIC')
+  #ADD(%SqlWordList,'SPECIFICTYPE')
+  #ADD(%SqlWordList,'SPECIFIC_NAME')
+  #ADD(%SqlWordList,'SQL')
+  #ADD(%SqlWordList,'SQL_AUTO_IS_NULL')                     #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'SQL_BIG_RESULT')                       #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SQL_BIG_SELECTS')
+  #ADD(%SqlWordList,'SQL_BIG_TABLES')
+  #ADD(%SqlWordList,'SQL_BUFFER_RESULT')                    #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'SQL_CALC_FOUND_ROWS')                  #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SQL_LOG_BIN')                          #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SQL_LOG_OFF')
+  #ADD(%SqlWordList,'SQL_LOG_UPDATE')
+  #ADD(%SqlWordList,'SQL_LOW_PRIORITY_UPDATES')
+  #ADD(%SqlWordList,'SQL_MAX_JOIN_SIZE')                    #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'SQL_QUOTE_SHOW_CREATE')                #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SQL_SAFE_UPDATES')                     #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'SQL_SELECT_LIMIT')
+  #ADD(%SqlWordList,'SQL_SLAVE_SKIP_COUNTER')               #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SQL_SMALL_RESULT')
+  #ADD(%SqlWordList,'SQL_BIG_RESULT')
+  #ADD(%SqlWordList,'SQL_WARNINGS')
+  #ADD(%SqlWordList,'SQLBUF')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'SQLCODE')
+  #ADD(%SqlWordList,'SQLERRM')
+  #ADD(%SqlWordList,'SQLERROR')
+  #ADD(%SqlWordList,'SQLEXCEPTION')
+  #ADD(%SqlWordList,'SQLID')                                #! RAYS.2002.05.28 / SAP
+  #ADD(%SqlWordList,'SQLMODE')                              #! RAYS.2002.05.28 / SAP
+  #ADD(%SqlWordList,'SQLSTATE')
+  #ADD(%SqlWordList,'SQLWARNING')
+  #ADD(%SqlWordList,'SQRT')
+  #ADD(%SqlWordList,'SSL')                                  #! RAYS.2002.11.13 / MySQLv4
+  #ADD(%SqlWordList,'SSP_EXPRE')                            #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'SSP_PRED')                             #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'STABLE')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'STABILITY')                            #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'STAMP')                                #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'STANDALONE')                           #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'STANDARD')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'START')
+  #ADD(%SqlWordList,'STARTING')
+  #ADD(%SqlWordList,'STARTS')                               #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'STATE')
+  #ADD(%SqlWordList,'STATEMENT')
+  #ADD(%SqlWordList,'STATEMENT_ID')                         #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'STATIC')
+  #ADD(%SqlWordList,'STATISTICS')
+  #ADD(%SqlWordList,'STATUS')
+  #ADD(%SqlWordList,'STAY')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'STD')
+  #ADD(%SqlWordList,'STDDEV')
+  #ADD(%SqlWordList,'STDDEV_POP')
+  #ADD(%SqlWordList,'STDDEV_SAMP')
+  #ADD(%SqlWordList,'STDIN')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'STDOUT')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'STOGROUP')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'STOP')
+  #ADD(%SqlWordList,'STORAGE')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'STORES')                               #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'STORPOOL')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'STRAIGHT_JOIN')
+  #ADD(%SqlWordList,'STR')
+  #ADD(%SqlWordList,'STRCMP')
+  #ADD(%SqlWordList,'STRICT')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'STRING')
+  #ADD(%SqlWordList,'STRIP')                                #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'STRIPED')                              #! RAYS.2001.01.27
+  #ADD(%SqlWordList,'STRUCTURE')
+  #ADD(%SqlWordList,'STUFF')
+  #ADD(%SqlWordList,'STYLE')
+  #ADD(%SqlWordList,'SUBCLASS_ORIGIN')
+  #ADD(%SqlWordList,'SUBLIST')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'SUBMULTISET')                          #! RAYS.2002.03.08
+  #ADD(%SqlWordList,'SUBPAGES')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SUBSTR')
+  #ADD(%SqlWordList,'SUBSTRING')
+  #ADD(%SqlWordList,'SUBSTRING_INDEX')
+  #ADD(%SqlWordList,'SUB_TYPE')                             #! RAYS.2001.10.21
+  #ADD(%SqlWordList,'SUBTYPE')
+  #ADD(%SqlWordList,'SUCESSFULL')
+  #ADD(%SqlWordList,'SUM')
+  #ADD(%SqlWordList,'SUSPEND')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'SVBEGIN')                              #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'SVEND')                                #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'SWITCH')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'SYMMETRIC')
+  #ADD(%SqlWordList,'SYNONYM')
+  #ADD(%SqlWordList,'SYSDATE')
+  #ADD(%SqlWordList,'SYSID')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'SYSTEM')
+  #ADD(%SqlWordList,'SYSTEM_USER')
+  #ADD(%SqlWordList,'T')                                    #! 'T'
+  #ADD(%SqlWordList,'TABAUTH')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'TABLE')
+  #ADD(%SqlWordList,'TABLE_NAME')
+  #ADD(%SqlWordList,'TABLEEXTRACT')                         #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'TABLELOAD')                            #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'TABLES')
+  #ADD(%SqlWordList,'TABLESPACE')                           #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'TABLEUNLOAD')                          #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'TABLEUPDATE')                          #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'TAIL')
+  #ADD(%SqlWordList,'TAN')
+  #ADD(%SqlWordList,'TANH')
+  #ADD(%SqlWordList,'TASK')                                 #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'TEMP')                                 #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'TEMPLATE')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'TEMPORARY')
+  #ADD(%SqlWordList,'TERM')                                 #! RAYS.2001.10.21
+  #ADD(%SqlWordList,'TERMCHARSET')                          #! RAYS.2002.06.28 / SAP
+  #ADD(%SqlWordList,'TERMINATE')
+  #ADD(%SqlWordList,'TERMINATED')
+  #ADD(%SqlWordList,'TERMINATOR')                           #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'TEST')
+  #ADD(%SqlWordList,'TEXT')
+  #ADD(%SqlWordList,'TEXTSIZE')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'THAN')
+  #ADD(%SqlWordList,'THEN')
+  #ADD(%SqlWordList,'THERE')
+  #ADD(%SqlWordList,'THREAD')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'TIES')
+  #ADD(%SqlWordList,'TIME')
+  #ADD(%SqlWordList,'TIME_TO_SEC')
+  #ADD(%SqlWordList,'TIMESPAN')
+  #ADD(%SqlWordList,'TIMESTAMP')
+  #ADD(%SqlWordList,'TIMESTAMPADD')
+  #ADD(%SqlWordList,'TIMESTAMPDIF')
+  #ADD(%SqlWordList,'TIMEZONE_HOUR')
+  #ADD(%SqlWordList,'TIMEZONE_MINUTE')
+  #ADD(%SqlWordList,'TINYBLOB')
+  #ADD(%SqlWordList,'TINYINT')
+  #ADD(%SqlWordList,'TINYTEXT')
+  #ADD(%SqlWordList,'TO')
+  #ADD(%SqlWordList,'TO_DAYS')
+  #ADD(%SqlWordList,'TOAST')                                #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'TOP')                                  #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'TOP_LEVEL_COUNT')
+  #ADD(%SqlWordList,'TORN')
+  #ADD(%SqlWordList,'TRACING')                              #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'TRAILING')
+  #ADD(%SqlWordList,'TRAN')                                 #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'TRANSACTION')
+  #ADD(%SqlWordList,'TRANSACTION_ACTIVE')
+  #ADD(%SqlWordList,'TRANSACTIONS_COMMITED')
+  #ADD(%SqlWordList,'TRANSACTIONS_ROLLED_BACK')
+  #ADD(%SqlWordList,'TRANSFORM')
+  #ADD(%SqlWordList,'TRANSFORMS')
+  #ADD(%SqlWordList,'TRANSLATE')
+  #ADD(%SqlWordList,'TRANSLATION')
+  #ADD(%SqlWordList,'TREAT')
+  #ADD(%SqlWordList,'TRIGGER')
+  #ADD(%SqlWordList,'TRIGGER_CATALOG')
+  #ADD(%SqlWordList,'TRIGGER_SCHEMA')
+  #ADD(%SqlWordList,'TRIGGER_NAME')
+  #ADD(%SqlWordList,'TRIGGERS')
+  #ADD(%SqlWordList,'TRIM')
+  #ADD(%SqlWordList,'TRUE')
+  #ADD(%SqlWordList,'TRUNC')
+  #ADD(%SqlWordList,'TRUNCATE')                             #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'TRUSTED')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'TS')                                   #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'TSEQUAL')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'TYPE')
+  #ADD(%SqlWordList,'U')                                    #! 'U'
+  #ADD(%SqlWordList,'UCASE')
+  #ADD(%SqlWordList,'UID')
+  #ADD(%SqlWordList,'UINT')
+  #ADD(%SqlWordList,'UNBOUNDED')
+  #ADD(%SqlWordList,'UNCOMMITED')
+  #ADD(%SqlWordList,'UNDER')
+  #ADD(%SqlWordList,'UNDO')                                 #! RAYS.2002.03.08
+  #ADD(%SqlWordList,'UNENCRYPTED')                          #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'UNION')
+  #ADD(%SqlWordList,'UNIQUE')
+  #ADD(%SqlWordList,'UNIX_TIMESTAMP')
+  #ADD(%SqlWordList,'UNKNOWN')
+  #ADD(%SqlWordList,'UNLIMITED')                            #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'UNLISTEN')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'UNLOCK')
+  #ADD(%SqlWordList,'UNNAMED')
+  #ADD(%SqlWordList,'UNNEST')
+  #ADD(%SqlWordList,'UNSIGNED')
+  #ADD(%SqlWordList,'UNTIL')                                #! LMS.2001.12.30 / PSQL
+  #ADD(%SqlWordList,'UNTYPED')                              #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'UPDATE')
+  #ADD(%SqlWordList,'UPDATETEXT')                           #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'UPPER')
+  #ADD(%SqlWordList,'URI')                                  #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'USAGE')
+  #ADD(%SqlWordList,'USE')
+  #ADD(%SqlWordList,'USER')
+  #ADD(%SqlWordList,'USERENV')
+  #ADD(%SqlWordList,'USER_DEFINED_TYPE_CATALOG')
+  #ADD(%SqlWordList,'USER_DEFINED_TYPE_NAME')
+  #ADD(%SqlWordList,'USER_DEFINED_TYPE_SCHEMA')
+  #ADD(%SqlWordList,'USING')
+  #ADD(%SqlWordList,'V')                                    #! 'V'
+  #ADD(%SqlWordList,'VACUUM')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'VALID')                                #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'VALIDATE')
+  #ADD(%SqlWordList,'VALIDATOR')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'VALIDPROC')                            #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'VALUE')
+  #ADD(%SqlWordList,'VALUES')
+  #ADD(%SqlWordList,'VAR_POP')
+  #ADD(%SqlWordList,'VAR_SAMP')
+  #ADD(%SqlWordList,'VARBINARY')
+  #ADD(%SqlWordList,'VARCHAR')
+  #ADD(%SqlWordList,'VARCHAR2')
+  #ADD(%SqlWordList,'VARCHARACTER')
+  #ADD(%SqlWordList,'VARIABLE')
+  #ADD(%SqlWordList,'VARIABLES')
+  #ADD(%SqlWordList,'VARIANCE')
+  #ADD(%SqlWordList,'VARIANT')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'VARYING')
+  #ADD(%SqlWordList,'VCAT')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'VERBOSE')                              #! RAYS.2002.11.13 / PostgreSQLv7
+  #ADD(%SqlWordList,'VERSION')
+  #ADD(%SqlWordList,'VIEW')
+  #ADD(%SqlWordList,'VIEWS')                                #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'VIRTUAL')
+  #ADD(%SqlWordList,'VISIBLE')
+  #ADD(%SqlWordList,'VOLATILE')                             #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'VOLUMES')                              #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'W')                                    #! 'W'
+  #ADD(%SqlWordList,'WAIT')
+  #ADD(%SqlWordList,'WAITFOR')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'WARNINGS')
+  #ADD(%SqlWordList,'WEEK')
+  #ADD(%SqlWordList,'WEEKDAY')
+  #ADD(%SqlWordList,'WHEN')
+  #ADD(%SqlWordList,'WHENEVER')
+  #ADD(%SqlWordList,'WHERE')
+  #ADD(%SqlWordList,'WHILE')
+  #ADD(%SqlWordList,'WHITESPACE')                           #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'WIDTH_BUCKET')
+  #ADD(%SqlWordList,'WINDOW')
+  #ADD(%SqlWordList,'WITH')
+  #ADD(%SqlWordList,'WITHIN')
+  #ADD(%SqlWordList,'WITHOUT')
+  #ADD(%SqlWordList,'WLM')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'WORK')
+  #ADD(%SqlWordList,'WRITE')
+  #ADD(%SqlWordList,'WRITETEXT')                            #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'X')                                    #! 'X'
+  #ADD(%SqlWordList,'XML')                                  #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLAGG')                               #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLATTRIBUTES')                        #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLBINARY')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLCAST')                              #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLCOMMENT')                           #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLCONCAT')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLDECLARATION')                       #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLDOCUMENT')                          #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLELEMENT')                           #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLEXISTS')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLFOREST')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLITERATE')                           #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLNAMESPACES')                        #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLPARSE')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLPI')                                #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLQUERY')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLSCHEMA')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLSERIALIZE')                         #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLTABLE')                             #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLTEXT')                              #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XMLVALIDATE')                          #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
+  #ADD(%SqlWordList,'XOR')                                  #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'Y')                                    #! 'Y'
+  #ADD(%SqlWordList,'YEAR')
+  #ADD(%SqlWordList,'YEAR_MONTH')
+  #ADD(%SqlWordList,'YEARDAY')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'YEARS')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'YIELDS')
+  #ADD(%SqlWordList,'Z')                                    #! 'Z'
+  #ADD(%SqlWordList,'ZEROFILL')
+  #ADD(%SqlWordList,'ZONE')
+  #SET(%SqlWordCount,ITEMS(%SqlWordList))                   #! How many are there?
+#GROUP(%SqlReservedWordsEnd)
+
+#!--------------------------------------------------------------------!
+#! 2001.01.21.SUN - Roberto Artigas Jr          IMPORTANT PLEASE READ !
+#!--------------------------------------------------------------------!
+#! This group contains the code necessary to build a searchable list  !
+#! of Clarion reserved words. This is used to make sure field, key,   !
+#! and table names are not in conflict with reserved words.           !
+#!--------------------------------------------------------------------!
+#! ALSO: I am a realist. I can pretty much say with a great amount of !
+#! certainty, that once having seen this list, most individuals are   !
+#! not going to type in their own to achieve the same functionality.  !
+#! If you use this list at least have the courtesy of giving credit   !
+#! to Roberto Artigas Jr for having typed all of this in. Leave this  !
+#! documentation block intact and give credit where credit is due.    !
+#!--------------------------------------------------------------------!
+#GROUP(%ClarionReservedWords)
+  #DECLARE(%ClarionWordCount)
+  #DECLARE(%ClarionWordItem)
+  #DECLARE(%ClarionWordList),MULTI,UNIQUE
+  #ADD(%ClarionWordList,'PROGRAM')                          #! Program Format
+  #ADD(%ClarionWordList,'MEMBER')
+  #ADD(%ClarionWordList,'MAP')
+  #ADD(%ClarionWordList,'MODULE')
+  #ADD(%ClarionWordList,'PROCEDURE')
+  #ADD(%ClarionWordList,'CODE')
+  #ADD(%ClarionWordList,'DATA')
+  #ADD(%ClarionWordList,'ROUTINE')
+  #ADD(%ClarionWordList,'END')
+  #ADD(%ClarionWordList,'C')                                #! Prototype Attributes
+  #ADD(%ClarionWordList,'PASCAL')
+  #ADD(%ClarionWordList,'DLL')
+  #ADD(%ClarionWordList,'NAME')
+  #ADD(%ClarionWordList,'PRIVATE')
+  #ADD(%ClarionWordList,'PROC')
+  #ADD(%ClarionWordList,'PROTECTED')
+  #ADD(%ClarionWordList,'RAW')
+  #ADD(%ClarionWordList,'REPLACE')
+  #ADD(%ClarionWordList,'TYPE')
+  #ADD(%ClarionWordList,'VIRTUAL')
+  #ADD(%ClarionWordList,'DERIVED')
+  #ADD(%ClarionWordList,'_PROC')
+  #ADD(%ClarionWordList,'_PROC1')
+  #ADD(%ClarionWordList,'_PROC2')
+  #ADD(%ClarionWordList,'_PROC3')
+  #ADD(%ClarionWordList,'ACCEPT')                           #! Compiler directives
+  #ADD(%ClarionWordList,'BEGIN')
+  #ADD(%ClarionWordList,'COMPILE')
+  #ADD(%ClarionWordList,'INCLUDE')
+  #ADD(%ClarionWordList,'EQUATE')
+  #ADD(%ClarionWordList,'ITEMIZE')
+  #ADD(%ClarionWordList,'OMIT')
+  #ADD(%ClarionWordList,'SECTION')
+  #ADD(%ClarionWordList,'SIZE')
+  #ADD(%ClarionWordList,'ONCE')
+  #ADD(%ClarionWordList,'BYTE')                             #! Simple data types
+  #ADD(%ClarionWordList,'SHORT')
+  #ADD(%ClarionWordList,'USHORT')
+  #ADD(%ClarionWordList,'LONG')
+  #ADD(%ClarionWordList,'ULONG')
+  #ADD(%ClarionWordList,'SIGNED')
+  #ADD(%ClarionWordList,'UNSIGNED')
+  #ADD(%ClarionWordList,'SREAL')
+  #ADD(%ClarionWordList,'REAL')
+  #ADD(%ClarionWordList,'BFLOAT4')
+  #ADD(%ClarionWordList,'BFLOAT8')
+  #ADD(%ClarionWordList,'DECIMAL')
+  #ADD(%ClarionWordList,'PDECIMAL')
+  #ADD(%ClarionWordList,'STRING')
+  #ADD(%ClarionWordList,'CSTRING')
+  #ADD(%ClarionWordList,'PSTRING')
+  #ADD(%ClarionWordList,'DATE')
+  #ADD(%ClarionWordList,'TIME')
+  #ADD(%ClarionWordList,'ASTRING')
+  #ADD(%ClarionWordList,'BSTRING')
+  #ADD(%ClarionWordList,'ANY')                              #! Special data types
+  #ADD(%ClarionWordList,'LIKE')
+  #ADD(%ClarionWordList,'NEW')                              #! Memory allocation
+  #ADD(%ClarionWordList,'DISPOSE')
+  #ADD(%ClarionWordList,'GROUP')                            #! Complex data structures
+  #ADD(%ClarionWordList,'CLASS')
+  #ADD(%ClarionWordList,'FILE')                             #! File Structures
+  #ADD(%ClarionWordList,'INDEX')
+  #ADD(%ClarionWordList,'KEY')
+  #ADD(%ClarionWordList,'MEMO')
+  #ADD(%ClarionWordList,'BLOB')
+  #ADD(%ClarionWordList,'RECORD')
+  #ADD(%ClarionWordList,'VIEW')                             #! View structures
+  #ADD(%ClarionWordList,'PROJECT')
+  #ADD(%ClarionWordList,'JOIN')
+  #ADD(%ClarionWordList,'QUEUE')                            #! Queue structures
+  #ADD(%ClarionWordList,'AUTO')                             #! Variable/Entity Attributes
+  #ADD(%ClarionWordList,'BINARY')
+  #ADD(%ClarionWordList,'BINDABLE')
+  #ADD(%ClarionWordList,'CREATE')
+  #ADD(%ClarionWordList,'DIM')
+  #ADD(%ClarionWordList,'DLL')
+  #ADD(%ClarionWordList,'DRIVER')
+  #ADD(%ClarionWordList,'DUP')
+  #ADD(%ClarionWordList,'ENCRYPT')
+  #ADD(%ClarionWordList,'EXTERNAL')
+  #ADD(%ClarionWordList,'FILTER')
+  #ADD(%ClarionWordList,'INNER')
+  #ADD(%ClarionWordList,'LINK')
+  #ADD(%ClarionWordList,'MODULE')
+  #ADD(%ClarionWordList,'NAME')
+  #ADD(%ClarionWordList,'NOCASE')
+  #ADD(%ClarionWordList,'OEM')
+  #ADD(%ClarionWordList,'OPT')
+  #ADD(%ClarionWordList,'ORDER')
+  #ADD(%ClarionWordList,'OVER')
+  #ADD(%ClarionWordList,'OWNER')
+  #ADD(%ClarionWordList,'PRE')
+  #ADD(%ClarionWordList,'PRIMARY')
+  #ADD(%ClarionWordList,'PRIVATE')
+  #ADD(%ClarionWordList,'PROTECTED')
+  #ADD(%ClarionWordList,'RECLAIM')
+  #ADD(%ClarionWordList,'STATIC')
+  #ADD(%ClarionWordList,'THREAD')
+  #ADD(%ClarionWordList,'TYPE')
+  #ADD(%ClarionWordList,'APPLICATION')                      #! Window structures
+  #ADD(%ClarionWordList,'WINDOW')
+  #ADD(%ClarionWordList,'MENUBAR')
+  #ADD(%ClarionWordList,'TOOLBAR')
+  #ADD(%ClarionWordList,'REPORT')                           #! Report structures
+  #ADD(%ClarionWordList,'BREAK')
+  #ADD(%ClarionWordList,'DETAIL')
+  #ADD(%ClarionWordList,'FOOTER')
+  #ADD(%ClarionWordList,'FORM')
+  #ADD(%ClarionWordList,'HEADER')
+  #ADD(%ClarionWordList,'BOX')                              #! Control declarations
+  #ADD(%ClarionWordList,'BUTTON')
+  #ADD(%ClarionWordList,'CHECK')
+  #ADD(%ClarionWordList,'COMBO')
+  #ADD(%ClarionWordList,'ELIPSE')
+  #ADD(%ClarionWordList,'ENTRY')
+  #ADD(%ClarionWordList,'GROUP')
+  #ADD(%ClarionWordList,'IMAGE')
+  #ADD(%ClarionWordList,'ITEM')
+  #ADD(%ClarionWordList,'LINE')
+  #ADD(%ClarionWordList,'LIST')
+  #ADD(%ClarionWordList,'MENU')
+  #ADD(%ClarionWordList,'OLE')
+  #ADD(%ClarionWordList,'OPTION')
+  #ADD(%ClarionWordList,'PANEL')
+  #ADD(%ClarionWordList,'PROMPT')
+  #ADD(%ClarionWordList,'PROGRESS')
+  #ADD(%ClarionWordList,'RADIO')
+  #ADD(%ClarionWordList,'REGION')
+  #ADD(%ClarionWordList,'SHEET')
+  #ADD(%ClarionWordList,'SPIN')
+  #ADD(%ClarionWordList,'STRING')
+  #ADD(%ClarionWordList,'TAB')
+  #ADD(%ClarionWordList,'TEXT')
+  #ADD(%ClarionWordList,'VBX')
+  #ADD(%ClarionWordList,'ABSOLUTE')                         #! Window/Report Attributes
+  #ADD(%ClarionWordList,'ALONE')
+  #ADD(%ClarionWordList,'ALRT')
+  #ADD(%ClarionWordList,'ANGLE')
+  #ADD(%ClarionWordList,'AT')
+  #ADD(%ClarionWordList,'AUTO')
+  #ADD(%ClarionWordList,'AUTOSIZE')
+  #ADD(%ClarionWordList,'AVE')
+  #ADD(%ClarionWordList,'BEVEL')
+  #ADD(%ClarionWordList,'BOXED')
+  #ADD(%ClarionWordList,'CAP')
+  #ADD(%ClarionWordList,'UPR')
+  #ADD(%ClarionWordList,'CENTER')
+  #ADD(%ClarionWordList,'CENTERED')
+  #ADD(%ClarionWordList,'CHECK')
+  #ADD(%ClarionWordList,'CLASS')
+  #ADD(%ClarionWordList,'CLIP')
+  #ADD(%ClarionWordList,'CNT')
+  #ADD(%ClarionWordList,'COLOR')
+  #ADD(%ClarionWordList,'COLUMN')
+  #ADD(%ClarionWordList,'COMPATABILITY')
+  #ADD(%ClarionWordList,'CREATE')
+  #ADD(%ClarionWordList,'CURSOR')
+  #ADD(%ClarionWordList,'DEFAULT')
+  #ADD(%ClarionWordList,'DELAY')
+  #ADD(%ClarionWordList,'DISABLE')
+  #ADD(%ClarionWordList,'DOCK')
+  #ADD(%ClarionWordList,'DOCKED')
+  #ADD(%ClarionWordList,'DOCUMENT')
+  #ADD(%ClarionWordList,'DOUBLE')
+  #ADD(%ClarionWordList,'NOFRAME')
+  #ADD(%ClarionWordList,'RESIZE')
+  #ADD(%ClarionWordList,'DRAGID')
+  #ADD(%ClarionWordList,'DROP')
+  #ADD(%ClarionWordList,'DROPID')
+  #ADD(%ClarionWordList,'FILL')
+  #ADD(%ClarionWordList,'FIRST')
+  #ADD(%ClarionWordList,'LAST')
+  #ADD(%ClarionWordList,'FLAT')
+  #ADD(%ClarionWordList,'FONT')
+  #ADD(%ClarionWordList,'FORMAT')
+  #ADD(%ClarionWordList,'FROM')
+  #ADD(%ClarionWordList,'FULL')
+  #ADD(%ClarionWordList,'GRAY')
+  #ADD(%ClarionWordList,'GRID')
+  #ADD(%ClarionWordList,'HIDE')
+  #ADD(%ClarionWordList,'HELP')
+  #ADD(%ClarionWordList,'HSCROLL')
+  #ADD(%ClarionWordList,'VSCROLL')
+  #ADD(%ClarionWordList,'HVSCROLL')
+  #ADD(%ClarionWordList,'ICON')
+  #ADD(%ClarionWordList,'ICONIZE')
+  #ADD(%ClarionWordList,'IMM')
+  #ADD(%ClarionWordList,'INS')
+  #ADD(%ClarionWordList,'OVR')
+  #ADD(%ClarionWordList,'JOIN')
+  #ADD(%ClarionWordList,'KEY')
+  #ADD(%ClarionWordList,'LANDSCAPE')
+  #ADD(%ClarionWordList,'LEFT')
+  #ADD(%ClarionWordList,'RIGHT')
+  #ADD(%ClarionWordList,'ABOVE')
+  #ADD(%ClarionWordList,'BELOW')
+  #ADD(%ClarionWordList,'LEFT')
+  #ADD(%ClarionWordList,'RIGHT')
+  #ADD(%ClarionWordList,'CENTER')
+  #ADD(%ClarionWordList,'DECIMAL')
+  #ADD(%ClarionWordList,'LINEWIDTH')
+  #ADD(%ClarionWordList,'LINK')
+  #ADD(%ClarionWordList,'MARK')
+  #ADD(%ClarionWordList,'MASK')
+  #ADD(%ClarionWordList,'MAX')
+  #ADD(%ClarionWordList,'MAXIMIZE')
+  #ADD(%ClarionWordList,'MDI')
+  #ADD(%ClarionWordList,'META')
+  #ADD(%ClarionWordList,'MIN')
+  #ADD(%ClarionWordList,'MODAL')
+  #ADD(%ClarionWordList,'MSG')
+  #ADD(%ClarionWordList,'NOBAR')
+  #ADD(%ClarionWordList,'NOCASE')
+  #ADD(%ClarionWordList,'NOMERGE')
+  #ADD(%ClarionWordList,'NOSHEET')
+  #ADD(%ClarionWordList,'OPEN')
+  #ADD(%ClarionWordList,'PAGE')
+  #ADD(%ClarionWordList,'PAGEAFTER')
+  #ADD(%ClarionWordList,'PAGEBEFORE')
+  #ADD(%ClarionWordList,'PAGENO')
+  #ADD(%ClarionWordList,'PALETTE')
+  #ADD(%ClarionWordList,'PAPER')
+  #ADD(%ClarionWordList,'PASSWORD')
+  #ADD(%ClarionWordList,'PREVIEW')
+  #ADD(%ClarionWordList,'RANGE')
+  #ADD(%ClarionWordList,'READONLY')
+  #ADD(%ClarionWordList,'REPEAT')
+  #ADD(%ClarionWordList,'REQ')
+  #ADD(%ClarionWordList,'RESET')
+  #ADD(%ClarionWordList,'RESIZE')
+  #ADD(%ClarionWordList,'RIGHT')
+  #ADD(%ClarionWordList,'ROUND')
+  #ADD(%ClarionWordList,'SCROLL')
+  #ADD(%ClarionWordList,'SEPARATOR')
+  #ADD(%ClarionWordList,'SINGLE')
+  #ADD(%ClarionWordList,'SKIP')
+  #ADD(%ClarionWordList,'SPREAD')
+  #ADD(%ClarionWordList,'STATUS')
+  #ADD(%ClarionWordList,'STD')
+  #ADD(%ClarionWordList,'STEP')
+  #ADD(%ClarionWordList,'STRETCH')
+  #ADD(%ClarionWordList,'SUM')
+  #ADD(%ClarionWordList,'SYSTEM')
+  #ADD(%ClarionWordList,'TALLY')
+  #ADD(%ClarionWordList,'THOUS')
+  #ADD(%ClarionWordList,'MM')
+  #ADD(%ClarionWordList,'POINTS')
+  #ADD(%ClarionWordList,'TILED')
+  #ADD(%ClarionWordList,'TIMER')
+  #ADD(%ClarionWordList,'TIP')
+  #ADD(%ClarionWordList,'TOOLBOX')
+  #ADD(%ClarionWordList,'TRN')
+  #ADD(%ClarionWordList,'UP')
+  #ADD(%ClarionWordList,'DOWN')
+  #ADD(%ClarionWordList,'USE')
+  #ADD(%ClarionWordList,'VALUE')
+  #ADD(%ClarionWordList,'VCR')
+  #ADD(%ClarionWordList,'WALLPAPER')
+  #ADD(%ClarionWordList,'WITHNEXT')
+  #ADD(%ClarionWordList,'WITHPRIOR')
+  #ADD(%ClarionWordList,'WIZARD')
+  #ADD(%ClarionWordList,'ZOOM')
+  #ADD(%ClarionWordList,'BIND')                             #! Expresion evaluation
+  #ADD(%ClarionWordList,'EVALUATE')
+  #ADD(%ClarionWordList,'POPBIND')
+  #ADD(%ClarionWordList,'PUSHBIND')
+  #ADD(%ClarionWordList,'UNBIND')
+  #ADD(%ClarionWordList,'CLEAR')                            #! Assignments
+  #ADD(%ClarionWordList,'ACCEPT')                           #! Control structures
+  #ADD(%ClarionWordList,'CASE')
+  #ADD(%ClarionWordList,'EXECUTE')
+  #ADD(%ClarionWordList,'IF')
+  #ADD(%ClarionWordList,'LOOP')
+  #ADD(%ClarionWordList,'BREAK')                            #! Execution control
+  #ADD(%ClarionWordList,'CYCLE')
+  #ADD(%ClarionWordList,'DO')
+  #ADD(%ClarionWordList,'EXIT')
+  #ADD(%ClarionWordList,'GOTO')
+  #ADD(%ClarionWordList,'RETURN')
+  #ADD(%ClarionWordList,'ABS')                              #! Built in procedures
+  #ADD(%ClarionWordList,'ACCEPTED')
+  #ADD(%ClarionWordList,'ACOS')
+  #ADD(%ClarionWordList,'ADD')
+  #ADD(%ClarionWordList,'ADDRESS')
+  #ADD(%ClarionWordList,'AGE')
+  #ADD(%ClarionWordList,'ALERT')
+  #ADD(%ClarionWordList,'ALIAS')
+  #ADD(%ClarionWordList,'ALL')
+  #ADD(%ClarionWordList,'APPEND')
+  #ADD(%ClarionWordList,'ARC')
+  #ADD(%ClarionWordList,'ASK')
+  #ADD(%ClarionWordList,'ASIN')
+  #ADD(%ClarionWordList,'ATAN')
+  #ADD(%ClarionWordList,'BAND')
+  #ADD(%ClarionWordList,'BEEP')
+  #ADD(%ClarionWordList,'BLANK')
+  #ADD(%ClarionWordList,'BOR')
+  #ADD(%ClarionWordList,'BOX')
+  #ADD(%ClarionWordList,'BSHIFT')
+  #ADD(%ClarionWordList,'BUFFER')
+  #ADD(%ClarionWordList,'BUILD')
+  #ADD(%ClarionWordList,'BXOR')
+  #ADD(%ClarionWordList,'BYTES')
+  #ADD(%ClarionWordList,'CALL')
+  #ADD(%ClarionWordList,'CENTER')
+  #ADD(%ClarionWordList,'CHAIN')
+  #ADD(%ClarionWordList,'CHANGE')
+  #ADD(%ClarionWordList,'CHANGES')
+  #ADD(%ClarionWordList,'CHOICE')
+  #ADD(%ClarionWordList,'CHOOSE')
+  #ADD(%ClarionWordList,'CHORD')
+  #ADD(%ClarionWordList,'CHR')
+  #ADD(%ClarionWordList,'CLIP')
+  #ADD(%ClarionWordList,'CLIPBOARD')
+  #ADD(%ClarionWordList,'CLOCK')
+  #ADD(%ClarionWordList,'CLOSE')
+  #ADD(%ClarionWordList,'COLORDIALOG')
+  #ADD(%ClarionWordList,'COMMAND')
+  #ADD(%ClarionWordList,'COMMIT')
+  #ADD(%ClarionWordList,'CONTENTS')
+  #ADD(%ClarionWordList,'CONVERTANSITOEOM')
+  #ADD(%ClarionWordList,'CONVERTEOMTOANSI')
+  #ADD(%ClarionWordList,'COPY')
+  #ADD(%ClarionWordList,'COS')
+  #ADD(%ClarionWordList,'CREATE')
+  #ADD(%ClarionWordList,'CREATE')
+  #ADD(%ClarionWordList,'DATE')
+  #ADD(%ClarionWordList,'DAY')
+  #ADD(%ClarionWordList,'DEFORMAT')
+  #ADD(%ClarionWordList,'DELETE')
+  #ADD(%ClarionWordList,'DESTROY')
+  #ADD(%ClarionWordList,'DIRECTORY')
+  #ADD(%ClarionWordList,'DISABLE')
+  #ADD(%ClarionWordList,'DISPLAY')
+  #ADD(%ClarionWordList,'DRAGID')
+  #ADD(%ClarionWordList,'DROPID')
+  #ADD(%ClarionWordList,'DUPLICATE')
+  #ADD(%ClarionWordList,'ELLIPSE')
+  #ADD(%ClarionWordList,'EMPTY')
+  #ADD(%ClarionWordList,'ENABLE')
+  #ADD(%ClarionWordList,'ENDPAGE')
+  #ADD(%ClarionWordList,'ERASE')
+  #ADD(%ClarionWordList,'ERROR')
+  #ADD(%ClarionWordList,'ERRORCODE')
+  #ADD(%ClarionWordList,'ERRORFILE')
+  #ADD(%ClarionWordList,'EVENTS')
+  #ADD(%ClarionWordList,'EXISTS')
+  #ADD(%ClarionWordList,'FIELD')
+  #ADD(%ClarionWordList,'FILEDIALOG')
+  #ADD(%ClarionWordList,'FILEERROR')
+  #ADD(%ClarionWordList,'FILEERRORCODE')
+  #ADD(%ClarionWordList,'FIRSTFIELD')
+  #ADD(%ClarionWordList,'FLUSH')
+  #ADD(%ClarionWordList,'FOCUS')
+  #ADD(%ClarionWordList,'FONTDIALOG')
+  #ADD(%ClarionWordList,'FORMAT')
+  #ADD(%ClarionWordList,'FREE')
+  #ADD(%ClarionWordList,'GET')
+  #ADD(%ClarionWordList,'GETFONT')
+  #ADD(%ClarionWordList,'GETINI')
+  #ADD(%ClarionWordList,'GETPOSITION')
+  #ADD(%ClarionWordList,'HALT')
+  #ADD(%ClarionWordList,'HELP')
+  #ADD(%ClarionWordList,'HIDE')
+  #ADD(%ClarionWordList,'HOLD')
+  #ADD(%ClarionWordList,'IDLE')
+  #ADD(%ClarionWordList,'IMAGE')
+  #ADD(%ClarionWordList,'INCOMPLETE')
+  #ADD(%ClarionWordList,'INLIST')
+  #ADD(%ClarionWordList,'INRANGE')
+  #ADD(%ClarionWordList,'INSTRING')
+  #ADD(%ClarionWordList,'INT')
+  #ADD(%ClarionWordList,'ISALPHA')
+  #ADD(%ClarionWordList,'ISLOWER')
+  #ADD(%ClarionWordList,'ISSTRING')
+  #ADD(%ClarionWordList,'ISUPPER')
+  #ADD(%ClarionWordList,'KEYBOARD')
+  #ADD(%ClarionWordList,'KEYCHAR')
+  #ADD(%ClarionWordList,'KEYCODE')
+  #ADD(%ClarionWordList,'KEYSTATE')
+  #ADD(%ClarionWordList,'LASTFIELD')
+  #ADD(%ClarionWordList,'LEFT')
+  #ADD(%ClarionWordList,'LEN')
+  #ADD(%ClarionWordList,'LINE')
+  #ADD(%ClarionWordList,'LOCALE')
+  #ADD(%ClarionWordList,'LOCK')
+  #ADD(%ClarionWordList,'LOCKTHREAD')
+  #ADD(%ClarionWordList,'LOG10')
+  #ADD(%ClarionWordList,'LOGE')
+  #ADD(%ClarionWordList,'LOGOUT')
+  #ADD(%ClarionWordList,'LONGPATH')
+  #ADD(%ClarionWordList,'LOWER')
+  #ADD(%ClarionWordList,'MATCH')
+  #ADD(%ClarionWordList,'MAXIMUM')
+  #ADD(%ClarionWordList,'MESSAGE')
+  #ADD(%ClarionWordList,'MONTH')
+  #ADD(%ClarionWordList,'MOUSEX')
+  #ADD(%ClarionWordList,'MOUSEY')
+  #ADD(%ClarionWordList,'NAME')
+  #ADD(%ClarionWordList,'NEXT')
+  #ADD(%ClarionWordList,'NOMEMO')
+  #ADD(%ClarionWordList,'NULL')
+  #ADD(%ClarionWordList,'NUMERIC')
+  #ADD(%ClarionWordList,'OMITTED')
+  #ADD(%ClarionWordList,'OPEN')
+  #ADD(%ClarionWordList,'PACK')
+  #ADD(%ClarionWordList,'PATH')
+  #ADD(%ClarionWordList,'PEEK')
+  #ADD(%ClarionWordList,'PENCOLOR')
+  #ADD(%ClarionWordList,'PENSTYLE')
+  #ADD(%ClarionWordList,'PENWIDTH')
+  #ADD(%ClarionWordList,'PIE')
+  #ADD(%ClarionWordList,'POINTER')
+  #ADD(%ClarionWordList,'POKE')
+  #ADD(%ClarionWordList,'POLYGON')
+  #ADD(%ClarionWordList,'POPUP')
+  #ADD(%ClarionWordList,'POSITION')
+  #ADD(%ClarionWordList,'POST')
+  #ADD(%ClarionWordList,'PRESS')
+  #ADD(%ClarionWordList,'PRESSKEY')
+  #ADD(%ClarionWordList,'PREVIOUS')
+  #ADD(%ClarionWordList,'PRINT')
+  #ADD(%ClarionWordList,'PRINTERDIALOG')
+  #ADD(%ClarionWordList,'PUT')
+  #ADD(%ClarionWordList,'PUTINI')
+  #ADD(%ClarionWordList,'RANDOM')
+  #ADD(%ClarionWordList,'RECORDS')
+  #ADD(%ClarionWordList,'REGISTER')
+  #ADD(%ClarionWordList,'REJECTCODE')
+  #ADD(%ClarionWordList,'REGET')
+  #ADD(%ClarionWordList,'RELEASE')
+  #ADD(%ClarionWordList,'REMOVE')
+  #ADD(%ClarionWordList,'RENAME')
+  #ADD(%ClarionWordList,'RESET')
+  #ADD(%ClarionWordList,'RIGHT')
+  #ADD(%ClarionWordList,'ROLLBACK')
+  #ADD(%ClarionWordList,'ROUND')
+  #ADD(%ClarionWordList,'ROUNDBOX')
+  #ADD(%ClarionWordList,'RUN')
+  #ADD(%ClarionWordList,'RUNCODE')
+  #ADD(%ClarionWordList,'SELECT')
+  #ADD(%ClarionWordList,'SELECTED')
+  #ADD(%ClarionWordList,'SEND')
+  #ADD(%ClarionWordList,'SET')
+  #ADD(%ClarionWordList,'SET3DLOOK')
+  #ADD(%ClarionWordList,'SETCLIPBOARD')
+  #ADD(%ClarionWordList,'SETCLOCK')
+  #ADD(%ClarionWordList,'SETCOMMAND')
+  #ADD(%ClarionWordList,'SETCURSOR')
+  #ADD(%ClarionWordList,'SETDROPID')
+  #ADD(%ClarionWordList,'SETFONT')
+  #ADD(%ClarionWordList,'SETKEYCHAR')
+  #ADD(%ClarionWordList,'SETKEYCODE')
+  #ADD(%ClarionWordList,'SETNONULL')
+  #ADD(%ClarionWordList,'SETNULL')
+  #ADD(%ClarionWordList,'SETPATH')
+  #ADD(%ClarionWordList,'SETPENCOLOR')
+  #ADD(%ClarionWordList,'SETPENSTYLE')
+  #ADD(%ClarionWordList,'SETPENWIDTH')
+  #ADD(%ClarionWordList,'SETPOSITION')
+  #ADD(%ClarionWordList,'SETTARGET')
+  #ADD(%ClarionWordList,'SETTODAY')
+  #ADD(%ClarionWordList,'SHORTPATH')
+  #ADD(%ClarionWordList,'SHOW')
+  #ADD(%ClarionWordList,'SHUTDOWN')
+  #ADD(%ClarionWordList,'SIN')
+  #ADD(%ClarionWordList,'SKIP')
+  #ADD(%ClarionWordList,'SORT')
+  #ADD(%ClarionWordList,'SQRT')
+  #ADD(%ClarionWordList,'START')
+  #ADD(%ClarionWordList,'STATUS')
+  #ADD(%ClarionWordList,'STOP')
+  #ADD(%ClarionWordList,'STREAM')
+  #ADD(%ClarionWordList,'SUB')
+  #ADD(%ClarionWordList,'TAN')
+  #ADD(%ClarionWordList,'THREAD')
+  #ADD(%ClarionWordList,'THREADLOCKED')
+  #ADD(%ClarionWordList,'TODAY')
+  #ADD(%ClarionWordList,'TYPE')
+  #ADD(%ClarionWordList,'UNHIDE')
+  #ADD(%ClarionWordList,'UNLOAD')
+  #ADD(%ClarionWordList,'UNLOCK')
+  #ADD(%ClarionWordList,'UNLOCKTHREAD')
+  #ADD(%ClarionWordList,'UNREGISTER')
+  #ADD(%ClarionWordList,'UPDATE')
+  #ADD(%ClarionWordList,'UPPER')
+  #ADD(%ClarionWordList,'VAL')
+  #ADD(%ClarionWordList,'WATCH')
+  #ADD(%ClarionWordList,'WHAT')
+  #ADD(%ClarionWordList,'WHERE')
+  #ADD(%ClarionWordList,'WHO')
+  #ADD(%ClarionWordList,'YEAR')
+  #ADD(%ClarionWordList,'YIELD')
+  #ADD(%ClarionWordList,'DDEACKNOWLEDGE')                   #! DDE procedures
+  #ADD(%ClarionWordList,'DDEAPP')
+  #ADD(%ClarionWordList,'DDECHANNEL')
+  #ADD(%ClarionWordList,'DDECLIENT')
+  #ADD(%ClarionWordList,'DDECLOSE')
+  #ADD(%ClarionWordList,'DDEEXECUTE')
+  #ADD(%ClarionWordList,'DDEITEM')
+  #ADD(%ClarionWordList,'DDEPOKE')
+  #ADD(%ClarionWordList,'DDEQUERY')
+  #ADD(%ClarionWordList,'DDEREAD')
+  #ADD(%ClarionWordList,'DDESERVER')
+  #ADD(%ClarionWordList,'DDETOPIC')
+  #ADD(%ClarionWordList,'DDEVALUE')
+  #ADD(%ClarionWordList,'DDEWRITE')
+  #ADD(%ClarionWordList,'OLEDIRECTORY')                     #! OLE
+  #ADD(%ClarionWordList,'OCXREGISTERPROPEDIT')              #! OCX
+  #ADD(%ClarionWordList,'OCXREGISTERPROPCHANGE')
+  #ADD(%ClarionWordList,'OCXREGISTEREVENTPROC')
+  #ADD(%ClarionWordList,'OCXUNREGISTERPROPEDIT')
+  #ADD(%ClarionWordList,'OCXUNREGISTERPROPCHANGE')
+  #ADD(%ClarionWordList,'OCXUNREGISTEREVENTPROC')
+  #ADD(%ClarionWordList,'OCXGETPARAMCOUNT')
+  #ADD(%ClarionWordList,'OCXGETPARAM')
+  #ADD(%ClarionWordList,'OCXSETPARAM')
+  #ADD(%ClarionWordList,'OCXLOADIMAGE')
+  #ADD(%ClarionWordList,'BOF')                              #! Legacy statements
+  #ADD(%ClarionWordList,'EOF')
+  #ADD(%ClarionWordList,'FUNCTION')
+  #ADD(%ClarionWordList,'POINTER')
+  #ADD(%ClarionWordList,'SHARE')
+  #ADD(%ClarionWordList,'#TEMPLATE')                        #! Template Sections
+  #ADD(%ClarionWordList,'#SYSTEM')
+  #ADD(%ClarionWordList,'#APPLICATION')
+  #ADD(%ClarionWordList,'#PROGRAM')
+  #ADD(%ClarionWordList,'#MODULE')
+  #ADD(%ClarionWordList,'#PROCEDURE')
+  #ADD(%ClarionWordList,'#GROUP')
+  #ADD(%ClarionWordList,'#UTILITY')
+  #ADD(%ClarionWordList,'#CODE')
+  #ADD(%ClarionWordList,'#CONTROL')
+  #ADD(%ClarionWordList,'#EXTENSION')
+  #ADD(%ClarionWordList,'#EMBED')                           #! Embed points
+  #ADD(%ClarionWordList,'#AT')
+  #ADD(%ClarionWordList,'#ENDAT')
+  #ADD(%ClarionWordList,'#PRIORITY')
+  #ADD(%ClarionWordList,'#ATSTART')
+  #ADD(%ClarionWordList,'#ATEND')
+  #ADD(%ClarionWordList,'#CONTEXT')
+  #ADD(%ClarionWordList,'#ENDCONTEXT')
+  #ADD(%ClarionWordList,'#EMPTYEMBED')
+  #ADD(%ClarionWordList,'#POSTEMBED')
+  #ADD(%ClarionWordList,'#PREEMBED')
+  #ADD(%ClarionWordList,'#WHERE')                           #! Section constraints
+  #ADD(%ClarionWordList,'#RESTRICT')
+  #ADD(%ClarionWordList,'#ACCEPT')
+  #ADD(%ClarionWordList,'#REJECT')
+  #ADD(%ClarionWordList,'#WINDOWS')                         #! Default Data/Code
+  #ADD(%ClarionWordList,'#REPORTS')
+  #ADD(%ClarionWordList,'#LOCALDATA')
+  #ADD(%ClarionWordList,'#GLOBALDATA')
+  #ADD(%ClarionWordList,'#DEFAULT')
+  #ADD(%ClarionWordList,'#DECLARE')                         #! Symbol management
+  #ADD(%ClarionWordList,'#ALIAS')
+  #ADD(%ClarionWordList,'#EQUATE')
+  #ADD(%ClarionWordList,'#ADD')
+  #ADD(%ClarionWordList,'#DELETE')
+  #ADD(%ClarionWordList,'#DELETEALL')
+  #ADD(%ClarionWordList,'#PURGE')
+  #ADD(%ClarionWordList,'#CLEAR')
+  #ADD(%ClarionWordList,'#FREE')
+  #ADD(%ClarionWordList,'#FIX')
+  #ADD(%ClarionWordList,'#FIND')
+  #ADD(%ClarionWordList,'#SELECT')
+  #ADD(%ClarionWordList,'#POP')
+  #ADD(%ClarionWordList,'#SET')
+  #ADD(%ClarionWordList,'#UNFIX')
+  #ADD(%ClarionWordList,'#PROMPT')                          #! Prompt and Validation
+  #ADD(%ClarionWordList,'#VALIDATE')
+  #ADD(%ClarionWordList,'#ENABLE')
+  #ADD(%ClarionWordList,'#BUTTON')
+  #ADD(%ClarionWordList,'#WITH')
+  #ADD(%ClarionWordList,'#FIELD')
+  #ADD(%ClarionWordList,'#PREPARE')
+  #ADD(%ClarionWordList,'#ENDPREPARE')
+  #ADD(%ClarionWordList,'CHECK')                            #! #PROMPT Entry Types
+  #ADD(%ClarionWordList,'COLOR')
+  #ADD(%ClarionWordList,'COMPONENT')
+  #ADD(%ClarionWordList,'CONTROL')
+  #ADD(%ClarionWordList,'DROP')
+  #ADD(%ClarionWordList,'EMBED')
+  #ADD(%ClarionWordList,'EXPR')
+  #ADD(%ClarionWordList,'FIELD')
+  #ADD(%ClarionWordList,'FILE')
+  #ADD(%ClarionWordList,'FORMAT')
+  #ADD(%ClarionWordList,'FROM')
+  #ADD(%ClarionWordList,'KEY')
+  #ADD(%ClarionWordList,'KEYCODE')
+  #ADD(%ClarionWordList,'OPENDIALOG')
+  #ADD(%ClarionWordList,'OPTFIELD')
+  #ADD(%ClarionWordList,'OPTION')
+  #ADD(%ClarionWordList,'PICTURE')
+  #ADD(%ClarionWordList,'PROCEDURE')
+  #ADD(%ClarionWordList,'RADIO')
+  #ADD(%ClarionWordList,'SAVEDIALOG')
+  #ADD(%ClarionWordList,'SPIN')
+  #ADD(%ClarionWordList,'TEXT')
+  #ADD(%ClarionWordList,'#BOXED')                           #! Display and Formating
+  #ADD(%ClarionWordList,'#ENDBOXED')
+  #ADD(%ClarionWordList,'#DISPLAY')
+  #ADD(%ClarionWordList,'#IMAGE')
+  #ADD(%ClarionWordList,'#SHEET')
+  #ADD(%ClarionWordList,'#ENDSHEET')
+  #ADD(%ClarionWordList,'#TAB')
+  #ADD(%ClarionWordList,'#ENDTAB')
+  #ADD(%ClarionWordList,'#FOR')                             #! Logic control
+  #ADD(%ClarionWordList,'#ENDFOR')
+  #ADD(%ClarionWordList,'#LOOP')
+  #ADD(%ClarionWordList,'#ENDLOOP')
+  #ADD(%ClarionWordList,'#BREAK')
+  #ADD(%ClarionWordList,'#CYCLE')
+  #ADD(%ClarionWordList,'#CASE')
+  #ADD(%ClarionWordList,'#ENDCASE')
+  #ADD(%ClarionWordList,'#INDENT')
+  #ADD(%ClarionWordList,'#INSERT')
+  #ADD(%ClarionWordList,'#CALL')
+  #ADD(%ClarionWordList,'#INVOKE')
+  #ADD(%ClarionWordList,'#RETURN')
+  #ADD(%ClarionWordList,'#CREATE')                          #! File Management
+  #ADD(%ClarionWordList,'#OPEN')
+  #ADD(%ClarionWordList,'#CLOSE')
+  #ADD(%ClarionWordList,'#READ')
+  #ADD(%ClarionWordList,'#REDIRECT')
+  #ADD(%ClarionWordList,'#APPEND')
+  #ADD(%ClarionWordList,'#SECTION')
+  #ADD(%ClarionWordList,'#REMOVE')
+  #ADD(%ClarionWordList,'#REPLACE')
+  #ADD(%ClarionWordList,'#PRINT')
+  #ADD(%ClarionWordList,'#GENERATE')                        #! Generation
+  #ADD(%ClarionWordList,'#ABORT')
+  #ADD(%ClarionWordList,'#SUSPEND')
+  #ADD(%ClarionWordList,'#RELEASE')
+  #ADD(%ClarionWordList,'#RESUME')
+  #ADD(%ClarionWordList,'#?')
+  #ADD(%ClarionWordList,'#QUERY')
+  #ADD(%ClarionWordList,'#RUN')                             #! External Execution
+  #ADD(%ClarionWordList,'#SERVICE')
+  #ADD(%ClarionWordList,'#RUNDLL')
+  #ADD(%ClarionWordList,'#!')                               #! Miscellaneous
+  #ADD(%ClarionWordList,'#<')
+  #ADD(%ClarionWordList,'#ASSERT')
+  #ADD(%ClarionWordList,'#CLASS')
+  #ADD(%ClarionWordList,'#COMMENT')
+  #ADD(%ClarionWordList,'#DEBUG')
+  #ADD(%ClarionWordList,'#ERROR')
+  #ADD(%ClarionWordList,'#EXPORT')
+  #ADD(%ClarionWordList,'#HELP')
+  #ADD(%ClarionWordList,'#INCLUDE')
+  #ADD(%ClarionWordList,'#IMPORT')
+  #ADD(%ClarionWordList,'#MESSAGE')
+  #ADD(%ClarionWordList,'#PROTOTYPE')
+  #ADD(%ClarionWordList,'#PROJECT')
+  #ADD(%ClarionWordList,'CALL')                             #! Built in procedures
+  #ADD(%ClarionWordList,'EXTRACT')
+  #ADD(%ClarionWordList,'EXISTS')
+  #ADD(%ClarionWordList,'FILEEXISTS')
+  #ADD(%ClarionWordList,'FULLNAME')
+  #ADD(%ClarionWordList,'INLIST')
+  #ADD(%ClarionWordList,'INSTANCE')
+  #ADD(%ClarionWordList,'INVOKE')
+  #ADD(%ClarionWordList,'ITEMS')
+  #ADD(%ClarionWordList,'LINKNAME')
+  #ADD(%ClarionWordList,'QUOTE')
+  #ADD(%ClarionWordList,'REGISTERED')
+  #ADD(%ClarionWordList,'REPLACE')
+  #ADD(%ClarionWordList,'SEPARATOR')
+  #ADD(%ClarionWordList,'SLICE')
+  #ADD(%ClarionWordList,'UNQUOTE')
+  #ADD(%ClarionWordList,'VAREXISTS')
+  #ADD(%ClarionWordList,'%APPLICATION')                     #! %APPLICATION
+  #ADD(%ClarionWordList,'%APPLICATIONDEBUG')
+  #ADD(%ClarionWordList,'%APPLICATIONLOCALLIBRARY')
+  #ADD(%ClarionWordList,'%APPLICATIONTEMPLATE')
+  #ADD(%ClarionWordList,'%APPLICATIONTEMPLATEINSTANCE')
+  #ADD(%ClarionWordList,'%APPLICATIONTEMPLATEPARENTINSTANCE')
+  #ADD(%ClarionWordList,'%PROJECTTARGET')
+  #ADD(%ClarionWordList,'%TARGET32')
+  #ADD(%ClarionWordList,'%DICTIONARYCHANGED')
+  #ADD(%ClarionWordList,'%REGISTRYCHANGED')
+  #ADD(%ClarionWordList,'%PROGRAMDATECREATED')
+  #ADD(%ClarionWordList,'%PROGRAMDATECHANGED')
+  #ADD(%ClarionWordList,'%PROGRAMTIMECREATED')
+  #ADD(%ClarionWordList,'%PROGRAMTIMECHANGED')
+  #ADD(%ClarionWordList,'%FIRSTPROCEDURE')
+  #ADD(%ClarionWordList,'%HELPFILE')
+  #ADD(%ClarionWordList,'%PROGRAMEXTENSION')                #! EXE,DLL,LIB
+  #ADD(%ClarionWordList,'%DICTIONARYFILE')
+  #ADD(%ClarionWordList,'%DICTIONARYTOOLOPTIONS')
+  #ADD(%ClarionWordList,'%FILE')
+  #ADD(%ClarionWordList,'%PROGRAM')
+  #ADD(%ClarionWordList,'%GLOBALDATA')
+  #ADD(%ClarionWordList,'%GLOBALDATASTATEMENT')
+  #ADD(%ClarionWordList,'%GLOBALDATALEVEL')
+  #ADD(%ClarionWordList,'%MODULE')
+  #ADD(%ClarionWordList,'%CREATELOCALMAP')
+  #ADD(%ClarionWordList,'%QUICKPROCEDURE')
+  #ADD(%ClarionWordList,'%EDITPROCEDURE')
+  #ADD(%ClarionWordList,'%EDITFILENAME')
+  #ADD(%ClarionWordList,'%PROCEDURE')
+  #ADD(%ClarionWordList,'%FILE')                            #! %FILE
+  #ADD(%ClarionWordList,'%FILEIDENT')
+  #ADD(%ClarionWordList,'%FILEPREFIX')
+  #ADD(%ClarionWordList,'%FILEDESCRIPTION')
+  #ADD(%ClarionWordList,'%FILETYPE')                        #! FILE,VIEW,ALIAS
+  #ADD(%ClarionWordList,'%FILEUSAGE')                       #! FILE,GLOBAL,POOL
+  #ADD(%ClarionWordList,'%GLOBALDATALAST')
+  #ADD(%ClarionWordList,'%FILEDRIVER')
+  #ADD(%ClarionWordList,'%FILEDRIVERPARAMETER')
+  #ADD(%ClarionWordList,'%FILENAME')
+  #ADD(%ClarionWordList,'%FILEOWNER')
+  #ADD(%ClarionWordList,'%FILECREATE')
+  #ADD(%ClarionWordList,'%FILERECLAIM')
+  #ADD(%ClarionWordList,'%FILEENCRYPT')
+  #ADD(%ClarionWordList,'%FILEBINDABLE')
+  #ADD(%ClarionWordList,'%FILELONGDESC')
+  #ADD(%ClarionWordList,'%FILE32BITONLY')
+  #ADD(%ClarionWordList,'%FILESTRUCT')
+  #ADD(%ClarionWordList,'%FILESTRUCTEND')
+  #ADD(%ClarionWordList,'%FILESTRUCTREC')
+  #ADD(%ClarionWordList,'%FILESTRUCTRECEND')
+  #ADD(%ClarionWordList,'%FILESTATEMENT')
+  #ADD(%ClarionWordList,'%FILETHREADED')
+  #ADD(%ClarionWordList,'%FILEEXTERNAL')
+  #ADD(%ClarionWordList,'%FILEEXTERNALMODULE')
+  #ADD(%ClarionWordList,'%FILEPRIMARYKEY')
+  #ADD(%ClarionWordList,'%FILEQUICKOPTIONS')
+  #ADD(%ClarionWordList,'%FILEUSEROPTIONS')
+  #ADD(%ClarionWordList,'%FILETOOLOPTIONS')
+  #ADD(%ClarionWordList,'%VIEWFILTER')
+  #ADD(%ClarionWordList,'%VIEWSTRUCT')
+  #ADD(%ClarionWordList,'%VIEWSTRUCTEND')
+  #ADD(%ClarionWordList,'%VIEWSTATEMENT')
+  #ADD(%ClarionWordList,'%VIEWPRIMARY')
+  #ADD(%ClarionWordList,'%VIEWPRIMARYFIELD')
+  #ADD(%ClarionWordList,'%VIEWFILES')
+  #ADD(%ClarionWordList,'%ALIASFILE')
+  #ADD(%ClarionWordList,'%FIELD')
+  #ADD(%ClarionWordList,'%KEY')
+  #ADD(%ClarionWordList,'%KEYORDER')
+  #ADD(%ClarionWordList,'%RELATION')
+  #ADD(%ClarionWordList,'%VIEWFILES')                       #! %VIEWFILES
+  #ADD(%ClarionWordList,'%VIEWFILESTRUCT')
+  #ADD(%ClarionWordList,'%VIEWFILESTRUCTEND')
+  #ADD(%ClarionWordList,'%VIEWFILE')
+  #ADD(%ClarionWordList,'%VIEWJOINTO')
+  #ADD(%ClarionWordList,'%VIEWFILEFIELDS')
+  #ADD(%ClarionWordList,'%VIEWFILEFIELD')
+  #ADD(%ClarionWordList,'%FIELD')                           #! %FIELD
+  #ADD(%ClarionWordList,'%FIELDIDENT')
+  #ADD(%ClarionWordList,'%FIELDDERIVEDFROM')
+  #ADD(%ClarionWordList,'%FIELDDESCRIPTION')
+  #ADD(%ClarionWordList,'%FIELDLONGDESC')
+  #ADD(%ClarionWordList,'%FIELDFILE')
+  #ADD(%ClarionWordList,'%FIELDID')
+  #ADD(%ClarionWordList,'%FIELDDISPLAYPICTURE')
+  #ADD(%ClarionWordList,'%FIELDRECORDPICTURE')
+  #ADD(%ClarionWordList,'%FIELDDIMENSION1')
+  #ADD(%ClarionWordList,'%FIELDDIMENSION2')
+  #ADD(%ClarionWordList,'%FIELDDIMENSION3')
+  #ADD(%ClarionWordList,'%FIELDDIMENSION4')
+  #ADD(%ClarionWordList,'%FIELDHELPID')
+  #ADD(%ClarionWordList,'%FIELDNAME')
+  #ADD(%ClarionWordList,'%FIELDRANGELOW')
+  #ADD(%ClarionWordList,'%FIELDRANGEHIGH')
+  #ADD(%ClarionWordList,'%FIELDTYPE')
+  #ADD(%ClarionWordList,'%FIELDPLACES')
+  #ADD(%ClarionWordList,'%FIELDMEMOSIZE')
+  #ADD(%ClarionWordList,'%FIELDMEMOIMAGE')
+  #ADD(%ClarionWordList,'%FIELDINITIAL')
+  #ADD(%ClarionWordList,'%FIELDLOOKUP')
+  #ADD(%ClarionWordList,'%FIELDSTRUCT')
+  #ADD(%ClarionWordList,'%FIELDSTATEMENT')
+  #ADD(%ClarionWordList,'%FIELDHEADER')
+  #ADD(%ClarionWordList,'%FIELDPICTURE')
+  #ADD(%ClarionWordList,'%FIELDJUSTTYPE')                   #! L,R,C,D
+  #ADD(%ClarionWordList,'%FIELDJUSTINDENT')
+  #ADD(%ClarionWordList,'%FIELDFORMATWIDTH')
+  #ADD(%ClarionWordList,'%FIELDSCREENCONTROL')
+  #ADD(%ClarionWordList,'%FIELDSCREENCONTROLWIDTH')
+  #ADD(%ClarionWordList,'%FIELDSCREENCONTROLHEIGHT')
+  #ADD(%ClarionWordList,'%FIELDREPORTCONTROL')
+  #ADD(%ClarionWordList,'%FIELDREPORTCONTROLWIDTH')
+  #ADD(%ClarionWordList,'%FIELDREPORTCONTROLHEIGHT')
+  #ADD(%ClarionWordList,'%FIELDVALIDATION')         #! NONZERO,INRANGE,BOOLEAN,INFILE,INLIST
+  #ADD(%ClarionWordList,'%FIELDCHOICES')
+  #ADD(%ClarionWordList,'%FIELDVALUES')
+  #ADD(%ClarionWordList,'%FIELDTRUEVALUE')
+  #ADD(%ClarionWordList,'%FIELDFALSEVALUE')
+  #ADD(%ClarionWordList,'%FIELDDISPLAYCHOICES')
+  #ADD(%ClarionWordList,'%FIELDQUICKOPTIONS')
+  #ADD(%ClarionWordList,'%FIELDUSEROPTIONS')
+  #ADD(%ClarionWordList,'%FIELDTOOLOPTIONS')
+  #ADD(%ClarionWordList,'%KEY')                             #! %KEY / %KEYORDER
+  #ADD(%ClarionWordList,'%KEYIDENT')
+  #ADD(%ClarionWordList,'%KEYDESCRIPTION')
+  #ADD(%ClarionWordList,'%KEYLONGDESC')
+  #ADD(%ClarionWordList,'%KEYFILE')
+  #ADD(%ClarionWordList,'%KEYID')
+  #ADD(%ClarionWordList,'%KEYINDEX')                        #! KEY,INDEX,DYNAMIC
+  #ADD(%ClarionWordList,'%KEYNAME')
+  #ADD(%ClarionWordList,'%KEYAUTO')
+  #ADD(%ClarionWordList,'%KEYDUPLICATE')
+  #ADD(%ClarionWordList,'%KEYEXCLUDENULLS')
+  #ADD(%ClarionWordList,'%KEYNOCASE')
+  #ADD(%ClarionWordList,'%KEYPRIMARY')
+  #ADD(%ClarionWordList,'%KEYSTRUCT')
+  #ADD(%ClarionWordList,'%KEYSTATEMENT')
+  #ADD(%ClarionWordList,'%KEYFIELD')
+  #ADD(%ClarionWordList,'%KEYFIELDSEQUENCE')
+  #ADD(%ClarionWordList,'%KEYQUICKOPTIONS')
+  #ADD(%ClarionWordList,'%KEYUSEROPTIONS')
+  #ADD(%ClarionWordList,'%KEYTOOLOPTIONS')
+  #ADD(%ClarionWordList,'%KEYORDER')
+  #ADD(%ClarionWordList,'%KEYORDERIDENT')
+  #ADD(%ClarionWordList,'%KEYORDERDESCRIPTION')
+  #ADD(%ClarionWordList,'%KEYORDERLONGDESC')
+  #ADD(%ClarionWordList,'%KEYORDERFILE')
+  #ADD(%ClarionWordList,'%KEYORDERID')
+  #ADD(%ClarionWordList,'%KEYORDERINDEX')                   #! KEY,INDEX,DYNAMIC
+  #ADD(%ClarionWordList,'%KEYORDERNAME')
+  #ADD(%ClarionWordList,'%KEYORDERAUTO')
+  #ADD(%ClarionWordList,'%KEYORDERDUPLICATE')
+  #ADD(%ClarionWordList,'%KEYORDEREXCLUDENULLS')
+  #ADD(%ClarionWordList,'%KEYORDERNOCASE')
+  #ADD(%ClarionWordList,'%KEYORDERPRIMARY')
+  #ADD(%ClarionWordList,'%KEYORDERSTRUCT')
+  #ADD(%ClarionWordList,'%KEYORDERSTATEMENT')
+  #ADD(%ClarionWordList,'%KEYORDERQUICKOPTIONS')
+  #ADD(%ClarionWordList,'%KEYORDERUSEROPTIONS')
+  #ADD(%ClarionWordList,'%KEYORDERTOOLOPTIONS')
+  #ADD(%ClarionWordList,'%RELATION')                        #! %RELATION
+  #ADD(%ClarionWordList,'%RELATIONPREFIX')
+  #ADD(%ClarionWordList,'%RELATIONALIAS')
+  #ADD(%ClarionWordList,'%FILERELATIONTYPE')                #! 1:MANY,MANY:1
+  #ADD(%ClarionWordList,'%RELATIONKEY')
+  #ADD(%ClarionWordList,'%FILEKEY')
+  #ADD(%ClarionWordList,'%RELATIONCONSTRAINTDELETE')
+  #ADD(%ClarionWordList,'%RELATIONCONSTRAINTUPDATE')
+  #ADD(%ClarionWordList,'%RELATIONKEYFIELD')
+  #ADD(%ClarionWordList,'%RELATIONKEYFIELDLINK')
+  #ADD(%ClarionWordList,'%FILEKEYFIELD')
+  #ADD(%ClarionWordList,'%FILEKEYFIELDLINK')
+  #ADD(%ClarionWordList,'%RELATIONQUICKOPTIONS')
+  #ADD(%ClarionWordList,'%RELATIONUSEROPTIONS')
+  #ADD(%ClarionWordList,'%RELATIONTOOLOPTIONS')
+  #ADD(%ClarionWordList,'%MODULE')                          #! %MODULE
+  #ADD(%ClarionWordList,'%MODULELANGUAGE')
+  #ADD(%ClarionWordList,'%MODULETEMPLATE')
+  #ADD(%ClarionWordList,'%MODULECHANGED')
+  #ADD(%ClarionWordList,'%MODULEEXTERNAL')
+  #ADD(%ClarionWordList,'%MODULEREADONLY')
+  #ADD(%ClarionWordList,'%MODULEEXTENSION')
+  #ADD(%ClarionWordList,'%MODULEBASE')
+  #ADD(%ClarionWordList,'%MODULEINCLUDE')
+  #ADD(%ClarionWordList,'%MODULEPROCEDURE')
+  #ADD(%ClarionWordList,'%MODULEDATA')
+  #ADD(%ClarionWordList,'%MODULEDATASTATEMENT')
+  #ADD(%ClarionWordList,'%PROCEDURE')                       #! %PROCEDURE
+  #ADD(%ClarionWordList,'%PROCEDURETODO')
+  #ADD(%ClarionWordList,'%PROCEDURETYPE')                   #! PROCEDURE,FUNCTION
+  #ADD(%ClarionWordList,'%PROCEDURERETURNTYPE')
+  #ADD(%ClarionWordList,'%PROCEDUREDATECREATED')
+  #ADD(%ClarionWordList,'%PROCEDUREDATECHANGED')
+  #ADD(%ClarionWordList,'%PROCEDURETIMECREATED')
+  #ADD(%ClarionWordList,'%PROCEDURETIMECHANGED')
+  #ADD(%ClarionWordList,'%PROCEDUREREADONLY')
+  #ADD(%ClarionWordList,'%PROCEDUREISGLOBAL')
+  #ADD(%ClarionWordList,'%PROTOTYPE')
+  #ADD(%ClarionWordList,'%PROCEDURETEMPLATE')
+  #ADD(%ClarionWordList,'%PROCEDUREDESCRIPTION')
+  #ADD(%ClarionWordList,'%PROCEDUREEXPORTED')
+  #ADD(%ClarionWordList,'%PROCEDURELONGDESCRIPTION')
+  #ADD(%ClarionWordList,'%PROCEDURECALLED')
+  #ADD(%ClarionWordList,'%LOCALDATA')
+  #ADD(%ClarionWordList,'%LOCALDATASTATEMENT')
+  #ADD(%ClarionWordList,'%LOCALDATADESCRIPTION')
+  #ADD(%ClarionWordList,'%LOCALDATAHEADER')
+  #ADD(%ClarionWordList,'%LOCALDATAPICTURE')
+  #ADD(%ClarionWordList,'%LOCALDATAJUSTTYPE')               #! L,R,C,D
+  #ADD(%ClarionWordList,'%LOCALDATAJUSTINDENT')
+  #ADD(%ClarionWordList,'%LOCALDATAFORMATWIDTH')
+  #ADD(%ClarionWordList,'%ACTIVETEMPLATE')
+  #ADD(%ClarionWordList,'%ACTIVETEMPLATEINSTANCE')
+  #ADD(%ClarionWordList,'%ACTIVETEMPLATEOWNERINSTANCE')
+  #ADD(%ClarionWordList,'%ACTIVETEMPLATEPARENTINSTANCE')
+  #ADD(%ClarionWordList,'%ACTIVETEMPLATEPRIMARYINSTANCE')
+  #ADD(%ClarionWordList,'%WINDOW')                          #! %WINDOW / %CONTROL
+  #ADD(%ClarionWordList,'%WINDOWSTATEMENT')
+  #ADD(%ClarionWordList,'%MENUBARSTATEMENT')
+  #ADD(%ClarionWordList,'%TOOLBARSTATEMENT')
+  #ADD(%ClarionWordList,'%WINDOWEVENT')
+  #ADD(%ClarionWordList,'%CONTROL')
+  #ADD(%ClarionWordList,'%CONTROLUSE')
+  #ADD(%ClarionWordList,'%CONTROLSTATEMENT')
+  #ADD(%ClarionWordList,'%CONTROLUNSPLITSTATEMENT')
+  #ADD(%ClarionWordList,'%CONTROLTYPE')                     #! MENU,ITEM,ENTRY,BUTTON,...
+  #ADD(%ClarionWordList,'%CONTROLTEMPLATE')
+  #ADD(%ClarionWordList,'%CONTROLTOOL')
+  #ADD(%ClarionWordList,'%CONTROLPARENT')                   #! OPTION,GROUP
+  #ADD(%ClarionWordList,'%CONTROLPARENTTYPE')
+  #ADD(%ClarionWordList,'%CONTROLPARENTTAB')
+  #ADD(%ClarionWordList,'%CONTROLPARAMETER')
+  #ADD(%ClarionWordList,'%CONTROLDEFAULTWIDTH')
+  #ADD(%ClarionWordList,'%CONTROLDEFAULTHEIGHT')
+  #ADD(%ClarionWordList,'%CONTROLMENU')
+  #ADD(%ClarionWordList,'%CONTROLTOOLBAR')
+  #ADD(%ClarionWordList,'%CONTROLMENUBAR')
+  #ADD(%ClarionWordList,'%CONTROLINDENT')
+  #ADD(%ClarionWordList,'%CONTROLINSTANCE')
+  #ADD(%ClarionWordList,'%CONTROLORIGINAL')
+  #ADD(%ClarionWordList,'%CONTROLFROM')
+  #ADD(%ClarionWordList,'%CONTROLALERT')
+  #ADD(%ClarionWordList,'%CONTROLEVENT')
+  #ADD(%ClarionWordList,'%CONTROLFIELD')
+  #ADD(%ClarionWordList,'%CONTROLFIELDHASICON')
+  #ADD(%ClarionWordList,'%CONTROLFIELDHASCOLOR')
+  #ADD(%ClarionWordList,'%CONTROLFIELDHASTREE')
+  #ADD(%ClarionWordList,'%CONTROLFIELDHASLOCATOR')
+  #ADD(%ClarionWordList,'%CONTROLFIELDPICTURE')
+  #ADD(%ClarionWordList,'%CONTROLFIELDHEADING')
+  #ADD(%ClarionWordList,'%CONTROLFIELDFORMAT')
+  #ADD(%ClarionWordList,'%REPORT')                          #! %REPORT
+  #ADD(%ClarionWordList,'%REPORTSTATEMENT')
+  #ADD(%ClarionWordList,'%REPORTCONTROL')
+  #ADD(%ClarionWordList,'%REPORTCONTROLUSE')
+  #ADD(%ClarionWordList,'%REPORTCONTROLSTATEMENT')
+  #ADD(%ClarionWordList,'%REPORTCONTROLTYPE')
+  #ADD(%ClarionWordList,'%REPORTCONTROLTEMPLATE')
+  #ADD(%ClarionWordList,'%REPORTCONTROLINDENT')
+  #ADD(%ClarionWordList,'%REPORTCONTROLINSTANCE')
+  #ADD(%ClarionWordList,'%REPORTCONTROLORIGINAL')
+  #ADD(%ClarionWordList,'%REPORTCONTROLLABEL')
+  #ADD(%ClarionWordList,'%REPORTCONTROLFIELD')
+  #ADD(%ClarionWordList,'%FORMULA')                         #! %FORMULA
+  #ADD(%ClarionWordList,'%FORMULADESCRIPTION')
+  #ADD(%ClarionWordList,'%FORMULACLASS')
+  #ADD(%ClarionWordList,'%FORMULAINSTANCE')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSION')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSIONTYPE')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSIONTRUE')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSIONFALSE')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSIONOF')
+  #ADD(%ClarionWordList,'%FORMULAEXPRESSIONCASE')
+  #ADD(%ClarionWordList,'%PRIMARY')                         #! %PRIMARY (File Schematic)
+  #ADD(%ClarionWordList,'%PRIMARYKEY')
+  #ADD(%ClarionWordList,'%PRIMARYINSTANCE')
+  #ADD(%ClarionWordList,'%SECONDARY')
+  #ADD(%ClarionWordList,'%SECONDARYTO')
+  #ADD(%ClarionWordList,'%SECONDARYTYPE')                   #! 1:MANY,MANY:1
+  #ADD(%ClarionWordList,'%SECONDARYCUSTOMJOIN')
+  #ADD(%ClarionWordList,'%SECONDARYCUSTOMTEXT')
+  #ADD(%ClarionWordList,'%OTHERFILES')
+  #ADD(%ClarionWordList,'%DRIVER')                          #! %DRIVER
+  #ADD(%ClarionWordList,'%DRIVERDLL')
+  #ADD(%ClarionWordList,'%DRIVERLIB')
+  #ADD(%ClarionWordList,'%DRIVERDESCRIPTION')
+  #ADD(%ClarionWordList,'%DRIVERCREATE')
+  #ADD(%ClarionWordList,'%DRIVEROWNER')
+  #ADD(%ClarionWordList,'%DRIVERENCRYPT')
+  #ADD(%ClarionWordList,'%DRIVERRECLAIM')
+  #ADD(%ClarionWordList,'%DRIVERMAXKEYS')
+  #ADD(%ClarionWordList,'%DRIVERUNIQUEKEY')
+  #ADD(%ClarionWordList,'%DRIVERREQUIRED')
+  #ADD(%ClarionWordList,'%DRIVERMEMO')
+  #ADD(%ClarionWordList,'%DRIVERBINMEMO')
+  #ADD(%ClarionWordList,'%DRIVERSQL')
+  #ADD(%ClarionWordList,'%DRIVERTYPE')
+  #ADD(%ClarionWordList,'%DRIVEROPCODE')
+  #ADD(%ClarionWordList,'%CONDITIONALGENERATE')             #! Miscellaneous symbols
+  #ADD(%ClarionWordList,'%CWVERSION')
+  #ADD(%ClarionWordList,'%NULL')
+  #ADD(%ClarionWordList,'%TRUE')
+  #ADD(%ClarionWordList,'%FALSE')
+  #ADD(%ClarionWordList,'%EOF')
+  #ADD(%ClarionWordList,'%BYTESOUTPUT')
+  #ADD(%ClarionWordList,'%EMBEDID')
+  #ADD(%ClarionWordList,'%EMBEDDESCRIPTION')
+  #ADD(%ClarionWordList,'%EMBEDPARAMETERS')
+  #ADD(%ClarionWordList,'%WIN32')
+  #ADD(%ClarionWordList,'[END]')                            #! Export/Inport text formats
+  #ADD(%ClarionWordList,'!!>')
+  #ADD(%ClarionWordList,'[DICTIONARY]')                     #! TXD
+  #ADD(%ClarionWordList,'[FILES]')
+  #ADD(%ClarionWordList,'[ALIASES]')
+  #ADD(%ClarionWordList,'[RELATIONS]')
+  #ADD(%ClarionWordList,'[LONGDESC]')
+  #ADD(%ClarionWordList,'[QUICKCODE]')
+  #ADD(%ClarionWordList,'[USEROPTION]')
+  #ADD(%ClarionWordList,'[TOOLOPTION]')
+  #ADD(%ClarionWordList,'[SCREENCONTROLS]')
+  #ADD(%ClarionWordList,'[REPORTCONTROLS]')
+  #ADD(%ClarionWordList,'[APPLICATION]')                    #! TXA
+  #ADD(%ClarionWordList,'[PROJECT]')
+  #ADD(%ClarionWordList,'[PROGRAM]')
+  #ADD(%ClarionWordList,'[MODULE]')
+  #ADD(%ClarionWordList,'[PROCEDURE]')
+  #ADD(%ClarionWordList,'[COMMON]')
+  #ADD(%ClarionWordList,'[DATA]')
+  #ADD(%ClarionWordList,'[FILES]')
+  #ADD(%ClarionWordList,'[PRIMARY]')
+  #ADD(%ClarionWordList,'[INSTANCE]')
+  #ADD(%ClarionWordList,'[KEY]')
+  #ADD(%ClarionWordList,'[SECONDARY]')
+  #ADD(%ClarionWordList,'[OTHERS]')
+  #ADD(%ClarionWordList,'[PROMPTS]')
+  #ADD(%ClarionWordList,'[EMBED]')
+  #ADD(%ClarionWordList,'[INSTANCES]')
+  #ADD(%ClarionWordList,'[DEFINITION]')
+  #ADD(%ClarionWordList,'[SOURCE]')
+  #ADD(%ClarionWordList,'[TEMPLATE]')
+  #ADD(%ClarionWordList,'[GROUP]')
+  #ADD(%ClarionWordList,'[ADDITION]')
+  #ADD(%ClarionWordList,'[FIELDPROMPT]')
+  #ADD(%ClarionWordList,'[INSTANCE]')
+  #ADD(%ClarionWordList,'[PROMPTS]')
+  #ADD(%ClarionWordList,'[PERSIST]')
+  #ADD(%ClarionWordList,'[CALLS]')
+  #ADD(%ClarionWordList,'[WINDOW]')
+  #ADD(%ClarionWordList,'[REPORT]')
+  #ADD(%ClarionWordList,'[FORMULA]')
+  #ADD(%ClarionWordList,'VERSION')                          #! Miscellaneous
+  #ADD(%ClarionWordList,'CREATED')
+  #ADD(%ClarionWordList,'MODIFIED')
+  #ADD(%ClarionWordList,'PASSWORD')
+  #ADD(%ClarionWordList,'NOPOPULATE')
+  #ADD(%ClarionWordList,'IDENT')
+  #ADD(%ClarionWordList,'USAGE')
+  #ADD(%ClarionWordList,'FILE')
+  #ADD(%ClarionWordList,'GLOBAL')
+  #ADD(%ClarionWordList,'POOL')
+  #ADD(%ClarionWordList,'LAST')
+  #ADD(%ClarionWordList,'ORDER')
+  #ADD(%ClarionWordList,'NORMAL')
+  #ADD(%ClarionWordList,'FIRST')
+  #ADD(%ClarionWordList,'AUTO')
+  #ADD(%ClarionWordList,'VERTICALSPACE')
+  #ADD(%ClarionWordList,'TAB')
+  #ADD(%ClarionWordList,'VALID')
+  #ADD(%ClarionWordList,'INITIAL')
+  #ADD(%ClarionWordList,'PROMPT')
+  #ADD(%ClarionWordList,'HEADER')
+  #ADD(%ClarionWordList,'HELP')
+  #ADD(%ClarionWordList,'MESSAGE')
+  #ADD(%ClarionWordList,'TOOLTIP')
+  #ADD(%ClarionWordList,'PICTURE')
+  #ADD(%ClarionWordList,'CASE')
+  #ADD(%ClarionWordList,'TYPEMODE')
+  #ADD(%ClarionWordList,'READONLY')
+  #ADD(%ClarionWordList,'NONZERO')
+  #ADD(%ClarionWordList,'INRANGE')
+  #ADD(%ClarionWordList,'BOOLEAN')
+  #ADD(%ClarionWordList,'INFILE')
+  #ADD(%ClarionWordList,'INLIST')
+  #ADD(%ClarionWordList,'RELATION')
+  #ADD(%ClarionWordList,'ONE:MANY')
+  #ADD(%ClarionWordList,'MANY:ONE')
+  #ADD(%ClarionWordList,'UPDATE')
+  #ADD(%ClarionWordList,'DELETE')
+  #ADD(%ClarionWordList,'NONE')
+  #ADD(%ClarionWordList,'RESTRICT')
+  #ADD(%ClarionWordList,'CASCADE')
+  #ADD(%ClarionWordList,'CLEAR')
+  #ADD(%ClarionWordList,'RESTRICT-SERVER')
+  #ADD(%ClarionWordList,'CASCADE-SERVER')
+  #ADD(%ClarionWordList,'CLEAR-SERVER')
+  #ADD(%ClarionWordList,'FILE_TO_RELATED_KEY')
+  #ADD(%ClarionWordList,'RELATED_FILE_TO_KEY')
+  #ADD(%ClarionWordList,'FIELD')
+  #ADD(%ClarionWordList,'NOLINK')
+  #ADD(%ClarionWordList,'HLP')
+  #ADD(%ClarionWordList,'DICTIONARY')
+  #ADD(%ClarionWordList,'PROCEDURE')
+  #ADD(%ClarionWordList,'LONGDESC')
+  #ADD(%ClarionWordList,'FROM')
+  #ADD(%ClarionWordList,'NAME')
+  #ADD(%ClarionWordList,'INCLUDE')
+  #ADD(%ClarionWordList,'#SEQ')
+  #ADD(%ClarionWordList,'#ORIG')
+  #ADD(%ClarionWordList,'#FIELDS')
+  #ADD(%ClarionWordList,'#LINK')
+  #ADD(%ClarionWordList,'DEFINE')
+  #ADD(%ClarionWordList,'ASSIGN')
+  #ADD(%ClarionWordList,'CLASS')
+  #ADD(%ClarionWordList,'DESCRIPTION')
+  #ADD(%ClarionWordList,'LONG')
+  #ADD(%ClarionWordList,'REAL')
+  #ADD(%ClarionWordList,'STRING')
+  #ADD(%ClarionWordList,'FILE')
+  #ADD(%ClarionWordList,'FIELD')
+  #ADD(%ClarionWordList,'KEY')
+  #ADD(%ClarionWordList,'COMPONENT')
+  #ADD(%ClarionWordList,'PROCEDURE')
+  #ADD(%ClarionWordList,'DEFAULT')
+  #ADD(%ClarionWordList,'DEPEND')
+  #ADD(%ClarionWordList,'WHEN')
+  #ADD(%ClarionWordList,'TIMES')
+  #ADD(%ClarionWordList,'INSTANCE')
+  #ADD(%ClarionWordList,'PARENT')
+  #ADD(%ClarionWordList,'PROCPROP')
+  #ADD(%ClarionWordList,'#ABORT')                           #! Project System
+  #ADD(%ClarionWordList,'#AND')
+  #ADD(%ClarionWordList,'#AUTOCOMPILE')
+  #ADD(%ClarionWordList,'#COMPILE')
+  #ADD(%ClarionWordList,'#DECLARE_COMPILER')
+  #ADD(%ClarionWordList,'#DOLINK')
+  #ADD(%ClarionWordList,'#ELSE')
+  #ADD(%ClarionWordList,'#ELSIF')
+  #ADD(%ClarionWordList,'#ENDIF')
+  #ADD(%ClarionWordList,'#ERROR')
+  #ADD(%ClarionWordList,'#EXEMOD')
+  #ADD(%ClarionWordList,'#EXISTS')
+  #ADD(%ClarionWordList,'#EXPAND')
+  #ADD(%ClarionWordList,'#FILE')
+  #ADD(%ClarionWordList,'#IF')
+  #ADD(%ClarionWordList,'#IGNORE')
+  #ADD(%ClarionWordList,'#IMPLIB')
+  #ADD(%ClarionWordList,'#INCLUDE')
+  #ADD(%ClarionWordList,'#LINK')
+  #ADD(%ClarionWordList,'#MESSAGE')
+  #ADD(%ClarionWordList,'#MODEL')
+  #ADD(%ClarionWordList,'#NOEDIT')
+  #ADD(%ClarionWordList,'#NOT')
+  #ADD(%ClarionWordList,'#OLDER')
+  #ADD(%ClarionWordList,'#OR')
+  #ADD(%ClarionWordList,'#PRAGMA')
+  #ADD(%ClarionWordList,'#PROMPT')
+  #ADD(%ClarionWordList,'#RUN')
+  #ADD(%ClarionWordList,'#RUNDLL')
+  #ADD(%ClarionWordList,'#SET')
+  #ADD(%ClarionWordList,'#SPLIT')
+  #ADD(%ClarionWordList,'#SYSTEM')
+  #ADD(%ClarionWordList,'#THEN')
+  #ADD(%ClarionWordList,'#TO')
+  #ADD(%ClarionWordList,'EVENT:ACCEPTED')                   #! Event Equates
+  #ADD(%ClarionWordList,'EVENT:NEWSELECTION')
+  #ADD(%ClarionWordList,'EVENT:SCROLLUP')
+  #ADD(%ClarionWordList,'EVENT:SCROLLDOWN')
+  #ADD(%ClarionWordList,'EVENT:PAGEUP')
+  #ADD(%ClarionWordList,'EVENT:PAGEDOWN')
+  #ADD(%ClarionWordList,'EVENT:SCROLLTOP')
+  #ADD(%ClarionWordList,'EVENT:SCROLLBOTTOM')
+  #ADD(%ClarionWordList,'EVENT:LOCATE')
+  #ADD(%ClarionWordList,'EVENT:MOUSEDOWN')
+  #ADD(%ClarionWordList,'EVENT:MOUSEUP')
+  #ADD(%ClarionWordList,'EVENT:MOUSEIN')
+  #ADD(%ClarionWordList,'EVENT:MOUSEOUT')
+  #ADD(%ClarionWordList,'EVENT:MOUSEMOVE')
+  #ADD(%ClarionWordList,'EVENT:VBXEVENT')
+  #ADD(%ClarionWordList,'EVENT:ALERTKEY')
+  #ADD(%ClarionWordList,'EVENT:PREALERTKEY')
+  #ADD(%ClarionWordList,'EVENT:DRAGGING')
+  #ADD(%ClarionWordList,'EVENT:DRAG')
+  #ADD(%ClarionWordList,'EVENT:DROP')
+  #ADD(%ClarionWordList,'EVENT:SCROLLDRAG')
+  #ADD(%ClarionWordList,'EVENT:TABCHANGING')
+  #ADD(%ClarionWordList,'EVENT:EXPANDING')
+  #ADD(%ClarionWordList,'EVENT:CONTRACTING')
+  #ADD(%ClarionWordList,'EVENT:EXPANDED')
+  #ADD(%ClarionWordList,'EVENT:CONTRACTED')
+  #ADD(%ClarionWordList,'EVENT:REJECTED')
+  #ADD(%ClarionWordList,'EVENT:DROPPINGDOWN')
+  #ADD(%ClarionWordList,'EVENT:DROPPEDDOWN')
+  #ADD(%ClarionWordList,'EVENT:SCROLLTRACK')
+  #ADD(%ClarionWordList,'EVENT:COLUMNRESIZE')
+  #ADD(%ClarionWordList,'EVENT:SELECTING')
+  #ADD(%ClarionWordList,'EVENT:SELECTED')
+  #ADD(%ClarionWordList,'EVENT:CLOSEWINDOW')
+  #ADD(%ClarionWordList,'EVENT:CLOSEDOWN')
+  #ADD(%ClarionWordList,'EVENT:OPENWINDOW')
+  #ADD(%ClarionWordList,'EVENT:OPENFAILED')
+  #ADD(%ClarionWordList,'EVENT:LOSEFOCUS')
+  #ADD(%ClarionWordList,'EVENT:GAINFOCUS')
+  #ADD(%ClarionWordList,'EVENT:SUSPEND')
+  #ADD(%ClarionWordList,'EVENT:RESUME')
+  #ADD(%ClarionWordList,'EVENT:TIMER')
+  #ADD(%ClarionWordList,'EVENT:DDEREQUEST')
+  #ADD(%ClarionWordList,'EVENT:DDEADVISE')
+  #ADD(%ClarionWordList,'EVENT:DDEDATA')
+  #ADD(%ClarionWordList,'EVENT:DDECOMMAND')
+  #ADD(%ClarionWordList,'EVENT:DDEEXECUTE')
+  #ADD(%ClarionWordList,'EVENT:DDEPOKE')
+  #ADD(%ClarionWordList,'EVENT:DDECLOSED')
+  #ADD(%ClarionWordList,'EVENT:MOVE')
+  #ADD(%ClarionWordList,'EVENT:SIZE')
+  #ADD(%ClarionWordList,'EVENT:RESTORE')
+  #ADD(%ClarionWordList,'EVENT:MAXIMIZE')
+  #ADD(%ClarionWordList,'EVENT:ICONIZE')
+  #ADD(%ClarionWordList,'EVENT:COMPLETED')
+  #ADD(%ClarionWordList,'EVENT:MOVED')
+  #ADD(%ClarionWordList,'EVENT:SIZED')
+  #ADD(%ClarionWordList,'EVENT:RESTORED')
+  #ADD(%ClarionWordList,'EVENT:MAXIMIZED')
+  #ADD(%ClarionWordList,'EVENT:ICONIZED')
+  #ADD(%ClarionWordList,'EVENT:DOCKED')
+  #ADD(%ClarionWordList,'EVENT:UNDOCKED')
+  #ADD(%ClarionWordList,'EVENT:BUILDFILE')
+  #ADD(%ClarionWordList,'EVENT:BUILDKEY')
+  #ADD(%ClarionWordList,'EVENT:BUILDDONE')
+  #ADD(%ClarionWordList,'EVENT:USER')
+  #ADD(%ClarionWordList,'EVENT:LAST')
+  #ADD(%ClarionWordList,'STD:WINDOWLIST')                   #! Standard Equates
+  #ADD(%ClarionWordList,'STD:TILEWINDOW')
+  #ADD(%ClarionWordList,'STD:CASCADEWINDOW')
+  #ADD(%ClarionWordList,'STD:ARRANGEICONS')
+  #ADD(%ClarionWordList,'STD:HELPINDEX')
+  #ADD(%ClarionWordList,'STD:HELPONHELP')
+  #ADD(%ClarionWordList,'STD:HELPSEARCH')
+  #ADD(%ClarionWordList,'STD:HELP')
+  #ADD(%ClarionWordList,'STD:CUT')
+  #ADD(%ClarionWordList,'STD:COPY')
+  #ADD(%ClarionWordList,'STD:PASTE')
+  #ADD(%ClarionWordList,'STD:CLEAR')
+  #ADD(%ClarionWordList,'STD:UNDO')
+  #ADD(%ClarionWordList,'STD:CLOSE')
+  #ADD(%ClarionWordList,'STD:PRINTSETUP')
+  #ADD(%ClarionWordList,'STD:TILEHORIZONTAL')
+  #ADD(%ClarionWordList,'STD:TILEVERTICAL')
+  #ADD(%ClarionWordList,'CURSOR:NONE')                      #! Cursor Equates
+  #ADD(%ClarionWordList,'CURSOR:ARROW')
+  #ADD(%ClarionWordList,'CURSOR:IBEAM')
+  #ADD(%ClarionWordList,'CURSOR:WAIT')
+  #ADD(%ClarionWordList,'CURSOR:CROSS')
+  #ADD(%ClarionWordList,'CURSOR:UPARROW')
+  #ADD(%ClarionWordList,'CURSOR:SIZE')
+  #ADD(%ClarionWordList,'CURSOR:ICON')
+  #ADD(%ClarionWordList,'CURSOR:SIZENWSE')
+  #ADD(%ClarionWordList,'CURSOR:SIZENESW')
+  #ADD(%ClarionWordList,'CURSOR:SIZEWE')
+  #ADD(%ClarionWordList,'CURSOR:SIZENS')
+  #ADD(%ClarionWordList,'CURSOR:DRAGWE')
+  #ADD(%ClarionWordList,'CURSOR:DROP')
+  #ADD(%ClarionWordList,'CURSOR:NODROP')
+  #ADD(%ClarionWordList,'CURSOR:ZOOM')
+  #ADD(%ClarionWordList,'ICON:NONE')                        #! Icon Equates
+  #ADD(%ClarionWordList,'ICON:APPLICATION')
+  #ADD(%ClarionWordList,'ICON:HAND')
+  #ADD(%ClarionWordList,'ICON:QUESTION')
+  #ADD(%ClarionWordList,'ICON:EXCLAMATION')
+  #ADD(%ClarionWordList,'ICON:ASTERISK')
+  #ADD(%ClarionWordList,'ICON:PICK')
+  #ADD(%ClarionWordList,'ICON:SAVE')
+  #ADD(%ClarionWordList,'ICON:PRINT')
+  #ADD(%ClarionWordList,'ICON:PASTE')
+  #ADD(%ClarionWordList,'ICON:OPEN')
+  #ADD(%ClarionWordList,'ICON:NEW')
+  #ADD(%ClarionWordList,'ICON:HELP')
+  #ADD(%ClarionWordList,'ICON:CUT')
+  #ADD(%ClarionWordList,'ICON:COPY')
+  #ADD(%ClarionWordList,'ICON:CHILD')
+  #ADD(%ClarionWordList,'ICON:FRAME')
+  #ADD(%ClarionWordList,'ICON:CLARION')
+  #ADD(%ClarionWordList,'ICON:NOPRINT')
+  #ADD(%ClarionWordList,'ICON:ZOOM')
+  #ADD(%ClarionWordList,'ICON:NEXTPAGE')
+  #ADD(%ClarionWordList,'ICON:PREVPAGE')
+  #ADD(%ClarionWordList,'ICON:JUMPPAGE')
+  #ADD(%ClarionWordList,'ICON:THUMBNAIL')
+  #ADD(%ClarionWordList,'ICON:TICK')
+  #ADD(%ClarionWordList,'ICON:CROSS')
+  #ADD(%ClarionWordList,'ICON:CONNECT')
+  #ADD(%ClarionWordList,'ICON:PRINT1')
+  #ADD(%ClarionWordList,'ICON:ELLIPSIS')
+  #ADD(%ClarionWordList,'ICON:VCRTOP')
+  #ADD(%ClarionWordList,'ICON:VCRREWIND')
+  #ADD(%ClarionWordList,'ICON:VCRBACK')
+  #ADD(%ClarionWordList,'ICON:VCRPLAY')
+  #ADD(%ClarionWordList,'ICON:VCRFASTFORWARD')
+  #ADD(%ClarionWordList,'ICON:VCRBOTTOM')
+  #ADD(%ClarionWordList,'ICON:VCRLOCATE')
+  #ADD(%ClarionWordList,'BEEP:SYSTEMDEFAULT')               #! Speaker equates
+  #ADD(%ClarionWordList,'BEEP:SYSTEMHAND')
+  #ADD(%ClarionWordList,'BEEP:SYSTEMQUESTION')
+  #ADD(%ClarionWordList,'BEEP:SYSTEMEXCLAMATION')
+  #ADD(%ClarionWordList,'BEEP:SYSTEMASTERISK')
+  #ADD(%ClarionWordList,'REJECT:RANGEHIGH')                 #! Record Reject Equates
+  #ADD(%ClarionWordList,'REJECT:RANGELOW')
+  #ADD(%ClarionWordList,'REJECT:RANGE')
+  #ADD(%ClarionWordList,'REJECT:INVALID')
+  #ADD(%ClarionWordList,'COLOR:NONE')                       #! Color Equates
+  #ADD(%ClarionWordList,'COLOR:NONE')
+  #ADD(%ClarionWordList,'COLOR:SCROLLBAR')
+  #ADD(%ClarionWordList,'COLOR:BACKGROUND')
+  #ADD(%ClarionWordList,'COLOR:ACTIVECAPTION')
+  #ADD(%ClarionWordList,'COLOR:INACTIVECAPTION')
+  #ADD(%ClarionWordList,'COLOR:MENU')
+  #ADD(%ClarionWordList,'COLOR:WINDOW')
+  #ADD(%ClarionWordList,'COLOR:WINDOWFRAME')
+  #ADD(%ClarionWordList,'COLOR:MENUTEXT')
+  #ADD(%ClarionWordList,'COLOR:WINDOWTEXT')
+  #ADD(%ClarionWordList,'COLOR:CAPTIONTEXT')
+  #ADD(%ClarionWordList,'COLOR:ACTIVEBORDER')
+  #ADD(%ClarionWordList,'COLOR:INACTIVEBORDER')
+  #ADD(%ClarionWordList,'COLOR:APPWORKSPACE')
+  #ADD(%ClarionWordList,'COLOR:HIGHLIGHT')
+  #ADD(%ClarionWordList,'COLOR:HIGHLIGHTTEXT')
+  #ADD(%ClarionWordList,'COLOR:BTNFACE')
+  #ADD(%ClarionWordList,'COLOR:BTNSHADOW')
+  #ADD(%ClarionWordList,'COLOR:GRAYTEXT')
+  #ADD(%ClarionWordList,'COLOR:BTNTEXT')
+  #ADD(%ClarionWordList,'COLOR:INACTIVECAPTIONTEXT')
+  #ADD(%ClarionWordList,'COLOR:BTNHIGHLIGHT')
+  #ADD(%ClarionWordList,'COLOR:BLACK')
+  #ADD(%ClarionWordList,'COLOR:MAROON')
+  #ADD(%ClarionWordList,'COLOR:GREEN')
+  #ADD(%ClarionWordList,'COLOR:OLIVE')
+  #ADD(%ClarionWordList,'COLOR:NAVY')
+  #ADD(%ClarionWordList,'COLOR:PURPLE')
+  #ADD(%ClarionWordList,'COLOR:TEAL')
+  #ADD(%ClarionWordList,'COLOR:GRAY')
+  #ADD(%ClarionWordList,'COLOR:SILVER')
+  #ADD(%ClarionWordList,'COLOR:RED')
+  #ADD(%ClarionWordList,'COLOR:LIME')
+  #ADD(%ClarionWordList,'COLOR:YELLOW')
+  #ADD(%ClarionWordList,'COLOR:BLUE')
+  #ADD(%ClarionWordList,'COLOR:FUSCHIA')
+  #ADD(%ClarionWordList,'COLOR:AQUA')
+  #ADD(%ClarionWordList,'COLOR:WHITE')
+  #ADD(%ClarionWordList,'CREATE:SSTRING')                   #! Control Type Equates
+  #ADD(%ClarionWordList,'CREATE:STRING')
+  #ADD(%ClarionWordList,'CREATE:IMAGE')
+  #ADD(%ClarionWordList,'CREATE:REGION')
+  #ADD(%ClarionWordList,'CREATE:LINE')
+  #ADD(%ClarionWordList,'CREATE:BOX')
+  #ADD(%ClarionWordList,'CREATE:ELLIPSE')
+  #ADD(%ClarionWordList,'CREATE:ENTRY')
+  #ADD(%ClarionWordList,'CREATE:BUTTON')
+  #ADD(%ClarionWordList,'CREATE:PROMPT')
+  #ADD(%ClarionWordList,'CREATE:OPTION')
+  #ADD(%ClarionWordList,'CREATE:CHECK')
+  #ADD(%ClarionWordList,'CREATE:GROUP')
+  #ADD(%ClarionWordList,'CREATE:LIST')
+  #ADD(%ClarionWordList,'CREATE:COMBO')
+  #ADD(%ClarionWordList,'CREATE:SPIN')
+  #ADD(%ClarionWordList,'CREATE:TEXT')
+  #ADD(%ClarionWordList,'CREATE:CUSTOM')
+  #ADD(%ClarionWordList,'CREATE:MENU')
+  #ADD(%ClarionWordList,'CREATE:ITEM')
+  #ADD(%ClarionWordList,'CREATE:RADIO')
+  #ADD(%ClarionWordList,'CREATE:MENUBAR')
+  #ADD(%ClarionWordList,'CREATE:APPLICATION')
+  #ADD(%ClarionWordList,'CREATE:WINDOW')
+  #ADD(%ClarionWordList,'CREATE:REPORT')
+  #ADD(%ClarionWordList,'CREATE:HEADER')
+  #ADD(%ClarionWordList,'CREATE:FOOTER')
+  #ADD(%ClarionWordList,'CREATE:BREAK')
+  #ADD(%ClarionWordList,'CREATE:FORM')
+  #ADD(%ClarionWordList,'CREATE:DETAIL')
+  #ADD(%ClarionWordList,'CREATE:OLE')
+  #ADD(%ClarionWordList,'CREATE:DROPLIST')
+  #ADD(%ClarionWordList,'CREATE:DROPCOMBO')
+  #ADD(%ClarionWordList,'CREATE:PROGRESS')
+  #ADD(%ClarionWordList,'CREATE:SHEET')
+  #ADD(%ClarionWordList,'CREATE:TAB')
+  #ADD(%ClarionWordList,'CREATE:PANEL')
+  #ADD(%ClarionWordList,'CREATE:SUBLIST')
+  #ADD(%ClarionWordList,'CREATE:TOOLBAR')
+  #ADD(%ClarionWordList,'FONT:THIN')                        #! Font Equates
+  #ADD(%ClarionWordList,'FONT:REGULAR')
+  #ADD(%ClarionWordList,'FONT:BOLD')
+  #ADD(%ClarionWordList,'FONT:WEIGHT')
+  #ADD(%ClarionWordList,'FONT:FIXED')
+  #ADD(%ClarionWordList,'FONT:ITALIC')
+  #ADD(%ClarionWordList,'FONT:UNDERLINE')
+  #ADD(%ClarionWordList,'FONT:STRIKEOUT')
+  #ADD(%ClarionWordList,'CHARSET:ANSI')                     #! Character Set Equates
+  #ADD(%ClarionWordList,'CHARSET:DEFAULT')
+  #ADD(%ClarionWordList,'CHARSET:SYMBOL')
+  #ADD(%ClarionWordList,'CHARSET:MAC')
+  #ADD(%ClarionWordList,'CHARSET:SHIFTJIS')
+  #ADD(%ClarionWordList,'CHARSET:HANGEUL')
+  #ADD(%ClarionWordList,'CHARSET:JOHAB')
+  #ADD(%ClarionWordList,'CHARSET:GB2312')
+  #ADD(%ClarionWordList,'CHARSET:CHINESEBIG5')
+  #ADD(%ClarionWordList,'CHARSET:GREEK')
+  #ADD(%ClarionWordList,'CHARSET:TURKISH')
+  #ADD(%ClarionWordList,'CHARSET:HEBREW')
+  #ADD(%ClarionWordList,'CHARSET:ARABIC')
+  #ADD(%ClarionWordList,'CHARSET:BALTIC')
+  #ADD(%ClarionWordList,'CHARSET:CYRILLIC')
+  #ADD(%ClarionWordList,'CHARSET:THAI')
+  #ADD(%ClarionWordList,'CHARSET:EASTEUROPE')
+  #ADD(%ClarionWordList,'CHARSET:OEM')
+  #ADD(%ClarionWordList,'PEN:SOLID')                        #! Pen Equates
+  #ADD(%ClarionWordList,'PEN:DASH')
+  #ADD(%ClarionWordList,'PEN:DOT')
+  #ADD(%ClarionWordList,'PEN:DASHDOT')
+  #ADD(%ClarionWordList,'PEN:DASHDOTDOT')
+  #ADD(%ClarionWordList,'PEN:NULL')
+  #ADD(%ClarionWordList,'PEN:INSIDEFRAME')
+  #ADD(%ClarionWordList,'LISTZONE:FIELD')                   #! List Zone Equates
+  #ADD(%ClarionWordList,'LISTZONE:RIGHT')
+  #ADD(%ClarionWordList,'LISTZONE:HEADER')
+  #ADD(%ClarionWordList,'LISTZONE:EXPANDBOX')
+  #ADD(%ClarionWordList,'LISTZONE:TREE')
+  #ADD(%ClarionWordList,'LISTZONE:ICON')
+  #ADD(%ClarionWordList,'LISTZONE:NOWHERE')
+  #ADD(%ClarionWordList,'VBXEVENT:CLICK')                   #! VBX Event Equates
+  #ADD(%ClarionWordList,'VBXEVENT:DBLCLICK')
+  #ADD(%ClarionWordList,'VBXEVENT:GOTFOCUS')
+  #ADD(%ClarionWordList,'VBXEVENT:KEYDOWN')
+  #ADD(%ClarionWordList,'VBXEVENT:KEYPRESS')
+  #ADD(%ClarionWordList,'VBXEVENT:KEYUP')
+  #ADD(%ClarionWordList,'VBXEVENT:LOSTFOCUS')
+  #ADD(%ClarionWordList,'VBXEVENT:MOUSEDOWN')
+  #ADD(%ClarionWordList,'VBXEVENT:MOUSEMOVE')
+  #ADD(%ClarionWordList,'VBXEVENT:MOUSEUP')
+  #ADD(%ClarionWordList,'BUTTON:OK')                        #! Button ID equates
+  #ADD(%ClarionWordList,'BUTTON:YES')
+  #ADD(%ClarionWordList,'BUTTON:NO')
+  #ADD(%ClarionWordList,'BUTTON:ABORT')
+  #ADD(%ClarionWordList,'BUTTON:RETRY')
+  #ADD(%ClarionWordList,'BUTTON:IGNORE')
+  #ADD(%ClarionWordList,'BUTTON:CANCEL')
+  #ADD(%ClarionWordList,'BUTTON:HELP')
+  #ADD(%ClarionWordList,'DDE:AUTO')                         #! DDE Equates
+  #ADD(%ClarionWordList,'DDE:MANUAL')
+  #ADD(%ClarionWordList,'DDE:REMOVE')
+  #ADD(%ClarionWordList,'FF_:NORMAL')                       #! Directory Equates
+  #ADD(%ClarionWordList,'FF_:READONLY')
+  #ADD(%ClarionWordList,'FF_:HIDDEN')
+  #ADD(%ClarionWordList,'FF_:SYSTEM')
+  #ADD(%ClarionWordList,'FF_:DIRECTORY')
+  #ADD(%ClarionWordList,'FF_:ARCHIVE')
+  #ADD(%ClarionWordList,'FF_:LFN')
+  #ADD(%ClarionWordList,'FF_:QUEUE')
+  #ADD(%ClarionWordList,'FILE:MAXFILENAME')                 #! File Equates
+  #ADD(%ClarionWordList,'FILE:MAXFILEPATH')
+  #ADD(%ClarionWordList,'FILE:QUEUE')
+  #ADD(%ClarionWordList,'FILE:SAVE')
+  #ADD(%ClarionWordList,'FILE:KEEPDIR')
+  #ADD(%ClarionWordList,'FILE:NOERROR')
+  #ADD(%ClarionWordList,'FILE:MULTI')
+  #ADD(%ClarionWordList,'FILE:LONGNAME')
+  #ADD(%ClarionWordList,'FILE:DIRECTORY')
+  #ADD(%ClarionWordList,'OCX:DEFAULT')                      #! OCX Equates
+  #ADD(%ClarionWordList,'OCX:16BIT')
+  #ADD(%ClarionWordList,'OCX:32BIT')
+  #ADD(%ClarionWordList,'OCX:1632BIT')
+  #ADD(%ClarionWordList,'DOCK:LEFT')                        #! Docking Equates
+  #ADD(%ClarionWordList,'DOCK:TOP')
+  #ADD(%ClarionWordList,'DOCK:RIGHT')
+  #ADD(%ClarionWordList,'DOCK:BOTTOM')
+  #ADD(%ClarionWordList,'DOCK:FLOAT')
+  #ADD(%ClarionWordList,'DOCK:ALL')
+  #ADD(%ClarionWordList,'TPSREADONLY')                      #! Odds and Ends
+  #ADD(%ClarionWordList,'FALSE')
+  #ADD(%ClarionWordList,'TRUE')
+  #ADD(%ClarionWordList,'Insert:None')
+  #ADD(%ClarionWordList,'Delete:None')
+  #ADD(%ClarionWordList,'Cancel:Cancel')
+  #ADD(%ClarionWordList,'Resize:SetMinSize')
+  #ADD(%ClarionWordList,'AppStrategy:Surface')
+  #ADD(%ClarionWordList,'RequestCancelled')
+  #ADD(%ClarionWordList,'MATCH:SIMPLE')                     #! MATCH Equates
+  #ADD(%ClarionWordList,'MATCH:WILD')
+  #ADD(%ClarionWordList,'MATCH:REGULAR')
+  #ADD(%ClarionWordList,'MATCH:SOUNDEX')
+  #ADD(%ClarionWordList,'MATCH:NOCASE')
+  #ADD(%ClarionWordList,'PAPER:LETTER')                     #! Paper Equates
+  #ADD(%ClarionWordList,'PAPER:LETTERSMALL')
+  #ADD(%ClarionWordList,'PAPER:TABLOID')
+  #ADD(%ClarionWordList,'PAPER:LEDGER')
+  #ADD(%ClarionWordList,'PAPER:LEGAL')
+  #ADD(%ClarionWordList,'PAPER:STATEMENT')
+  #ADD(%ClarionWordList,'PAPER:EXECUTIVE')
+  #ADD(%ClarionWordList,'PAPER:A3')
+  #ADD(%ClarionWordList,'PAPER:A4')
+  #ADD(%ClarionWordList,'PAPER:A4SMALL')
+  #ADD(%ClarionWordList,'PAPER:A5')
+  #ADD(%ClarionWordList,'PAPER:B4')
+  #ADD(%ClarionWordList,'PAPER:B5')
+  #ADD(%ClarionWordList,'PAPER:FOLIO')
+  #ADD(%ClarionWordList,'PAPER:QUARTO')
+  #ADD(%ClarionWordList,'PAPER:10X14')
+  #ADD(%ClarionWordList,'PAPER:11X17')
+  #ADD(%ClarionWordList,'PAPER:NOTE')
+  #ADD(%ClarionWordList,'PAPER:ENV_9')
+  #ADD(%ClarionWordList,'PAPER:ENV_10')
+  #ADD(%ClarionWordList,'PAPER:ENV_11')
+  #ADD(%ClarionWordList,'PAPER:ENV_12')
+  #ADD(%ClarionWordList,'PAPER:ENV_14')
+  #ADD(%ClarionWordList,'PAPER:CSHEET')
+  #ADD(%ClarionWordList,'PAPER:DSHEET')
+  #ADD(%ClarionWordList,'PAPER:ESHEET')
+  #ADD(%ClarionWordList,'PAPER:ENV_DL')
+  #ADD(%ClarionWordList,'PAPER:ENV_C5')
+  #ADD(%ClarionWordList,'PAPER:ENV_C3')
+  #ADD(%ClarionWordList,'PAPER:ENV_C4')
+  #ADD(%ClarionWordList,'PAPER:ENV_C6')
+  #ADD(%ClarionWordList,'PAPER:ENV_C65')
+  #ADD(%ClarionWordList,'PAPER:ENV_B4')
+  #ADD(%ClarionWordList,'PAPER:ENV_B5')
+  #ADD(%ClarionWordList,'PAPER:ENV_B6')
+  #ADD(%ClarionWordList,'PAPER:ENV_ITALY')
+  #ADD(%ClarionWordList,'PAPER:ENV_MONARCH')
+  #ADD(%ClarionWordList,'PAPER:ENV_PERSONAL')
+  #ADD(%ClarionWordList,'PAPER:FANFOLD_US')
+  #ADD(%ClarionWordList,'PAPER:FANFOLD_STD_GERMAN')
+  #ADD(%ClarionWordList,'PAPER:FANFOLD_LGL_GERMAN')
+  #ADD(%ClarionWordList,'PAPER:LAST')
+  #ADD(%ClarionWordList,'PAPER:USER')
+  #ADD(%ClarionWordList,'PROP:DISABLE')                     #! PROP Equates
+  #ADD(%ClarionWordList,'PROP:HEIGHT')
+  #ADD(%ClarionWordList,'PROP:MAXIMIZE')
+  #ADD(%ClarionWordList,'PROP:WIDTH')
+  #ADD(%ClarionWordList,'PROP:XPOS')
+  #ADD(%ClarionWordList,'PROP:YPOS')
+  #ADD(%ClarionWordList,'PROP:TEXT')
+  #ADD(%ClarionWordList,'PROP:TYPE')
+  #ADD(%ClarionWordList,'PROP:AT')
+  #ADD(%ClarionWordList,'PROP:XPOS')
+  #ADD(%ClarionWordList,'PROP:YPOS')
+  #ADD(%ClarionWordList,'PROP:WIDTH')
+  #ADD(%ClarionWordList,'PROP:HEIGHT')
+  #ADD(%ClarionWordList,'PROP:CENTER')
+  #ADD(%ClarionWordList,'PROP:CENTEROFFSET')
+  #ADD(%ClarionWordList,'PROP:LEFT')
+  #ADD(%ClarionWordList,'PROP:LEFTOFFSET')
+  #ADD(%ClarionWordList,'PROP:DECIMAL')
+  #ADD(%ClarionWordList,'PROP:DECIMALOFFSET')
+  #ADD(%ClarionWordList,'PROP:RIGHT')
+  #ADD(%ClarionWordList,'PROP:RIGHTOFFSET')
+  #ADD(%ClarionWordList,'PROP:ABOVE')
+  #ADD(%ClarionWordList,'PROP:ABOVESIZE')
+  #ADD(%ClarionWordList,'PROP:BELOW')
+  #ADD(%ClarionWordList,'PROP:BELOWSIZE')
+  #ADD(%ClarionWordList,'PROP:CLASS')
+  #ADD(%ClarionWordList,'PROP:VBXFILE')
+  #ADD(%ClarionWordList,'PROP:VBXNAME')
+  #ADD(%ClarionWordList,'PROP:FONT')
+  #ADD(%ClarionWordList,'PROP:FONTNAME')
+  #ADD(%ClarionWordList,'PROP:FONTSIZE')
+  #ADD(%ClarionWordList,'PROP:FONTCOLOR')
+  #ADD(%ClarionWordList,'PROP:FONTSTYLE')
+  #ADD(%ClarionWordList,'PROP:TIPSFONT')
+  #ADD(%ClarionWordList,'PROP:STATUSFONT')
+  #ADD(%ClarionWordList,'PROP:RANGE')
+  #ADD(%ClarionWordList,'PROP:RANGELOW')
+  #ADD(%ClarionWordList,'PROP:RANGEHIGH')
+  #ADD(%ClarionWordList,'PROP:VCR')
+  #ADD(%ClarionWordList,'PROP:VCRFEQ')
+  #ADD(%ClarionWordList,'PROP:DOUBLE')
+  #ADD(%ClarionWordList,'PROP:RESIZE')
+  #ADD(%ClarionWordList,'PROP:NOFRAME')
+  #ADD(%ClarionWordList,'PROP:MM')
+  #ADD(%ClarionWordList,'PROP:THOUS')
+  #ADD(%ClarionWordList,'PROP:POINTS')
+  #ADD(%ClarionWordList,'PROP:PIXELS')
+  #ADD(%ClarionWordList,'PROP:SUM')
+  #ADD(%ClarionWordList,'PROP:AVE')
+  #ADD(%ClarionWordList,'PROP:MAX')
+  #ADD(%ClarionWordList,'PROP:MIN')
+  #ADD(%ClarionWordList,'PROP:CNT')
+  #ADD(%ClarionWordList,'PROP:PAGENO')
+  #ADD(%ClarionWordList,'PROP:PAGE')
+  #ADD(%ClarionWordList,'PROP:ABSOLUTE')
+  #ADD(%ClarionWordList,'PROP:ALONE')
+  #ADD(%ClarionWordList,'PROP:PREVIEW')
+  #ADD(%ClarionWordList,'PROP:FLUSHPREVIEW')
+  #ADD(%ClarionWordList,'PROP:FIRST')
+  #ADD(%ClarionWordList,'PROP:LAST')
+  #ADD(%ClarionWordList,'PROP:INS')
+  #ADD(%ClarionWordList,'PROP:OVR')
+  #ADD(%ClarionWordList,'PROP:BOXED')
+  #ADD(%ClarionWordList,'PROP:CAP')
+  #ADD(%ClarionWordList,'PROP:COLUMN')
+  #ADD(%ClarionWordList,'PROP:CURSOR')
+  #ADD(%ClarionWordList,'PROP:DEFAULT')
+  #ADD(%ClarionWordList,'PROP:DISABLE')
+  #ADD(%ClarionWordList,'PROP:DROP')
+  #ADD(%ClarionWordList,'PROP:FILL')
+  #ADD(%ClarionWordList,'PROP:FROM')
+  #ADD(%ClarionWordList,'PROP:FULL')
+  #ADD(%ClarionWordList,'PROP:GRAY')
+  #ADD(%ClarionWordList,'PROP:HIDE')
+  #ADD(%ClarionWordList,'PROP:HLP')
+  #ADD(%ClarionWordList,'PROP:HSCROLL')
+  #ADD(%ClarionWordList,'PROP:ICON')
+  #ADD(%ClarionWordList,'PROP:ICONIZE')
+  #ADD(%ClarionWordList,'PROP:IMM')
+  #ADD(%ClarionWordList,'PROP:KEY')
+  #ADD(%ClarionWordList,'PROP:LANDSCAPE')
+  #ADD(%ClarionWordList,'PROP:MARK')
+  #ADD(%ClarionWordList,'PROP:MASK')
+  #ADD(%ClarionWordList,'PROP:MAXIMIZE')
+  #ADD(%ClarionWordList,'PROP:MDI')
+  #ADD(%ClarionWordList,'PROP:META')
+  #ADD(%ClarionWordList,'PROP:MODAL')
+  #ADD(%ClarionWordList,'PROP:MSG')
+  #ADD(%ClarionWordList,'PROP:NOBAR')
+  #ADD(%ClarionWordList,'PROP:NOMERGE')
+  #ADD(%ClarionWordList,'PROP:PAGEAFTER')
+  #ADD(%ClarionWordList,'PROP:PAGEAFTERNUM')
+  #ADD(%ClarionWordList,'PROP:PAGEBEFORE')
+  #ADD(%ClarionWordList,'PROP:PAGEBEFORENUM')
+  #ADD(%ClarionWordList,'PROP:PASSWORD')
+  #ADD(%ClarionWordList,'PROP:READONLY')
+  #ADD(%ClarionWordList,'PROP:REQ')
+  #ADD(%ClarionWordList,'PROP:RESET')
+  #ADD(%ClarionWordList,'PROP:ROUND')
+  #ADD(%ClarionWordList,'PROP:SCROLL')
+  #ADD(%ClarionWordList,'PROP:SEPARATE')
+  #ADD(%ClarionWordList,'PROP:SKIP')
+  #ADD(%ClarionWordList,'PROP:STD')
+  #ADD(%ClarionWordList,'PROP:STEP')
+  #ADD(%ClarionWordList,'PROP:SYSTEM')
+  #ADD(%ClarionWordList,'PROP:FORMAT')
+  #ADD(%ClarionWordList,'PROP:TIMER')
+  #ADD(%ClarionWordList,'PROP:CHECK')
+  #ADD(%ClarionWordList,'PROP:TRN')
+  #ADD(%ClarionWordList,'PROP:UPR')
+  #ADD(%ClarionWordList,'PROP:VSCROLL')
+  #ADD(%ClarionWordList,'PROP:WITHNEXT')
+  #ADD(%ClarionWordList,'PROP:WITHPRIOR')
+  #ADD(%ClarionWordList,'PROP:ITEMS')
+  #ADD(%ClarionWordList,'PROP:SELECTED')
+  #ADD(%ClarionWordList,'PROP:SELSTART')
+  #ADD(%ClarionWordList,'PROP:SELEND')
+  #ADD(%ClarionWordList,'PROP:AUTO')
+  #ADD(%ClarionWordList,'PROP:TOOLBOX')
+  #ADD(%ClarionWordList,'PROP:PALETTE')
+  #ADD(%ClarionWordList,'PROP:IMAGEBITS')
+  #ADD(%ClarionWordList,'PROP:THREAD')
+  #ADD(%ClarionWordList,'PROP:HANDLE')
+  #ADD(%ClarionWordList,'PROP:ACTIVE')
+  #ADD(%ClarionWordList,'PROP:VBXEVENT')
+  #ADD(%ClarionWordList,'PROP:FOLLOWS')
+  #ADD(%ClarionWordList,'PROP:ACCEPTALL')
+  #ADD(%ClarionWordList,'PROP:TOUCHED')
+  #ADD(%ClarionWordList,'PROP:VSCROLLPOS')
+  #ADD(%ClarionWordList,'PROP:CLIPBITS')
+  #ADD(%ClarionWordList,'PROP:TIP')
+  #ADD(%ClarionWordList,'PROP:TOOLTIP')
+  #ADD(%ClarionWordList,'PROP:LFNSUPPORT')
+  #ADD(%ClarionWordList,'PROP:PROGRESS')
+  #ADD(%ClarionWordList,'PROP:VISIBLE')
+  #ADD(%ClarionWordList,'PROP:ENABLED')
+  #ADD(%ClarionWordList,'PROP:WIZARD')
+  #ADD(%ClarionWordList,'PROP:CHOICEFEQ')
+  #ADD(%ClarionWordList,'PROP:CLIENTHANDLE')
+  #ADD(%ClarionWordList,'PROP:LINECOUNT')
+  #ADD(%ClarionWordList,'PROP:MINWIDTH')
+  #ADD(%ClarionWordList,'PROP:MINHEIGHT')
+  #ADD(%ClarionWordList,'PROP:MAXWIDTH')
+  #ADD(%ClarionWordList,'PROP:MAXHEIGHT')
+  #ADD(%ClarionWordList,'PROP:NOTIPS')
+  #ADD(%ClarionWordList,'PROP:TIPDELAY')
+  #ADD(%ClarionWordList,'PROP:TIPDISPLAY')
+  #ADD(%ClarionWordList,'PROP:WNDPROC')
+  #ADD(%ClarionWordList,'PROP:CLIENTWNDPROC')
+  #ADD(%ClarionWordList,'PROP:IMAGEBLOB')
+  #ADD(%ClarionWordList,'PROP:SPREAD')
+  #ADD(%ClarionWordList,'PROP:SIZE')
+  #ADD(%ClarionWordList,'PROP:SCREENTEXT')
+  #ADD(%ClarionWordList,'PROP:HSCROLLPOS')
+  #ADD(%ClarionWordList,'PROP:LAZYDISPLAY')
+  #ADD(%ClarionWordList,'PROP:DEFERMOVE')
+  #ADD(%ClarionWordList,'PROP:APPINSTANCE')
+  #ADD(%ClarionWordList,'PROP:VALUE')
+  #ADD(%ClarionWordList,'PROP:TRUEVALUE')
+  #ADD(%ClarionWordList,'PROP:FALSEVALUE')
+  #ADD(%ClarionWordList,'PROP:DDETIMEOUT')
+  #ADD(%ClarionWordList,'PROP:TABROWS')
+  #ADD(%ClarionWordList,'PROP:NUMTABS')
+  #ADD(%ClarionWordList,'PROP:LIBVERSION')
+  #ADD(%ClarionWordList,'PROP:EXEVERSION')
+  #ADD(%ClarionWordList,'PROP:CREATE')
+  #ADD(%ClarionWordList,'PROP:SAVEAS')
+  #ADD(%ClarionWordList,'PROP:OPEN')
+  #ADD(%ClarionWordList,'PROP:BLOB')
+  #ADD(%ClarionWordList,'PROP:DOVERB')
+  #ADD(%ClarionWordList,'PROP:SIZEMODE')
+  #ADD(%ClarionWordList,'PROP:SELECTINTERFACE')
+  #ADD(%ClarionWordList,'PROP:ADDREF')
+  #ADD(%ClarionWordList,'PROP:RELEASE')
+  #ADD(%ClarionWordList,'PROP:DEACTIVATE')
+  #ADD(%ClarionWordList,'PROP:UPDATE')
+  #ADD(%ClarionWordList,'PROP:PASTE')
+  #ADD(%ClarionWordList,'PROP:REPORTEXCEPTION')
+  #ADD(%ClarionWordList,'PROP:PASTELINK')
+  #ADD(%ClarionWordList,'PROP:COPY')
+  #ADD(%ClarionWordList,'PROP:CANPASTE')
+  #ADD(%ClarionWordList,'PROP:CANPASTELINK')
+  #ADD(%ClarionWordList,'PROP:WINDOWUI')
+  #ADD(%ClarionWordList,'PROP:DESIGNMODE')
+  #ADD(%ClarionWordList,'PROP:CTRL')
+  #ADD(%ClarionWordList,'PROP:GRABHANDLES')
+  #ADD(%ClarionWordList,'PROP:OLE')
+  #ADD(%ClarionWordList,'PROP:ISRADIO')
+  #ADD(%ClarionWordList,'PROP:LASTEVENTNAME')
+  #ADD(%ClarionWordList,'PROP:CLSID')
+  #ADD(%ClarionWordList,'PROP:PROGID')
+  #ADD(%ClarionWordList,'PROP:BEVELSTYLE')
+  #ADD(%ClarionWordList,'PROP:JOIN')
+  #ADD(%ClarionWordList,'PROP:NOSHEET')
+  #ADD(%ClarionWordList,'PROP:BEVEL')
+  #ADD(%ClarionWordList,'PROP:BEVELOUTER')
+  #ADD(%ClarionWordList,'PROP:BEVELINNER')
+  #ADD(%ClarionWordList,'PROP:LINEWIDTH')
+  #ADD(%ClarionWordList,'PROP:ANGLE')
+  #ADD(%ClarionWordList,'PROP:AUTOSIZE')
+  #ADD(%ClarionWordList,'PROP:CLIP')
+  #ADD(%ClarionWordList,'PROP:STRETCH')
+  #ADD(%ClarionWordList,'PROP:ZOOM')
+  #ADD(%ClarionWordList,'PROP:COMPATIBILITY')
+  #ADD(%ClarionWordList,'PROP:DESIGN')
+  #ADD(%ClarionWordList,'PROP:DOCUMENT')
+  #ADD(%ClarionWordList,'PROP:LINK')
+  #ADD(%ClarionWordList,'PROP:CREATEFROMFILE')
+  #ADD(%ClarionWordList,'PROP:CREATELINKTOFILE')
+  #ADD(%ClarionWordList,'PROP:ALIGN')
+  #ADD(%ClarionWordList,'PROP:CANCEL')
+  #ADD(%ClarionWordList,'PROP:TEXTALIGN')
+  #ADD(%ClarionWordList,'PROP:OBJECT')
+  #ADD(%ClarionWordList,'PROP:LICENSE')
+  #ADD(%ClarionWordList,'PROP:LANGUAGE')
+  #ADD(%ClarionWordList,'PROP:COLOR')
+  #ADD(%ClarionWordList,'PROP:BACKGROUND')
+  #ADD(%ClarionWordList,'PROP:FILLCOLOR')
+  #ADD(%ClarionWordList,'PROP:SELECTEDCOLOR')
+  #ADD(%ClarionWordList,'PROP:SELECTEDFILLCOLOR')
+  #ADD(%ClarionWordList,'PROP:LINEHEIGHT')
+  #ADD(%ClarionWordList,'PROP:DROPWIDTH')
+  #ADD(%ClarionWordList,'PROP:ALWAYSDROP')
+  #ADD(%ClarionWordList,'PROP:UP')
+  #ADD(%ClarionWordList,'PROP:DOWN')
+  #ADD(%ClarionWordList,'PROP:UPSIDEDOWN')
+  #ADD(%ClarionWordList,'PROP:HEADERHEIGHT')
+  #ADD(%ClarionWordList,'PROP:CHECKED')
+  #ADD(%ClarionWordList,'PROP:AUTOPAPER')
+  #ADD(%ClarionWordList,'PROP:SINGLE')
+  #ADD(%ClarionWordList,'PROP:PARENT')
+  #ADD(%ClarionWordList,'PROP:REPEAT')
+  #ADD(%ClarionWordList,'PROP:EVENTSWAITING')
+  #ADD(%ClarionWordList,'PROP:DDEMODE')
+  #ADD(%ClarionWordList,'PROP:THREADING')
+  #ADD(%ClarionWordList,'PROP:TEMPNAMEFUNC')
+  #ADD(%ClarionWordList,'PROP:DELAY')
+  #ADD(%ClarionWordList,'PROP:BREAKVAR')
+  #ADD(%ClarionWordList,'PROP:USE')
+  #ADD(%ClarionWordList,'PROP:FEQ')
+  #ADD(%ClarionWordList,'PROP:LISTFEQ')
+  #ADD(%ClarionWordList,'PROP:BUTTONFEQ')
+  #ADD(%ClarionWordList,'PROP:FLAT')
+  #ADD(%ClarionWordList,'PROP:WALLPAPER')
+  #ADD(%ClarionWordList,'PROP:TILED')
+  #ADD(%ClarionWordList,'PROP:CENTERED')
+  #ADD(%ClarionWordList,'PROP:TILEIMAGE')
+  #ADD(%ClarionWordList,'PROP:CENTERIMAGE')
+  #ADD(%ClarionWordList,'PROP:CHILDINDEX')
+  #ADD(%ClarionWordList,'PROP:INTOOLBAR')
+  #ADD(%ClarionWordList,'PROP:PRINTMODE')
+  #ADD(%ClarionWordList,'PROP:REJECTCODE')
+  #ADD(%ClarionWordList,'PROP:VLBPROC')
+  #ADD(%ClarionWordList,'PROP:VLBVAL')
+  #ADD(%ClarionWordList,'PROP:TEMPIMAGE')
+  #ADD(%ClarionWordList,'PROP:TEMPPATH')
+  #ADD(%ClarionWordList,'PROP:TEMPPAGEPATH')
+  #ADD(%ClarionWordList,'PROP:TEMPIMAGEPATH')
+  #ADD(%ClarionWordList,'PROP:LIBHOOK')
+  #ADD(%ClarionWordList,'PROP:COLORDIALOGHOOK')
+  #ADD(%ClarionWordList,'PROP:FILEDIALOGHOOK')
+  #ADD(%ClarionWordList,'PROP:FONTDIALOGHOOK')
+  #ADD(%ClarionWordList,'PROP:PRINTERDIALOGHOOK')
+  #ADD(%ClarionWordList,'PROP:HALTHOOK')
+  #ADD(%ClarionWordList,'PROP:MESSAGEHOOK')
+  #ADD(%ClarionWordList,'PROP:STOPHOOK')
+  #ADD(%ClarionWordList,'PROP:ASSERTHOOK')
+  #ADD(%ClarionWordList,'PROP:FATALERRORHOOK')
+  #ADD(%ClarionWordList,'PROP:CHARSET')
+  #ADD(%ClarionWordList,'PROP:FONTCHARSET')
+  #ADD(%ClarionWordList,'PROP:SYSTEMPROPHOOK')
+  #ADD(%ClarionWordList,'PROP:ASSERTHOOK2')
+  #ADD(%ClarionWordList,'PROP:INITASTRINGHOOK')
+  #ADD(%ClarionWordList,'PROP:NOWIDTH')
+  #ADD(%ClarionWordList,'PROP:NOHEIGHT')
+  #ADD(%ClarionWordList,'PROP:NEXTPAGENO')
+  #ADD(%ClarionWordList,'PROP:XORIGIN')
+  #ADD(%ClarionWordList,'PROP:YORIGIN')
+  #ADD(%ClarionWordList,'PROP:TARGET')
+  #ADD(%ClarionWordList,'PROP:TOGETHER')
+  #ADD(%ClarionWordList,'PROP:DOCK')
+  #ADD(%ClarionWordList,'PROP:DOCKED')
+  #ADD(%ClarionWordList,'PROP:BROKENTABS')
+  #ADD(%ClarionWordList,'PROP:IMAGEINSTANCE')
+  #ADD(%ClarionWordList,'PROP:GLOBALHELP')
+  #ADD(%ClarionWordList,'PROP:BUFFER')
+  #ADD(%ClarionWordList,'PROP:CLIENTX')
+  #ADD(%ClarionWordList,'PROP:CLIENTY')
+  #ADD(%ClarionWordList,'PROP:CLIENTWIDTH')
+  #ADD(%ClarionWordList,'PROP:CLIENTHEIGHT')
+  #ADD(%ClarionWordList,'PROP:USEADDRESS')
+  #ADD(%ClarionWordList,'PROP:FLUSHPAGENUMFUNC')
+  #ADD(%ClarionWordList,'PROP:STATUS')
+  #ADD(%ClarionWordList,'PROP:STATUSTEXT')
+  #ADD(%ClarionWordList,'PROP:DRAGID')
+  #ADD(%ClarionWordList,'PROP:DROPID')
+  #ADD(%ClarionWordList,'PROP:VBXEVENTARG')
+  #ADD(%ClarionWordList,'PROP:EDIT')
+  #ADD(%ClarionWordList,'PROP:ALRT')
+  #ADD(%ClarionWordList,'PROP:ICONLIST')
+  #ADD(%ClarionWordList,'PROP:LINE')
+  #ADD(%ClarionWordList,'PROP:TALLY')
+  #ADD(%ClarionWordList,'PROP:CHILD')
+  #ADD(%ClarionWordList,'PROP:NEXTFIELD')
+  #ADD(%ClarionWordList,'PROP:SNAPWIDTH')
+  #ADD(%ClarionWordList,'PROP:SNAPHEIGHT')
+  #ADD(%ClarionWordList,'PROP:CURRENTKEY')
+  #ADD(%ClarionWordList,'PROP:LOGOUT')
+  #ADD(%ClarionWordList,'PROP:LOG')
+  #ADD(%ClarionWordList,'PROP:PROFILE')
+  #ADD(%ClarionWordList,'PROP:DETAILS')
+  #ADD(%ClarionWordList,'PROP:WATCHED')
+  #ADD(%ClarionWordList,'PROP:HELD')
+  #ADD(%ClarionWordList,'PROP:PROGRESSEVENTS')
+  #ADD(%ClarionWordList,'PROP:COMPLETED')
+  #ADD(%ClarionWordList,'PROP:DRIVER')
+  #ADD(%ClarionWordList,'PROP:DRIVERLOGSOUTALIAS')
+  #ADD(%ClarionWordList,'PROP:KEYS')
+  #ADD(%ClarionWordList,'PROP:BLOBS')
+  #ADD(%ClarionWordList,'PROP:MEMOS')
+  #ADD(%ClarionWordList,'PROP:FIELDS')
+  #ADD(%ClarionWordList,'PROP:ENCRYPT')
+  #ADD(%ClarionWordList,'PROP:DRIVERSTRING')
+  #ADD(%ClarionWordList,'PROP:OWNER')
+  #ADD(%ClarionWordList,'PROP:NAME')
+  #ADD(%ClarionWordList,'PROP:LABEL')
+  #ADD(%ClarionWordList,'PROP:OEM')
+  #ADD(%ClarionWordList,'PROP:RECLAIM')
+  #ADD(%ClarionWordList,'PROP:SQLDRIVER')
+  #ADD(%ClarionWordList,'PROP:FILESIZE')
+  #ADD(%ClarionWordList,'PROP:SUPPORTSOP')
+  #ADD(%ClarionWordList,'PROP:SUPPORTSTYPE')
+  #ADD(%ClarionWordList,'PROP:RECORD')
+  #ADD(%ClarionWordList,'PROP:COMPONENTS')
+  #ADD(%ClarionWordList,'PROP:DUP')
+  #ADD(%ClarionWordList,'PROP:OPT')
+  #ADD(%ClarionWordList,'PROP:NOCASE')
+  #ADD(%ClarionWordList,'PROP:PRIMARY')
+  #ADD(%ClarionWordList,'PROP:FIELD')
+  #ADD(%ClarionWordList,'PROP:ASCENDING')
+  #ADD(%ClarionWordList,'PROP:BINARY')
+  #ADD(%ClarionWordList,'PROP:PLACES')
+  #ADD(%ClarionWordList,'PROP:DIM')
+  #ADD(%ClarionWordList,'PROP:OVER')
+  #ADD(%ClarionWordList,'PROP:ORDER')
+  #ADD(%ClarionWordList,'PROP:FILTER')
+  #ADD(%ClarionWordList,'PROP:JOINEXPRESSION')
+  #ADD(%ClarionWordList,'PROP:FILES')
+  #ADD(%ClarionWordList,'PROP:FILE')
+  #ADD(%ClarionWordList,'PROP:PROFILEINTOFILES')
+  #ADD(%ClarionWordList,'PROP:INNER')
+  #ADD(%ClarionWordList,'PROP:FIELD')
+  #ADD(%ClarionWordList,'PROP:FIELDSFILE')
+  #ADD(%ClarionWordList,'PROP:SQL')
+  #ADD(%ClarionWordList,'PROP:ORDERALLTABLES')
+  #ADD(%ClarionWordList,'PROP:SQLFILTER')
+  #ADD(%ClarionWordList,'PROP:LOGFILE')
+  #ADD(%ClarionWordList,'PROP:WHERE')
+  #ADD(%ClarionWordList,'PROP:FETCHSIZE')
+  #ADD(%ClarionWordList,'PROP:ALIAS')
+  #ADD(%ClarionWordList,'PROP:DISCONNECT')
+  #ADD(%ClarionWordList,'PROP:SQLORDER')
+  #ADD(%ClarionWordList,'PROP:SQLJOINEXPRESSION')
+  #ADD(%ClarionWordList,'PROP:HINT')
+  #ADD(%ClarionWordList,'PROP:APPENDBUFFER')
+  #ADD(%ClarionWordList,'PROP:CONNECTSTRING')
+  #ADD(%ClarionWordList,'PROP:LOGINTIMEOUT')
+  #ADD(%ClarionWordList,'PROP:HENV')
+  #ADD(%ClarionWordList,'PROP:HDBC')
+  #ADD(%ClarionWordList,'PROP:HSTMT')
+  #ADD(%ClarionWordList,'PROP:ORDERINSELECT')
+  #ADD(%ClarionWordList,'PROP:QUOTESTRING')
+  #ADD(%ClarionWordList,'PROP:LOGONSCREEN')
+  #ADD(%ClarionWordList,'PROP:ALWAYSREBIND')
+  #ADD(%ClarionWordList,'PROP:DBMSVER')
+  #ADD(%ClarionWordList,'PROP:ISOLATIONLEVEL')
+  #ADD(%ClarionWordList,'PROP:MAXSTATEMENTS')
+  #ADD(%ClarionWordList,'PROP:STMTATTR')
+  #ADD(%ClarionWordList,'PROP:LOGOUTISOLATIONLEVEL')
+  #ADD(%ClarionWordList,'PROP:FULLBUILD')
+  #ADD(%ClarionWordList,'PROP:POSITIONBLOCK')
+  #ADD(%ClarionWordList,'PROP:NEXTTABSTOP')                 #! RAYS.2001.10.17
+  #ADD(%ClarionWordList,'PROP:PREVTABSTOP')                 #! RAYS.2001.10.17
+  #ADD(%ClarionWordList,'PROPSTYLE:FIRST')                  #! PROPSTYLE Equates
+  #ADD(%ClarionWordList,'PROPSTYLE:FONTNAME')
+  #ADD(%ClarionWordList,'PROPSTYLE:FONTSIZE')
+  #ADD(%ClarionWordList,'PROPSTYLE:FONTCOLOR')
+  #ADD(%ClarionWordList,'PROPSTYLE:FONTSTYLE')
+  #ADD(%ClarionWordList,'PROPSTYLE:TEXTCOLOR')
+  #ADD(%ClarionWordList,'PROPSTYLE:BACKCOLOR')
+  #ADD(%ClarionWordList,'PROPSTYLE:TEXTSELECTED')
+  #ADD(%ClarionWordList,'PROPSTYLE:BACKSELECTED')
+  #ADD(%ClarionWordList,'PROPSTYLE:PICTURE')
+  #ADD(%ClarionWordList,'PROPSTYLE:CHARSET')
+  #ADD(%ClarionWordList,'PROPSTYLE:LAST')
+  #ADD(%ClarionWordList,'PROPLIST:UNDERLINE')               #! PROPLIST Equates
+  #ADD(%ClarionWordList,'PROPLIST:RESIZE')
+  #ADD(%ClarionWordList,'PROPLIST:RIGHTBORDER')
+  #ADD(%ClarionWordList,'PROPLIST:HEADER')
+  #ADD(%ClarionWordList,'PROPLIST:WIDTH')
+  #ADD(%ClarionWordList,'PROPLIST:PICTURE')
+  #ADD(%ClarionWordList,'PROPLIST:FIXED')
+  #ADD(%ClarionWordList,'PROPLIST:SCROLL')
+  #ADD(%ClarionWordList,'PROPLIST:LASTONLINE')
+  #ADD(%ClarionWordList,'PROPLIST:LOCATOR')
+  #ADD(%ClarionWordList,'PROPLIST:EXISTS')
+  #ADD(%ClarionWordList,'PROPLIST:RESVD2')
+  #ADD(%ClarionWordList,'PROPLIST:RESVD3')
+  #ADD(%ClarionWordList,'PROPLIST:GROUPNO')
+  #ADD(%ClarionWordList,'PROPLIST:FIELDNO')
+  #ADD(%ClarionWordList,'PROPLIST:FORMAT')
+  #ADD(%ClarionWordList,'PROPLIST:LEFT')
+  #ADD(%ClarionWordList,'PROPLIST:LEFTOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:RIGHT')
+  #ADD(%ClarionWordList,'PROPLIST:RIGHTOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:CENTER')
+  #ADD(%ClarionWordList,'PROPLIST:CENTEROFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:DECIMAL')
+  #ADD(%ClarionWordList,'PROPLIST:DECIMALOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERLEFT')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERLEFTOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERRIGHT')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERRIGHTOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERCENTER')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERCENTEROFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERDECIMAL')
+  #ADD(%ClarionWordList,'PROPLIST:HEADERDECIMALOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:ICON')
+  #ADD(%ClarionWordList,'PROPLIST:COLOR')
+  #ADD(%ClarionWordList,'PROPLIST:TREE')
+  #ADD(%ClarionWordList,'PROPLIST:TREELINES')
+  #ADD(%ClarionWordList,'PROPLIST:TREEBOXES')
+  #ADD(%ClarionWordList,'PROPLIST:TREEINDENT')
+  #ADD(%ClarionWordList,'PROPLIST:TREEOFFSET')
+  #ADD(%ClarionWordList,'PROPLIST:TREEROOT')
+  #ADD(%ClarionWordList,'PROPLIST:DEFCOLORS')
+  #ADD(%ClarionWordList,'PROPLIST:TEXTCOLOR')
+  #ADD(%ClarionWordList,'PROPLIST:BACKCOLOR')
+  #ADD(%ClarionWordList,'PROPLIST:TEXTSELECTED')
+  #ADD(%ClarionWordList,'PROPLIST:BACKSELECTED')
+  #ADD(%ClarionWordList,'PROPLIST:CELLSTYLE')
+  #ADD(%ClarionWordList,'PROPLIST:COLSTYLE')
+  #ADD(%ClarionWordList,'PROPLIST:ICONTRN')
+  #ADD(%ClarionWordList,'PROPLIST:GROUP')
+  #ADD(%ClarionWordList,'PROPLIST:STYLE')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEDOWNROW')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEMOVEROW')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEUPROW')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEDOWNFIELD')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEMOVEFIELD')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEUPFIELD')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEDOWNZONE')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEMOVEZONE')
+  #ADD(%ClarionWordList,'PROPLIST:MOUSEUPZONE')
+  #ADD(%ClarionWordList,'PROPLIST:GRID')
+  #ADD(%ClarionWordList,'PROPLIST:BARCOLOR')
+  #ADD(%ClarionWordList,'LEVEL:BENIGN')                     #! LEVEL Equates
+  #ADD(%ClarionWordList,'LEVEL:USER')
+  #ADD(%ClarionWordList,'LEVEL:PROGRAM')
+  #ADD(%ClarionWordList,'LEVEL:FATAL')
+  #ADD(%ClarionWordList,'LEVEL:CANCEL')
+  #ADD(%ClarionWordList,'LEVEL:NOTIFY')
+  #ADD(%ClarionWordList,'OCXEVENT:AUTOSIZE')                #! OCXEVENT Equates
+  #ADD(%ClarionWordList,'OCXEVENT:BACKCOLOR')
+  #ADD(%ClarionWordList,'OCXEVENT:BACKSTYLE')
+  #ADD(%ClarionWordList,'OCXEVENT:BORDERCOLOR')
+  #ADD(%ClarionWordList,'OCXEVENT:BORDERSTYLE')
+  #ADD(%ClarionWordList,'OCXEVENT:BORDERWIDTH')
+  #ADD(%ClarionWordList,'OCXEVENT:DRAWMODE')
+  #ADD(%ClarionWordList,'OCXEVENT:DRAWSTYLE')
+  #ADD(%ClarionWordList,'OCXEVENT:DRAWWIDTH')
+  #ADD(%ClarionWordList,'OCXEVENT:FILLCOLOR')
+  #ADD(%ClarionWordList,'OCXEVENT:FILLSTYLE')
+  #ADD(%ClarionWordList,'OCXEVENT:FONT')
+  #ADD(%ClarionWordList,'OCXEVENT:FORECOLOR')
+  #ADD(%ClarionWordList,'OCXEVENT:ENABLED')
+  #ADD(%ClarionWordList,'OCXEVENT:HWND')
+  #ADD(%ClarionWordList,'OCXEVENT:TABSTOP')
+  #ADD(%ClarionWordList,'OCXEVENT:TEXT')
+  #ADD(%ClarionWordList,'OCXEVENT:CAPTION')
+  #ADD(%ClarionWordList,'OCXEVENT:BORDERVISIBLE')
+  #ADD(%ClarionWordList,'OCXEVENT:REFRESH')
+  #ADD(%ClarionWordList,'OCXEVENT:DOCLICK')
+  #ADD(%ClarionWordList,'OCXEVENT:ABOUTBOX')
+  #ADD(%ClarionWordList,'OCXEVENT:CLICK')
+  #ADD(%ClarionWordList,'OCXEVENT:DBLCLICK')
+  #ADD(%ClarionWordList,'OCXEVENT:KEYDOWN')
+  #ADD(%ClarionWordList,'OCXEVENT:KEYPRESS')
+  #ADD(%ClarionWordList,'OCXEVENT:KEYUP')
+  #ADD(%ClarionWordList,'OCXEVENT:MOUSEDOWN')
+  #ADD(%ClarionWordList,'OCXEVENT:MOUSEMOVE')
+  #ADD(%ClarionWordList,'OCXEVENT:MOUSEUP')
+  #ADD(%ClarionWordList,'OCXEVENT:ERROREVENT')
+  #ADD(%ClarionWordList,'PROPPRINT:DEVMODE')                #! PROPPRINT Equates
+  #ADD(%ClarionWordList,'PROPPRINT:PAPER')
+  #ADD(%ClarionWordList,'PROPPRINT:PAPERHEIGHT')
+  #ADD(%ClarionWordList,'PROPPRINT:PAPERWIDTH')
+  #ADD(%ClarionWordList,'PROPPRINT:PERCENT')
+  #ADD(%ClarionWordList,'PROPPRINT:COPIES')
+  #ADD(%ClarionWordList,'PROPPRINT:PAPERBIN')
+  #ADD(%ClarionWordList,'PROPPRINT:RESOLUTION')
+  #ADD(%ClarionWordList,'PROPPRINT:COLOR')
+  #ADD(%ClarionWordList,'PROPPRINT:DUPLEX')
+  #ADD(%ClarionWordList,'PROPPRINT:YRESOLUTION')
+  #ADD(%ClarionWordList,'PROPPRINT:FONTMODE')
+  #ADD(%ClarionWordList,'PROPPRINT:PRINTTOFILE')
+  #ADD(%ClarionWordList,'PROPPRINT:PRINTTONAME')
+  #ADD(%ClarionWordList,'PROPPRINT:FROMPAGE')
+  #ADD(%ClarionWordList,'PROPPRINT:TOPAGE')
+  #ADD(%ClarionWordList,'PROPPRINT:FROMMAX')
+  #ADD(%ClarionWordList,'PROPPRINT:FROMMIN')
+  #ADD(%ClarionWordList,'PROPPRINT:TOMAX')
+  #ADD(%ClarionWordList,'PROPPRINT:COLLATE')
+  #ADD(%ClarionWordList,'PROPPRINT:DRIVER')
+  #ADD(%ClarionWordList,'PROPPRINT:DEVICE')
+  #ADD(%ClarionWordList,'PROPPRINT:PORT')
+  #ADD(%ClarionWordList,'PROPPRINT:CONTEXT')
+  #ADD(%ClarionWordList,'PAPERBIN:UPPER')                   #! PAPERBIN Equates
+  #ADD(%ClarionWordList,'PAPERBIN:ONLYONE')
+  #ADD(%ClarionWordList,'PAPERBIN:LOWER')
+  #ADD(%ClarionWordList,'PAPERBIN:MIDDLE')
+  #ADD(%ClarionWordList,'PAPERBIN:MANUAL')
+  #ADD(%ClarionWordList,'PAPERBIN:ENVELOPE')
+  #ADD(%ClarionWordList,'PAPERBIN:ENVMANUAL')
+  #ADD(%ClarionWordList,'PAPERBIN:AUTO')
+  #ADD(%ClarionWordList,'PAPERBIN:TRACTOR')
+  #ADD(%ClarionWordList,'PAPERBIN:SMALLFMT')
+  #ADD(%ClarionWordList,'PAPERBIN:LARGEFMT')
+  #ADD(%ClarionWordList,'PAPERBIN:LARGECAPACITY')
+  #ADD(%ClarionWordList,'PAPERBIN:CASSETTE')
+  #ADD(%ClarionWordList,'RESOLUTION:DRAFT')                 #! Other Printer Equates
+  #ADD(%ClarionWordList,'RESOLUTION:LOW')
+  #ADD(%ClarionWordList,'RESOLUTION:MEDIUM')
+  #ADD(%ClarionWordList,'RESOLUTION:HIGH')
+  #ADD(%ClarionWordList,'DUPLEX:SIMPLEX')
+  #ADD(%ClarionWordList,'DUPLEX:VERTICAL')
+  #ADD(%ClarionWordList,'DUPLEX:HORIZONTAL')
+  #ADD(%ClarionWordList,'FONTMODE:BITMAP')
+  #ADD(%ClarionWordList,'FONTMODE:DOWNLOAD')
+  #ADD(%ClarionWordList,'FONTMODE:SUBDEV')
+  #SET(%ClarionWordCount,ITEMS(%ClarionWordList))           #! How many are there?
+#GROUP(%ClarionReservedWordsEnd)
+
+#!--------------------------------------------------------------------!
+#! 2001.03.10.SAT - Roberto Artigas Jr          IMPORTANT PLEASE READ !
+#!--------------------------------------------------------------------!
+#! This group contains the code necessary to build a searchable list  !
+#! of Suneido reserved words. This is used to make sure field, key,   !
+#! and table names are not in conflict with reserved words.           !
+#!--------------------------------------------------------------------!
+#! ALSO: I am a realist. I can pretty much say with a great amount of !
+#! certainty, that once having seen this list, most individuals are   !
+#! not going to type in their own to achieve the same functionality.  !
+#! If you use this list at least have the courtesy of giving credit   !
+#! to Roberto Artigas Jr for having typed all of this in. Leave this  !
+#! documentation block intact and give credit where credit is due.    !
+#!--------------------------------------------------------------------!
+#GROUP(%SuneidoReservedWords)
+  #DECLARE(%SuneidoWordCount)
+  #DECLARE(%SuneidoWordItem)
+  #DECLARE(%SuneidoWordList),MULTI,UNIQUE
+  #ADD(%SuneidoWordList,'Address')
+  #ADD(%SuneidoWordList,'alter')
+  #ADD(%SuneidoWordList,'and')
+  #ADD(%SuneidoWordList,'ascending')
+  #ADD(%SuneidoWordList,'average')
+  #ADD(%SuneidoWordList,'Backup')
+  #ADD(%SuneidoWordList,'Boolean?')
+  #ADD(%SuneidoWordList,'Built')
+  #ADD(%SuneidoWordList,'bool')
+  #ADD(%SuneidoWordList,'break')
+  #ADD(%SuneidoWordList,'buffer')
+  #ADD(%SuneidoWordList,'by')
+  #ADD(%SuneidoWordList,'Call')
+  #ADD(%SuneidoWordList,'CallClass')
+  #ADD(%SuneidoWordList,'Class?')
+  #ADD(%SuneidoWordList,'ClearCallBack')
+  #ADD(%SuneidoWordList,'Cmdline')
+  #ADD(%SuneidoWordList,'COMobject')
+  #ADD(%SuneidoWordList,'Construct')
+  #ADD(%SuneidoWordList,'Construct2')
+  #ADD(%SuneidoWordList,'Cursor')
+  #ADD(%SuneidoWordList,'callback')
+  #ADD(%SuneidoWordList,'cascade')
+  #ADD(%SuneidoWordList,'catch')
+  #ADD(%SuneidoWordList,'class')
+  #ADD(%SuneidoWordList,'case')
+  #ADD(%SuneidoWordList,'char')
+  #ADD(%SuneidoWordList,'continue')
+  #ADD(%SuneidoWordList,'count')
+  #ADD(%SuneidoWordList,'create')
+  #ADD(%SuneidoWordList,'Database')
+  #ADD(%SuneidoWordList,'Date')
+  #ADD(%SuneidoWordList,'Date?')
+  #ADD(%SuneidoWordList,'Debug')
+  #ADD(%SuneidoWordList,'Default')
+  #ADD(%SuneidoWordList,'Display')
+  #ADD(%SuneidoWordList,'Dump')
+  #ADD(%SuneidoWordList,'default')
+  #ADD(%SuneidoWordList,'delete')
+  #ADD(%SuneidoWordList,'descending')
+  #ADD(%SuneidoWordList,'destroy')
+  #ADD(%SuneidoWordList,'dll')
+  #ADD(%SuneidoWordList,'do')
+  #ADD(%SuneidoWordList,'else')
+  #ADD(%SuneidoWordList,'ensure')
+  #ADD(%SuneidoWordList,'extend')
+  #ADD(%SuneidoWordList,'False')
+  #ADD(%SuneidoWordList,'File')
+  #ADD(%SuneidoWordList,'Frame')
+  #ADD(%SuneidoWordList,'Function?')
+  #ADD(%SuneidoWordList,'for')
+  #ADD(%SuneidoWordList,'foreach')
+  #ADD(%SuneidoWordList,'forever')
+  #ADD(%SuneidoWordList,'function')
+  #ADD(%SuneidoWordList,'history')
+  #ADD(%SuneidoWordList,'Integer?')
+  #ADD(%SuneidoWordList,'if')
+  #ADD(%SuneidoWordList,'in')
+  #ADD(%SuneidoWordList,'index')
+  #ADD(%SuneidoWordList,'insert')
+  #ADD(%SuneidoWordList,'instantiate')
+  #ADD(%SuneidoWordList,'intersect')
+  #ADD(%SuneidoWordList,'into')
+  #ADD(%SuneidoWordList,'is')
+  #ADD(%SuneidoWordList,'isnt')
+  #ADD(%SuneidoWordList,'join')
+  #ADD(%SuneidoWordList,'key')
+  #ADD(%SuneidoWordList,'Libraries')
+  #ADD(%SuneidoWordList,'Locals')
+  #ADD(%SuneidoWordList,'leftjoin')
+  #ADD(%SuneidoWordList,'list')
+  #ADD(%SuneidoWordList,'long')
+  #ADD(%SuneidoWordList,'Memcopy')
+  #ADD(%SuneidoWordList,'Memory')
+  #ADD(%SuneidoWordList,'max')
+  #ADD(%SuneidoWordList,'min')
+  #ADD(%SuneidoWordList,'minus')
+  #ADD(%SuneidoWordList,'Name')
+  #ADD(%SuneidoWordList,'New')
+  #ADD(%SuneidoWordList,'Number?')
+  #ADD(%SuneidoWordList,'new')
+  #ADD(%SuneidoWordList,'not')
+  #ADD(%SuneidoWordList,'Object')
+  #ADD(%SuneidoWordList,'Object?')
+  #ADD(%SuneidoWordList,'or')
+  #ADD(%SuneidoWordList,'project')
+  #ADD(%SuneidoWordList,'Random')
+  #ADD(%SuneidoWordList,'Record?')
+  #ADD(%SuneidoWordList,'RichEditGet')
+  #ADD(%SuneidoWordList,'RichEditOle')
+  #ADD(%SuneidoWordList,'RichEditPut')
+  #ADD(%SuneidoWordList,'rename')
+  #ADD(%SuneidoWordList,'return')
+  #ADD(%SuneidoWordList,'Scanner')
+  #ADD(%SuneidoWordList,'ScintillaStyle')
+  #ADD(%SuneidoWordList,'Server?')
+  #ADD(%SuneidoWordList,'SetAccelerators')
+  #ADD(%SuneidoWordList,'SocketClient')
+  #ADD(%SuneidoWordList,'SocketServer')
+  #ADD(%SuneidoWordList,'String?')
+  #ADD(%SuneidoWordList,'StringFrom')
+  #ADD(%SuneidoWordList,'Suneido')
+  #ADD(%SuneidoWordList,'set')
+  #ADD(%SuneidoWordList,'short')
+  #ADD(%SuneidoWordList,'sort')
+  #ADD(%SuneidoWordList,'string')
+  #ADD(%SuneidoWordList,'struct')
+  #ADD(%SuneidoWordList,'summarize')
+  #ADD(%SuneidoWordList,'super')
+  #ADD(%SuneidoWordList,'switch')
+  #ADD(%SuneidoWordList,'TestAsync')
+  #ADD(%SuneidoWordList,'TestFiber')
+  #ADD(%SuneidoWordList,'Thread')
+  #ADD(%SuneidoWordList,'Timestamp')
+  #ADD(%SuneidoWordList,'Trace')
+  #ADD(%SuneidoWordList,'Transactions')
+  #ADD(%SuneidoWordList,'True')
+  #ADD(%SuneidoWordList,'throw')
+  #ADD(%SuneidoWordList,'this')
+  #ADD(%SuneidoWordList,'times')
+  #ADD(%SuneidoWordList,'to')
+  #ADD(%SuneidoWordList,'total')
+  #ADD(%SuneidoWordList,'try')
+  #ADD(%SuneidoWordList,'Unload')
+  #ADD(%SuneidoWordList,'Unuse')
+  #ADD(%SuneidoWordList,'Use')
+  #ADD(%SuneidoWordList,'union')
+  #ADD(%SuneidoWordList,'update')
+  #ADD(%SuneidoWordList,'value')
+  #ADD(%SuneidoWordList,'view')
+  #ADD(%SuneidoWordList,'where')
+  #ADD(%SuneidoWordList,'while')
+  #SET(%SuneidoWordCount,ITEMS(%SuneidoWordList))           #! How many are there?
+#GROUP(%SuneidoReservedWordsEnd)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ReserveWordDefines)
+#PREPARE
+#DECLARE(%TotalWordCount)
+#DECLARE(%SqlSearchItem)
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ReserveWordBuild)
+#!---------------------------------------------------------------------
+#! RA.2017.10.16 - Build the complete list of reserved words to check.
+#! RA.2017.10.16 - This works and the code can be cleaned up
+#IF(%optUnderReservedWords)                                              #! IF option is ON
+  #INSERT(%SqlReservedWords)                                                    #! SQL reserved words
+#!--- Reserved Words SQL: %SqlWordCount
+  #INSERT(%ClarionReservedWords)                                                #! CLARION reserved words
+#!--- Reserved Words CLARION: %ClarionWordCount
+  #FOR(%ClarionWordList)
+    #ADD(%SqlWordList,%ClarionWordList)
+  #ENDFOR
+  #SET(%TotalWordCount,ITEMS(%SqlWordList))                                     #! How many are there?
+#!--- Reserved Words ALL: %TotalWordCount
+#ENDIF                                                                  #! ENDIF option is ON
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ReserveWordReplace,*%SqlWordItem)
+#!---------------------------------------------------------------------
+#! RA.2017.10.16 - This works and the code can be cleaned up
+#IF(%optUnderReservedWords)                                             #! IF option is ON
+#!---- THECHECK: %SqlWordItem
+  #SET(%SqlSearchItem, UPPER(%SqlWordItem))
+  #FIND(%SqlWordList, %SqlSearchItem)
+  #IF(%SqlWordList)
+    #SET(%SqlWordItem, %SqlWordItem & '_')
+#!---- RESERVED: %SqlWordItem
+  #ENDIF                                                                #! ENDIF option is ON
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RAYS.2001.08.09 - This took a while to get correct. TESTING strap saved.
+#GROUP(%ReplaceSubString,*%pString,%OldSubString,%NewSubString,%pCaseSensitive=0) #!,AUTO
+#DECLARE(%lPosition,LONG)
+#DECLARE(%lLen,LONG)
+#SET(%lPosition,1)
+#SET(%lLen,LEN(%OldSubString))
+#LOOP
+#!! REPLACE 0 !! pString(%pString)
+#!! REPLACE 0 !! OldSubString(%OldSubString)
+#!! REPLACE 0 !! NewSubString(%NewSubString)
+#!! REPLACE 0 !! lPosition(%lPosition)
+#!! REPLACE 0 !! lLen(%lLen)
+  #IF(%pCaseSensitive)
+    #SET(%lPosition,INSTRING(%OldSubString,%pString,1,%lPosition))
+  #ELSE
+    #SET(%lPosition,INSTRING(UPPER(%OldSubString),UPPER(%pString),1,%lPosition))
+  #ENDIF
+#!! REPLACE 5 !! lPosition(%lPosition)
+  #IF (%lPosition=0)
+    #BREAK
+  #ELSE
+    #SET(%pString,SUB(%pString,1,%lPosition-1)&%NewSubString&SUB(%pString,%lPosition+%lLen,LEN(CLIP(%pString))-%lPosition))
+    #SET(%lPosition,%lPosition+LEN(%NewSubString))
+  #ENDIF
+#ENDLOOP
+#!! REPLACE 9 !! pString(%pString)
+#!! REPLACE 9 !! OldSubString(%OldSubString)
+#!! REPLACE 9 !! NewSubString(%NewSubString)
+#!! REPLACE 9 !! lPosition(%lPosition)
+#!! REPLACE 9 !! lLen(%lLen)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#!
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2017.11.21 - Begin SQL DDL types reference documentation
+#GROUP(%DataTypeSizes)
+#!
+#!  --- MSSQL ---
+#!
+#!  DATATYPE          STORAGE         RANGE
+#!  --------          -------         -----
+#!  bigint            8 bytes         -2^63 (-9,223,372,036,854,775,808) to 2^63-1 (9,223,372,036,854,775,807)
+#!  int               4 bytes         -2^31 (-2,147,483,648) to 2^31-1 (2,147,483,647)
+#!  smallint          2 bytes         -2^15 (-32,768) to 2^15-1 (32,767)
+#!  tinyint           1 byte          0 to 255 [-128 to 127]
+#!
+#!  bit               1 byte          =< 8 bits
+#!                    2 bytes[+]      =< 16 bits[+]
+#!                    1 byte          TRUE [1]
+#!                    1 byte          FALSE [0]
+#!
+#!  Unique ID         16 bytes        Unique Identifier
+#!
+#!  decimal[(p[,s])]  5-17 bytes      p = 1 to 38; 0 <= s <= p; - 10^38 +1 through 10^38 - 1
+#!  numeric[(p[,s])]  8               (precision <=18)
+#!  numeric[(p[,s])]  16              (precision >18)
+#!
+#!  real[(n)]         4 bytes         n = 1 to 24;  p = 7;  - 3.40E + 38 to -1.18E - 38, 0 and 1.18E - 38 to 3.40E + 38
+#!  float[(n)]        8 bytes         n = 25 to 53; p = 15; - 1.79E+308 to -2.23E-308, 0 and 2.23E-308 to 1.79E+308
+#!
+#!  smallmoney        4 bytes         -214,748.3648 to 214,748.3647
+#!  money             8 bytes         -922,337,203,685,477.5808 to 922,337,203,685,477.5807
+#!
+#!  date              3 bytes         0001-01-01 to 9999-12-31
+#!  time              8-16 bytes      00:00:00[.0000000 to 23:59:59[.9999999]
+#!  datetime          8 bytes         date: January 1, 1753, to December 31, 9999; time: 00:00:00 to 23:59:59.997
+#!  datetime2         8 bytes         date: 0001-01-01 through 9999-12-31; time: 00:00:00 through 23:59:59.9999999
+#!                                    19 positions minimum (YYYY-MM-DD hh:mm:ss ) to 27 maximum (YYYY-MM-DD hh:mm:ss.0000000)
+#!  smalldatetime     4 bytes         date: 1900-01-01 to 2079-06-06; time: 00:00:00 to 23:59:59
+#!  datetimeoffset    10 bytes        date: 0001-01-01 to 9999-12-31; time: 00:00:00 to 23:59:59.9999999; time zone offset: -14:00 through +14:00
+#!                                    26 positions minimum (YYYY-MM-DD hh:mm:ss {+|-}hh:mm) to 34 maximum (YYYY-MM-DD hh:mm:ss.nnnnnnn {+|-}hh:mm)
+#!
+#!  binary[(n)]       n bytes         n = 1 to 8,000
+#!  varbinary[(n)]    n + 2 bytes     n = 1 to 8,000
+#!  varbinary[(max)]  max             max = maximum storage size is 2^31-1 bytes (2 GB)
+#!
+#!  char[(n)]         n bytes         n = 1 to 8,000
+#!  varchar[(n)]      n + 2 bytes     n = 1 to 8,000
+#!  varchar[(max)]    max             max = maximum storage size is 2^31-1 bytes (2 GB)
+#!
+#!  nchar[(n)]        n bytes         Unicode: n = 1 to 4,000
+#!  nvarchar[(n)]     n + 2 bytes     Unicode: n = 1 to 4,000; sysname = nvarchar(128)
+#!  nvarchar[(max)]   max             Unicode: max = maximum storage size is 2^31-1 bytes (2 GB)
+#!
+#!  text                                       maximum string length of   2^31-1 (2,147,483,647) bytes
+#!  ntext                             Unicode: maximum string length of   2^30-1 (1,073,741,823) bytes
+#!  image                                      binary data from 0 through 2^31-1 (2,147,483,647) bytes
+#!
+#!  MAX characters                    Max = CSTRING(65534) [From SQL to DCT import translation by Clarion]
+#!                                    There are limits associated with record sizes. Check the manual.
+#!
+#!
+#!  --- POSTGRESQL ---
+#!
+#!  DATATYPE                            STORAGE         DESCRIPTION                               RANGE
+#!  --------                            -------         -----------                               -----
+#!  bigint                              8 bytes         signed integer                            -9223372036854775808 to +9223372036854775807
+#!  int8
+#!  bigserial                           8 bytes         autoincrementing integer                  1 to 9223372036854775807
+#!  serial8
+#!  bit[(n)]                            n/8 bytes       fixed-length bit string
+#!  bit varying[(n)]                                    variable-length bit string
+#!  varbit
+#!  boolean                             1 byte          logical Boolean (true/false)              TRUE = 't' | 'true' | 'y' | 'yes' | 'on' | '1'
+#!                                                                                                FALSE = 'f' | 'false' | 'n' | 'no' | 'off' | '0'
+#!  bool
+#!  box                                 32 bytes        rectangular box on a plane                ((x1,y1),(x2,y2))
+#!  bytea                               1 or 4 bytes+   binary data ("byte array")
+#!  character[(n)]                      n bytes         fixed-length, blank padded
+#!  char[(n)]
+#!  character varying[(n)]              max n bytes     variable-length character string
+#!  varchar[(n)]
+#!  cidr                                7 bytes         IPv4 network address
+#!                                      19 bytes        IPv6 network address
+#!  circle                              24 bytes        circle on a plane                         <(x,y),r> (center point and radius)
+#!  date                                4 bytes         calendar date (year, month, day)          4713 BC-5874897 AD; 1 day
+#!  decimal[(p,s)]                                      exact numeric of selectable precision     up to 131072 digits before the decimal point; up to 16383 digits after the decimal point
+#!  double precision                    8 bytes         double floating-point number              15 decimal digits precision
+#!  double                                                                                        1E-307 to 1E+308; Case-insensitive values 'NaN' (not-a-number), 'Infinity' and '-Infinity' are allowed
+#!  float                               --->>> IS float OK FOR 8 BYTES ???
+#!  inet                                7 bytes         IPv4 host address
+#!                                      19 bytes        IPv6 host address
+#!  integer                             4 bytes         signed integer                            -2147483648 to +2147483647
+#!  int
+#!  int4
+#!  interval[fields][(p)]               16 bytes        time interval                             -178000000 years to 178000000 years; 1 microsecond / 14 digits
+#!  json                                                textual JSON data
+#!  jsonb                                               binary JSON data, decomposed
+#!  line                                32 bytes        infinite line on a plane                  {A,B,C}
+#!  lseg                                32 bytes        line segment on a plane                   ((x1,y1),(x2,y2))
+#!  macaddr                             6 bytes         MAC (Media Access Control) address
+#!  money                               8 bytes         currency amount                           -92233720368547758.08 to +92233720368547758.07
+#!  numeric[(p,s)]                                      exact numeric of selectable precision     up to 131072 digits before the decimal point; up to 16383 digits after the decimal point
+#!  path                                16+16n bytes    geometric path on a plane                 ((x1,y1),...)
+#!  pg_lsn                                              PostgreSQL Log Sequence Number
+#!  point                               16 bytes        geometric point on a plane                (x,y)
+#!  polygon                             40+16n bytes    closed geometric path on a plane          ((x1,y1),...)
+#!  real                                4 bytes         single floating-point number              6 decimal digits precision
+#!  float4
+#!  smallint                            2 bytes         signed integer                            -32768 to +32767
+#!  int2
+#!  smallserial                         2 bytes         autoincrementing integer                  1 to 32767
+#!  serial2
+#!  serial                              4 bytes         autoincrementing integer                  1 to 2147483647
+#!  serial4
+#!  text                                                variable-length character string
+#!  time[(p)][without time zone]        8 bytes         time of day (no time zone)                00:00:00 to 24:00:00; 1 microsecond / 14 digits
+#!  time[(p)] with time zone            12 bytes        time of day, including time zone          00:00:00+1459 to 24:00:00-1459; 1 microsecond / 14 digits
+#!  timetz
+#!  timestamp[(p)][without time zone]   8 bytes         date and time (no time zone)              4713 BC to 294276 AD; 1 microsecond / 14 digits
+#!  timestamp[(p)] with time zone       8 bytes         date and time, including time zone        4713 BC to 294276 AD; 1 microsecond / 14 digits
+#!  timestamptz
+#!  tsquery                                             text search query
+#!  tsvector                                            text search document
+#!  txid_snapshot                                       user-level transaction ID snapshot
+#!  uuid                                16 bytes        universally unique identifier             a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+#!  xml                                                 XML data
+#!
+#!
+#!
+#!  --- MIMER ---
+#!
+#!  DATATYPE                            STORAGE         DESCRIPTION                               RANGE
+#!  --------                            -------         -----------                               -----
+#!
+#!
+#!
+#!  --- SQL ANYWHERE ---
+#!
+#!  DATATYPE                            STORAGE         DESCRIPTION                               RANGE
+#!  --------                            -------         -----------                               -----
+#!

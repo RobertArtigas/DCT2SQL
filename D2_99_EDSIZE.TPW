@@ -1,0 +1,2101 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2EdSize.tpw
+#! Purpose:     DCT to SYBASE creation script
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2006 09 20   Eddie Sizemore
+#!  *   Added Support assign a name to a foreign key in the script.  Needed when using a pk as the linking side
+#!  *     of a file relationship so the script does not try to create the pk and fk with the same name.
+#!  *     RASQL(,relation name,,)     Foreign Key Name
+#! 2006 08 07   Eddie Sizemore
+#!      Added Support to keep a history (99) of the old files
+#! 2006 03 18   Eddie Sizemore
+#!      Added Support for naming of primary keys ie CONSTRAINT "pkTimeTest" PRIMARY KEY CLUSTERED ( "SysID" )
+#!      Added Support to Drop the pk in the drop script
+#! 2006 02 03   Eddie Sizemore
+#!      Added Support for ULONG and USHORT Will create UNSIGNED INTEGER and UNSIGNED SMALLINT
+#!      Added Support for SREAL and REAL
+#! 2005 12 30   Eddie Sizemore
+#!  *   Added support to override PKClustered flag per file in file user option 2
+#!  *     And set another key as clustered using the key user option 2.
+#!  *     RASQL(,NC,,)     File option 2 [NC] Override global flag set primary key clustered
+#!  *     RASQL(,C,,)      Key  option 2 [C] Set this key as Clustered only one per table
+#! 2005 10 07   Eddie Sizemore
+#!  *     Changed the comment delimiter from ' to "
+#! 2005 06 01   Eddie Sizemore
+#!  *   Added Constraints to column validations.  The db error message will include this text in the error message
+#! 2003 09.16   Eddie Sizemore
+#!  *     Changed Database Options to IncludeDctComments As Script
+#!                         Allows you to place SQL script in the Dct
+#!                         comments and it will be included after all
+#!                         the tables and indexes are created
+#! 2003 05.31   Eddie Sizemore
+#!  *   Added support for GLOBAL TEMPORARY TABLE in File User Options
+#!  *     RASQL(,,GT,)     GLOBAL TEMPORARY TABLE
+#!  *     RASQL(,,PR,)     GLOBAL TEMPORARY TABLE ON COMMIT PRESERVE ROWS
+#!  *     RASQL(,,,IC)     Include Table Comment as script
+#!                         Allows you to place SQL script in the table
+#!                         comments and it will be included after the
+#!                         table and indexes are created
+#!  *   Added support for additional defaults
+#!  *     RASQL(,,LU,)     Default Last User
+#! Changes:
+#! 2003 03.16   Eddie Sizemore
+#!  *   Added support for additional defaults
+#!  *     RASQL(,,CP,)     Default Current Publisher
+#!  *     RASQL(,,CDB,)    Default Current DataBase
+#!  *     RASQL(,,CUTS,)   Default Current UTC TimeStamp
+#!  *     RASQL(,,CTS,)    Default Current TimeStamp
+#!  *     RASQL(,,CD,)     Default Current Date
+#!  *     RASQL(,,CT,)     Default Current Time
+#!  *     RASQL(,,CU,)     Default Current User
+#!  *     RASQL(,,UTS,)    Default UTC TimeStamp
+#!  *     RASQL(,,TS,)     Default TimeStamp
+#! 2003.01.24   Eddie Sizemore
+#!  *   Added TempTable
+#!  *   Added Database Options
+#! 2003.01.05   Roberto Artigas Jr
+#!  *   Added NOTEPAD show of the script at generation end.
+#! 2003.01.03   Eddie Sizemore
+#!  *   Changed to process tables in alphbetical order
+#!  *   Changed the Table format
+#!  *   Added support for defaults including AutoInc and Global AutoInc
+#!  *     RASQL(,,A,)     Default AutoIncrement
+#!  *     RASQL(,,G,)     Default Global AutoIncrement
+#!  *     RASQL(,,G,1024) Default Global AutoIncrement Partition Size
+#!  *   Added quote toggle
+#!  *   Added flag to turn off reserved words check
+#!  *   Added column constriants
+#!  *   Added table owner
+#!  *   Added primary key def in table
+#!  *   Added Table & Column Comments
+#!  *   Added Drop Table, FK, and Index
+#!  *   Added automatic conversion of timestamp fields
+#!  *   Added Combined Script
+#!  *   Added Flag to Add Clustered to the primary Key
+#!  *   My changes do not support the use of arrays!
+#! 2002.12.02   Roberto Artigas Jr
+#!  *   Created skeleton for the Sybase variant.
+#!---------------------------------------------------------------------
+#UTILITY(Dct2SYBASE_EddieSizemore, '2016.02.17: Dictionary to SYBASE script')
+#!---------------------------------------------------------------------
+#BOXED('Hidden Variables'),HIDE
+  #PROMPT('DictName: '      ,@S40 ),%DictName
+  #PROMPT('DictPath: '      ,@S80 ),%DictPath
+  #PROMPT('nLoc1: '         ,@N4  ),%nLoc1
+  #PROMPT('nLoc2: '         ,@N4  ),%nLoc2
+  #PROMPT('OutCombinedName:',@S120),%OutCombinedName
+  #PROMPT('OutTableName: '  ,@S120),%OutTableName
+  #PROMPT('OutDropName:  '  ,@S120),%OutDropName
+  #PROMPT('OutGrantName: '  ,@S120),%OutGrantName
+  #PROMPT('OutIndexName: '  ,@S120),%OutIndexName
+  #PROMPT('OutRelatName: '  ,@S120),%OutRelatName
+#ENDBOXED
+#!
+#SHEET,HSCROLL
+ #TAB('General')
+  #BOXED('')
+   #DISPLAY('The SYBASE Script Creator.')
+   #DISPLAY('Copyright 2002-2003 © by Roberto Artigas Jr.')
+   #DISPLAY('All Rights Reserved World Wide.')
+   #DISPLAY('')
+   #PROMPT('Directory:'  ,@S80 ),%SQLDirectory,AT(52,,130)
+   #DISPLAY('')
+   #PROMPT('Combine Scripts into 1?',CHECK),%SQLCombined,DEFAULT(%TRUE),AT(10)                #! ES 2003.01.03
+   #PROMPT('Combined Script:',@S40),%SQLCombinedName,AT(82,,100)                              #! ES 2003.01.03
+   #DISPLAY('')
+   #PROMPT('Generate CREATE?',CHECK),%SQLTable,DEFAULT(%TRUE),AT(10)
+   #PROMPT('CREATE Script:',@S40),%SQLTableName,AT(82,,100)
+   #DISPLAY('')
+   #PROMPT('Generate DROP?',CHECK),%SQLDrop,DEFAULT(%TRUE),AT(10)                             #! ES 2003.01.03
+   #PROMPT('DROP Script:',@S40),%SQLDropName,AT(82,,100)                                      #! ES 2003.01.03
+   #DISPLAY('')
+   #PROMPT('Generate Indexs?',CHECK),%SQLIndex,DEFAULT(%TRUE),AT(10)
+   #PROMPT('Index Script:',@S40),%SQLIndexName,AT(82,,100)
+   #DISPLAY('')
+   #PROMPT('Generate FK?',CHECK),%SQLRelat,DEFAULT(%TRUE),AT(10)
+   #PROMPT('FK Script:',@S40),%SQLRelatName,AT(82,,100)
+   #DISPLAY('')
+   #PROMPT('Generate GRANT?',CHECK),%SQLGrant,DEFAULT(%FALSE),AT(10)
+   #PROMPT('GRANT Script:',@S40),%SQLGrantName,AT(82,,100)
+  #ENDBOXED
+ #ENDTAB
+ #TAB('Options')
+  #BOXED('')
+   #PROMPT('Table Owner:'         ,@S20 ),%SQLPrefix,AT(82,,100),DEFAULT('DBA')               #! ES 2003.01.03
+   #PROMPT('Grant User:'         ,@S20 ),%GrantUser,AT(82,,100),DEFAULT('GSIUser')            #! ES 2003.01.03
+   #PROMPT('Keep History Files:',CHECK),%KeepHistoryFiles,AT(10),DEFAULT(%True)               #! ES 2006.08.07
+   #PROMPT('Use Quotes on Table and Column Names:',CHECK),%UseQuotes,AT(10),DEFAULT(%True)    #! ES 2003.01.03
+   #PROMPT('Declare Primary Key in Table:',CHECK),%PKInTable,AT(10),DEFAULT(%True)            #! ES 2003.01.03
+   #PROMPT('Declare Primary Key as Clustered:',CHECK),%PKClustered,AT(10),DEFAULT(%True)      #! ES 2003.01.03
+   #PROMPT('Declare Primary Key as Constraint:',CHECK),%PKConstraint,AT(10),DEFAULT(%True)    #! ES 2006.03.18
+   #PROMPT('DROP Primary Key in Drop Script',CHECK),%DropPK,AT(10),DEFAULT(%False)            #! ES 2006 03 18
+   #PROMPT('Check Reserved Words:',CHECK),%CheckReserved,AT(10),DEFAULT(%False)               #! ES 2003.01.03
+   #PROMPT('Add TempTable to Script:',CHECK),%AddTempTable,AT(10),DEFAULT(%False)             #! ES 2003.01.24
+   #PROMPT('Add DataBase Options to Script:',CHECK),%IncludeDctComments,AT(10),DEFAULT(%True) #! ES 2003.01.24
+   #DISPLAY('')
+  #ENDBOXED
+ #ENDTAB
+ #TAB('Arrays')
+  #BOXED('')
+   #DISPLAY('There are two ways to handle arrays:')
+   #DISPLAY('')
+   #DISPLAY('1) You defined a group with all the fields of the array')
+   #DISPLAY('inside this group. Then you put the array OVER the')
+   #DISPLAY('group. If you set up your arrays in this manner, then')
+   #DISPLAY('LEAVE the checkbox bellow OFF.')
+   #DISPLAY('')
+   #DISPLAY('2) You define your arrays as actual fields using no')
+   #DISPLAY('groups whatsoever. If you set up your arrays this way,')
+   #DISPLAY('then TURN ON the checkbox bellow.')
+   #DISPLAY('')
+   #DISPLAY('')
+   #PROMPT('I DO NOT HAVE ARRAYS OVER GROUPS. ',CHECK),%NoArrayOver,AT(10),DEFAULT(1)
+   #DISPLAY('')
+   #DISPLAY('')
+   #DISPLAY('')
+   #DISPLAY('')
+   #DISPLAY('')
+  #ENDBOXED
+ #ENDTAB
+#! #TAB('Standardize')
+#!   #BOXED('')
+#!   #PROMPT('Generate script comments? ',CHECK),%DoComments,AT(10),DEFAULT(0)
+#!   #PROMPT('Force BOOLEAN validation to [Y,N] choices? ',CHECK),%ForceBoolYN,AT(10),DEFAULT(1)
+#!   #PROMPT('Prefix tables and rows with file prefix? ',CHECK),%UsePrefix,AT(10),DEFAULT(0)
+#!   #PROMPT('Do KEYFIELD-FILE list to create relations? ',CHECK),%DoFieldFile,AT(10),DEFAULT(0)
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!   #DISPLAY('')
+#!  #ENDBOXED
+#!  #BOXED('')
+#!   #PROMPT('True Value (Y,T,1): ',@S1),%TrueValue,REQ,DEFAULT('Y')
+#!   #PROMPT('False Value (N,F,0): ',@S1),%FalseValue,REQ,DEFAULT('N')
+#!  #ENDBOXED
+#! #ENDTAB
+#ENDSHEET
+#BOXED('Hidden Variables'),HIDE
+  #PROMPT('Generate script comments? ',CHECK),%DoComments,AT(10),DEFAULT(0)
+  #PROMPT('Force BOOLEAN validation to [Y,N] choices? ',CHECK),%ForceBoolYN,AT(10),DEFAULT(0)
+  #PROMPT('Prefix tables and rows with file prefix? ',CHECK),%UsePrefix,AT(10),DEFAULT(0)
+  #PROMPT('Do KEYFIELD-FILE list to create relations? ',CHECK),%DoFieldFile,AT(10),DEFAULT(0)
+  #PROMPT('True Value (Y,T,1): ',@S1),%TrueValue,REQ,DEFAULT('1')
+  #PROMPT('False Value (N,F,0): ',@S1),%FalseValue,REQ,DEFAULT('0')
+#ENDBOXED
+#!---------------------------------------------------------------------
+#PREPARE
+#!
+#SET(%nLoc1,INSTRING('\',%DictionaryFile,1,1))
+#LOOP,WHILE(%nLoc1)
+  #SET(%nLoc2,%nLoc1)
+  #SET(%nLoc1,INSTRING('\',%DictionaryFile,1,%nLoc1+1))
+#ENDLOOP
+#SET(%DictName,UPPER(SUB(%DictionaryFile,%nLoc2+1,LEN(%DictionaryFile)-%nLoc2-4)))
+#SET(%DictPath,UPPER(SUB(%DictionaryFile,1,%nLoc2)))
+#!
+#SET(%SQLDirectory,%DictPath)
+#SET(%SQLCombinedName,%DictName & '.SY.SQL')
+#SET(%SQLTableName,%DictName    & '.T_SY.SQL')
+#SET(%SQLDropName,%DictName     & '.D_SY.SQL')
+#SET(%SQLGrantName,%DictName    & '.G_SY.SQL')
+#SET(%SQLIndexName,%DictName    & '.I_SY.SQL')
+#SET(%SQLRelatName,%DictName    & '.F_SY.SQL')
+#!
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#MESSAGE('The SYBASE Script Creator',0)
+#DECLARE(%NFileUser)                    #! File user options [RASQL]
+#DECLARE(%NFileOpt1)                    #! File option 1 [NO]
+#DECLARE(%NFileOpt2)                    #! File option 2 [NC]
+#DECLARE(%NFileOpt3)                    #! File option 3 [GT],[PR] Global Temp Table, Preserve Rows
+#DECLARE(%NFileOpt4)                    #! File option 4 [IC]
+#!
+#DECLARE(%NFieldUser)                   #! Field user options [RASQL]
+#DECLARE(%NFieldOpt1)                   #! Field option 1 [NO]
+#DECLARE(%NFieldOpt2)                   #! Field option 2 [Override Clarion Data Type with SQL Data Type]
+#DECLARE(%NFieldOpt3)                   #! Field option 3 [A],[G] Auto Inc or Global Auto Inc
+#DECLARE(%NFieldOpt4)                   #! Field option 4 [#####] Global Auto Inc Partion Size
+#!
+#DECLARE(%NKeyUser)                     #! Key user options [RASQL]
+#DECLARE(%NKeyOpt1)                     #! Key option 1 [NO]
+#DECLARE(%NKeyOpt2)                     #! Key option 2 [C] Clustered] Added 20051230 Eddie Sizemore
+#DECLARE(%NKeyOpt3)                     #! Key option 3
+#DECLARE(%NKeyOpt4)                     #! Key option 4
+#!
+#DECLARE(%NRelationUser)                #! Relation user options [RASQL]
+#DECLARE(%NRelationOpt1)                #! Relation option 1 [NO]
+#DECLARE(%NRelationOpt2)                #! Relation option 2 [] fkey name
+#DECLARE(%NRelationOpt3)                #! Relation option 3
+#DECLARE(%NRelationOpt4)                #! Relation option 4
+#!
+#DECLARE(%NFileName)                    #! File Name
+#DECLARE(%NFileType)                    #! TYPE=???
+#DECLARE(%NFileRowFormat)               #! ROW_FORMAT=???
+#!
+#DECLARE(%NFieldPKey)                   #! Field is Primary Key?
+#DECLARE(%NFieldLine)                   #! Field line
+#DECLARE(%NFieldName)                   #! Field Name
+#DECLARE(%NFieldTSql)                   #! Field SQL type
+#DECLARE(%NFieldType)                   #! Field type
+#DECLARE(%NFieldDef)                    #! Field default
+#DECLARE(%NFieldAuto)                   #! Field AUTO_INCREMENT
+#DECLARE(%NFieldNN)                     #! Field NOT NULL
+#DECLARE(%NFieldSize  ,LONG)            #! Field decimal size
+#DECLARE(%NFieldDec   ,LONG)            #! Field decimal places
+#DECLARE(%NLeadZero   ,LONG)            #! Have a leading zero
+#DECLARE(%NFNameAuto)                   #! Field Name Auto Increment
+#!
+#DECLARE(%NKeyName)                     #! Key name
+#DECLARE(%NKeyFields)                   #! Key building line
+#DECLARE(%NKeyField)                    #! Key field current
+#DECLARE(%NKeyFieldCount)               #! Number of key fields
+#DECLARE(%PrimaryCount)                 #! Primary key exists
+#DECLARE(%SecondaryCount)               #! Secondary key exists
+#DECLARE(%AutoIncrementCount)           #! Auto-Increment key exists
+#!
+#DECLARE(%NFileList),UNIQUE             #! ES 2003.01.03
+#DECLARE(%NRelList),MULTI               #! ES 2003.01.03
+#DECLARE(%ESFileName,%NFileList)        #! ES 2003.01.03
+#DECLARE(%ESdFileName,%NFileList)       #! ES 2003.01.03
+#DECLARE(%ESIndexDef),MULTI             #! ES 2003.01.03 - Index Defs
+#DECLARE(%ESComments),MULTI             #! ES 2003.01.03 - Comments
+#DECLARE(%ESdTable),MULTI               #! ES 2003.01.03 - Drop Table
+#DECLARE(%ESdfk),MULTI                  #! ES 2003.01.03 - Drop FK
+#DECLARE(%ESdindex),MULTI               #! ES 2003.01.03 - Drop index
+#DECLARE(%ESdTableName)                 #! ES 2003.01.03
+#DECLARE(%ESdKeyName)                   #! ES 2003.01.03
+#DECLARE(%NFieldCheck)                  #! ES 2003.01.03 - Column Constraints
+#DECLARE(%NPrimaryKeyDef)               #! ES 2003.01.03 - Primary Key Def
+#DECLARE(%NKeyDir)                      #! ES 2003.01.03 - Key Sort Direction ASC or DESC
+#DECLARE(%NForignScript),MULTI          #! ES 2003.01.03 -
+#DECLARE(%PossibleTimeStamp,LONG)       #! ES 2003.01.03
+#DECLARE(%PossibleTimeStampField)       #! ES 2003.01.03
+#DECLARE(%GroupOver)                    #! ES 2003.01.03
+#DECLARE(%WriteLine)                    #! ES 2003.01.03
+#DECLARE(%AddComma)                     #! ES 2003.01.03
+#DECLARE(%ASCIIFileRecord)              #! ES 2003.01.03
+#DECLARE(%ESFieldNumeric)               #! ES 2003.08.06
+#DECLARE(%ESSetPKClustered)             #! ES 2005.12.30
+#DECLARE(%ESSetClustered)               #! ES 2005.12.30
+#!
+#DECLARE(%NRelateItem)                  #! Working item number
+#DECLARE(%NRelateCount)                 #! Total items to work
+#DECLARE(%NRelateComma)                 #! Number of commas
+#DECLARE(%NRelateFile)                  #! Related file
+#DECLARE(%NRelateField1)                #! Related origin field
+#DECLARE(%NRelateField2)                #! Related relate field
+#DECLARE(%RelationField1Count)          #! Count of origin file key items
+#DECLARE(%RelationField2Count)          #! Count of relate file key items
+#DECLARE(%RelationField1)               #! The origin file keys
+#DECLARE(%RelationField2)               #! The relate file keys
+#DECLARE(%RelationUpdate)               #! ON UPDATE ?
+#DECLARE(%RelationDelete)               #! ON DELETE ?
+#!
+#!#DECLARE(%nLoc1       ,LONG)            #! Location 1
+#!#DECLARE(%nLoc2       ,LONG)            #! Location 2
+#DECLARE(%TheCount    ,LONG)            #! Count posible relations
+#DECLARE(%CStringLen)                   #! Length of types shortened by one
+#DECLARE(%LastField)                    #! Last field processed
+#DECLARE(%InnerGroup)                   #! Inner group level processed
+#DECLARE(%FieldComma)                   #! Number of fields - 1
+#!
+#DECLARE(%ChoiceLine)                   #! Build ENUM field type line
+#DECLARE(%ChoiceComma)                  #! Count ENUM values - 1
+#!
+#DECLARE(%DocVar)                       #! Documentation Variable
+#DECLARE(%TableCount, 0)                #! Count of tables
+#DECLARE(%AutoCount, 0)                 #! Count of Auto-Increment Keys
+#DECLARE(%PKeyCount, 0)                 #! Count of primary keys (From Keys)
+#DECLARE(%PKeyOption, 0)                #! Count of primary keys (From Options)
+#DECLARE(%KeyOthers, 0)                 #! Count of secondary keys
+#DECLARE(%KeyCount, 0)                  #! Count of all keys combined
+#DECLARE(%FieldCount, 0)                #! Count of fields
+#DECLARE(%RelCount, 0)                  #! Relationship Counts
+#DECLARE(%FieldTable),MULTI,UNIQUE      #! List of unique fields
+#DECLARE(%FieldUnique, 0)               #! Count of unique fields
+#!
+#DECLARE(%TheDate)                      #! Display current date
+#DECLARE(%TheTime)                      #! Display current time
+#SET(%TheDate,FORMAT(TODAY(),@D010))    #! Set current date
+#SET(%TheTime,FORMAT(CLOCK(),@T06))     #! Set current time
+#!
+#DECLARE (%DimCount   ,LONG)            #! Number of dimensions
+#DECLARE (%FldArray   ,STRING)          #! Created field name from array
+#DECLARE (%FD1S       ,STRING)          #! Number for dimension 1
+#DECLARE (%FD2S       ,STRING)          #! Number for dimension 2
+#DECLARE (%FD3S       ,STRING)          #! Number for dimension 3
+#DECLARE (%FD4S       ,STRING)          #! Number for dimension 4
+#DECLARE (%FD1I       ,LONG)            #! Looping in Dimension 1
+#DECLARE (%FD2I       ,LONG)            #! Looping in Dimension 2
+#DECLARE (%FD3I       ,LONG)            #! Looping in Dimension 3
+#DECLARE (%FD4I       ,LONG)            #! Looping in Dimension 4
+#DECLARE (%FD1L       ,LONG)            #! Set to %FieldDimension1
+#DECLARE (%FD2L       ,LONG)            #! Set to %FieldDimension2
+#DECLARE (%FD3L       ,LONG)            #! Set to %FieldDimension3
+#DECLARE (%FD4L       ,LONG)            #! Set to %fieldDimension4
+#!
+#DECLARE(%LOOPCount)
+#DECLARE(%TempFileName1)
+#!
+#IF (%KeepHistoryFiles)
+  #LOOP,FOR(%LoopCount,99,1),BY(-1)
+    #SET(%TempFileName1,%DictName & '.SY-'& FORMAT(%LOOPCount,@N02) &'.SQL')
+    #IF(FILEEXISTS(%TempFileName1))
+      #REPLACE(%DictName & '.SY-'& FORMAT(%LOOPCount + 1,@N02) &'.SQL',%TempFileName1)             #!Replace old with new (if changed)
+    #ENDIF
+  #ENDLOOP
+#!
+  #SET(%TempFileName1,%DictName & '.SY.SQL')
+  #IF(FILEEXISTS(%TempFileName1))
+    #REPLACE(%DictName & '.SY-01.SQL',%TempFileName1)             #!Replace old with new (if changed)
+  #ENDIF
+#ENDIF
+#!
+#!--------------------------------------------------------------!
+#! List of table, key and rows names found in reserved list.    !
+#!--------------------------------------------------------------!
+#DECLARE(%ReservedFieldList),MULTI,UNIQUE
+#EQUATE (%FoundFileName     ,'File Name:          ')
+#EQUATE (%FoundFileField    ,'File Field Name:    ')
+#EQUATE (%FoundAIKeyName    ,'AI Key Name:        ')
+#EQUATE (%FoundKeyName      ,'Key Name:           ')
+#EQUATE (%FoundKeyField     ,'Key Field Name:     ')
+#EQUATE (%FoundRelatedName  ,'Related File Name:  ')
+#EQUATE (%FoundRelatedField ,'Related Field Name: ')
+#!--------------------------------------------------------------------------!
+#! RAS.2001.12.15 - Table of field-table to be able to create relations.    !
+#!--------------------------------------------------------------------------!
+#DECLARE(%FieldTableList),MULTI,UNIQUE
+#!---------------------------------------------------------------------
+#DECLARE(%LFieldInKey),MULTI,UNIQUE     #! Field list that are used in keys
+#DECLARE(%IFieldInKey)                  #! Field item to search for in list
+#DECLARE(%LFieldInKeyCount)             #! How many fields are in keys?
+#FREE(%LFieldInKey)
+#FOR(%File)
+  #IF(ITEMS(%Key))
+    #FOR(%Key)
+      #FOR(%KeyField)
+        #ADD(%LFieldInKey,%KeyField)
+      #ENDFOR
+    #ENDFOR
+  #ENDIF
+#ENDFOR
+#SET(%LFieldInKeyCount,ITEMS(%LFieldInKey))
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#INSERT(%ClarionReservedWords)
+#INSERT(%SqlReservedWords)
+#FOR(%ClarionWordList)
+  #ADD(%SqlWordList,%ClarionWordList)
+#ENDFOR
+#IF(~%CheckReserved)                                            #! ES.2002.12.03
+  #FREE(%SqlWordList)                                           #! ES.2002.12.03
+#ENDIF                                                          #! ES.2002.12.03
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#SET(%TableCount, 0)                    #! Count of tables
+#SET(%AutoCount, 0)                     #! Count of Auto-Increment Keys
+#SET(%PKeyCount, 0)                     #! Count of primary keys (From Keys)
+#SET(%PKeyOption, 0)                    #! Count of primary keys (From Options)
+#SET(%KeyOthers, 0)                     #! Count of secondary keys
+#SET(%KeyCount, 0)                      #! Count of all keys combined
+#SET(%FieldCount, 0)                    #! Count of fields
+#SET(%RelCount, 0)                      #! Relationship Counts
+#SET(%FieldUnique, 0)                   #! Count of unique fields
+#!---------------------------------------------------------------------
+#! ES 2003.01.03 Process tables by Alpha and filter files once
+#!---------------------------------------------------------------------
+#MESSAGE('Building Table List: ',1)
+#SET(%TableCount,0)
+#FOR(%File)
+  #!IF(UPPER(%FileType) = 'FILE' AND (UPPER(%FileDriver) = 'SQLANYWHERE' OR UPPER(%FileDriver) = 'ODBC'))  #! ES .2002.12.03
+  #IF(UPPER(%FileDriver) = 'SQLANYWHERE' OR UPPER(%FileDriver) = 'ODBC')  #! ES .2002.12.03
+    #IF(ITEMS(%Field))                                            #! RAS.2001.12.01
+      #IF(SUB(UPPER(EXTRACT(%FileUserOptions,'RASQL',1)),1,1)='N')
+        #CYCLE
+      #ELSE
+        #ADD(%NFileList,UPPER(%File))
+        #SET(%NFileName,%File)
+        #IF(%UsePrefix)
+          #SET(%NFileName,%FilePrefix & '_' & %File)
+        #ENDIF
+        #SET(%SqlWordItem, UPPER(%NFileName))
+        #FIND(%SqlWordList, %SqlWordItem)
+        #IF(%SqlWordList)
+          #ADD(%ReservedFieldList, %FoundFileName & %NFileName)
+          #SET(%NFileName, %NFileName & '_')
+        #ENDIF
+        #SET(%ESdFileName,%NFileName)                                   #! ES 2003.01.03
+        #IF(%SQLPrefix)                                                 #! ES 2003.01.03
+          #IF(%UseQuotes)                                               #! ES 2003.01.03
+            #SET(%NFileName,'"' & %SQLPrefix & '"."' & %NFileName & '"')
+          #ELSE                                                         #! ES 2003.01.03
+            #SET(%NFileName,%SQLPrefix &'.'& %NFileName)
+          #ENDIF                                                        #! ES 2003.01.03
+        #ELSE                                                           #! ES 2003.01.03
+          #IF(%UseQuotes)                                               #! ES 2003.01.03
+            #SET(%NFileName,'"' & %NFileName & '"')
+          #ENDIF                                                        #! ES 2003.01.03
+        #ENDIF                                                          #! ES 2003.01.03
+        #SET(%ESFileName,%NFileName)                                    #! ES 2003.01.03
+        #SET(%TableCount,%TableCount +1)
+        #MESSAGE('Table Structure: ' & %NFileList,2)
+        #MESSAGE('Table Count    : ' & %TableCount,3)
+      #ENDIF
+    #ENDIF                                                        #! RAS.2001.12.01
+  #ENDIF                                                          #! ES .2002.12.03
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLRelat)
+  #SET(%OutRelatName,%SQLDirectory & %SQLRelatName)
+  #CREATE(%OutRelatName)
+  #MESSAGE('Creating: ' & %SQLRelatName,1)
+--
+-- BOF: %OutRelatName
+--
+-- SQL script creator for SYBASE database [RELATIONS]
+-- Created: %TheDate - %TheTime
+--
+PRINT '** Add Foregin Keys **';
+
+#!
+  #SET(%RelCount, 0)
+  #FOR(%NFileList)                                                #! ES 2003.01.03
+    #FIX(%File,%NFileList)                                        #! ES 2003.01.03
+    #IF(%FileType='ALIAS')                                        #! ES 2003.03.19
+      #CYCLE
+    #ENDIF
+    #SET(%NFileName,%ESFileName)                                  #! ES 2003.01.03
+#!
+    #SET(%TheCount, 0)
+    #IF(ITEMS(%Relation))
+      #FOR(%Relation)
+        #SET(%nLoc1,INSTRING('RASQL(',%RelationUserOptions,1,1))
+        #SET(%nLoc2,INSTRING(')',%RelationUserOptions,1,%nLoc1))
+        #SET(%nRelationUser,UPPER(SUB(%RelationUserOptions,%nLoc1,%nLoc2)))
+        #!SET(%NRelationUser,UPPER(EXTRACT(%RelationUserOptions,'RASQL')))
+        #SET(%NRelationOpt1,EXTRACT(%NRelationUser,'RASQL',1))
+        #SET(%NRelationOpt2,EXTRACT(%NRelationUser,'RASQL',2))
+        #SET(%NRelationOpt3,EXTRACT(%NRelationUser,'RASQL',3))
+        #SET(%NRelationOpt4,EXTRACT(%NRelationUser,'RASQL',4))
+#!%NFileList, %Relation, %NRelationUser, %NRelationOpt1, %NRelationOpt2, %NRelationOpt3, %NRelationOpt4
+        #!-----------------------------------------------------------------!
+        #! The first option RASQL(NO) controls if a relation is processed. !
+        #!-----------------------------------------------------------------!
+        #IF(SUB(%NRelationOpt1,1,1)='N')
+          #CYCLE
+        #ENDIF
+#!
+        #IF(%FileRelationType = 'MANY:1')
+          #SET(%Relationfield1, '')
+          #SET(%Relationfield2, '')
+          #SET(%NKeyField, SUB(%FileKey, INSTRING(':',%FileKey,1,1) + 1 , 50))
+          #IF(NOT %NKeyField)
+            #SET(%NKeyField, SUB(%RelationKey, INSTRING(':',%RelationKey,1,1) + 1 , 50))
+          #ENDIF
+          #IF(%UsePrefix)
+            #SET(%NKeyField, %FilePrefix & '_' & %NKeyField)
+          #ENDIF
+          #SET(%SqlWordItem, UPPER(%NKeyField))
+          #FIND(%SqlWordList, %SqlWordItem)
+          #IF(%SqlWordList)
+            #ADD(%ReservedFieldList, %FoundKeyField & %FilePrefix & ':' & %NKeyField)
+            #SET(%NKeyField, %NKeyField & '_')
+          #ENDIF
+          #SET(%ESdKeyName,%NKeyField)                                  #! ES 2003.01.03
+          #IF(%UseQuotes)                                               #! ES 2003.01.03
+            #SET(%NKeyField,'"' & %NKeyField & '"')                     #! ES 2003.01.03
+          #ENDIF                                                        #! ES 2003.01.03
+          #!
+          #IF(%RelationAlias)                                           #! ES 2003.01.03
+            #SET(%NRelateFile, %RelationAlias)                          #! ES 2003.01.03
+          #ELSE                                                         #! ES 2003.01.03
+            #SET(%NRelateFile, %Relation)
+          #ENDIF                                                        #! ES 2003.01.03
+          #IF(%UsePrefix)
+            #SET(%NRelateFile, %RelationPrefix & '_' & %Relation)
+          #ENDIF
+          #SET(%SqlWordItem, UPPER(%NRelateFile))
+          #FIND(%SqlWordList, %SqlWordItem)
+          #IF(%SqlWordList)
+            #ADD(%ReservedFieldList, %FoundRelatedName & %NRelateFile)
+            #SET(%NRelateFile, %NRelateFile & '_')
+          #ENDIF
+          #IF(%SQLPrefix)                                                 #! ES 2003.05.28
+            #IF(%UseQuotes)                                               #! ES 2003.05.28
+              #SET(%NRelateFile,'"' & %SQLPrefix & '"."' & %NRelateFile & '"')
+            #ELSE                                                         #! ES 2003.05.28
+              #SET(%NRelateFile,%SQLPrefix &'.'& %NRelateFile)
+            #ENDIF                                                        #! ES 2003.05.28
+          #ELSE                                                           #! ES 2003.05.28
+            #IF(%UseQuotes)                                               #! ES 2003.05.28
+              #SET(%NRelateFile,'"' & %NRelateFile & '"')
+            #ENDIF                                                        #! ES 2003.05.28
+          #ENDIF                                                          #! ES 2003.05.28
+          #!
+          #SET(%RelationField1Count, ITEMS(%FileKeyField))
+          #SET(%RelationField2Count, ITEMS(%RelationKeyField))
+          #!
+          #SET(%NRelateCount, %RelationField1Count)
+          #SET(%NRelateComma, %NRelateCount - 1)
+          #SET(%NRelateItem, 0)
+          #FOR(%FileKeyField)
+            #IF(%NRelateItem > %NRelateCount)
+              #BREAK
+            #ENDIF
+            #SET(%NRelateItem, %NRelateItem + 1)
+            #SET(%NRelateField1, SUB(%FileKeyField,INSTRING(':',%FileKeyField,1,1)+1,50))
+            #SET(%NRelateField2, SUB(%FileKeyFieldLink,INSTRING(':',%FileKeyFieldLink,1,1)+1,50))
+            #!
+            #IF(%UsePrefix)
+              #SET(%NRelateField1, %FilePrefix & '_' & %NRelateField1)
+            #ENDIF
+            #SET(%SqlWordItem, UPPER(%NRelateField1))
+            #FIND(%SqlWordList, %SqlWordItem)
+            #IF(%SqlWordList)
+              #ADD(%ReservedFieldList, %FoundRelatedField & %FilePrefix & ':' & %NRelateField1)
+              #SET(%NRelateField1, %NRelateField1 & '_')
+            #ENDIF
+            #!
+            #IF(%UsePrefix)
+              #SET(%NRelateField2, %RelationPrefix & '_' & %NRelateField2)
+            #ENDIF
+            #SET(%SqlWordItem, UPPER(%NRelateField2))
+            #FIND(%SqlWordList, %SqlWordItem)
+            #IF(%SqlWordList)
+              #ADD(%ReservedFieldList, %FoundRelatedField & %RelationPrefix & ':' & %NRelateField2)
+              #SET(%NRelateField2, %NRelateField2 & '_')
+            #ENDIF
+            #!
+            #IF(%UseQuotes)                                                         #! ES 2003.01.03
+              #SET(%RelationField1, %RelationField1 & '"' & %NRelateField1 & '"')   #! ES 2003.01.03
+              #SET(%RelationField2, %RelationField2 & '"' & %NRelateField2 & '"')   #! ES 2003.01.03
+            #ELSE
+              #SET(%RelationField1, %RelationField1 & %NRelateField1)
+              #SET(%RelationField2, %RelationField2 & %NRelateField2)
+            #ENDIF                                                                   #! ES 2003.01.03
+            #IF(%NRelateComma)
+              #SET(%NRelateComma, %NRelateComma - 1)
+              #SET(%RelationField1, %RelationField1 & ', ')
+              #SET(%RelationField2, %RelationField2 & ', ')
+            #ENDIF
+          #ENDFOR
+          #!-------------------------------------------!
+          #! RAS.2001.01.20 - Added this feature.      !
+          #! Has syntax errors, so commented out.      !
+          #!-------------------------------------------!
+          #! Added to the comments so programmer is at !
+          #! aware that other relationships may exist. !
+          #!-------------------------------------------!
+          #!SET(%RelationUpdate,%RelationConstraintUpdate)       #! ON UPDATE ?
+          #!SET(%RelationDelete,%RelationConstraintDelete)       #! ON DELETE ?
+          #CASE(%RelationConstraintUpdate)                       #! ES 2003.01.03
+          #OF ('CASCADE_SERVER')                                 #! ES 2003.01.03
+            #SET(%RelationUpdate,'CASCADE')                      #! ES 2003.01.03
+          #OF ('CLEAR_SERVER')                                   #! ES 2003.01.03
+            #SET(%RelationUpdate,'SET NULL')                     #! ES 2003.01.03
+          #OF ('RESTRICT_SERVER')                                #! ES 2003.01.03
+            #SET(%RelationUpdate,'RESTRICT')                     #! ES 2003.01.03
+          #ELSE                                                  #! ES 2003.01.03
+            #SET(%RelationUpdate,'')                             #! ES 2003.01.03
+          #ENDCASE                                               #! ES 2003.01.03
+          #CASE(%RelationConstraintDelete)                       #! ES 2003.01.03
+          #OF ('CASCADE_SERVER')                                 #! ES 2003.01.03
+            #SET(%RelationDelete,'CASCADE')                      #! ES 2003.01.03
+          #OF ('CLEAR_SERVER')                                   #! ES 2003.01.03
+            #SET(%RelationDelete,'SET NULL')                     #! ES 2003.01.03
+          #OF ('RESTRICT_SERVER')                                #! ES 2003.01.03
+            #SET(%RelationDelete,'RESTRICT')                     #! ES 2003.01.03
+          #ELSE                                                  #! ES 2003.01.03
+            #SET(%RelationDelete,'')                             #! ES 2003.01.03
+          #ENDCASE                                               #! ES 2003.01.03
+          #!-------------------------------------------!
+          #IF(%Relationfield1)
+            #MESSAGE('Relation of: ' & %File,2)
+            #SET(%RelCount, %RelCount + 1)
+            #!----------------------------------------------------------!
+            #! RAS.2001.07.22 - The alias name gets changed to the real !
+            #! name to generate the SQL statement for the relationship. !
+            #!----------------------------------------------------------!
+            #IF(%FileType = 'ALIAS')
+              #SET(%NFileName,%AliasFile)
+              #FIX(%File, %AliasFile)
+              #IF(%UsePrefix)
+                #SET(%NFileName,%FilePrefix & '_' & %File)
+              #ENDIF
+              #IF(%SQLPrefix)                                                 #! ES 2003.01.03
+                #IF(%UseQuotes)                                               #! ES 2003.01.03
+                  #SET(%NFileName,'"' & %SQLPrefix & '"."' & %NFileName & '"')
+                #ELSE                                                         #! ES 2003.01.03
+                  #SET(%NFileName,%SQLPrefix &'.'& %NFileName)
+                #ENDIF                                                        #! ES 2003.01.03
+              #ELSE                                                           #! ES 2003.01.03
+                #IF(%UseQuotes)                                               #! ES 2003.01.03
+                  #SET(%NFileName,'"' & %NFileName & '"')
+                #ENDIF                                                        #! ES 2003.01.03
+              #ENDIF                                                          #! ES 2003.01.03
+            #ENDIF
+            #IF(%TheCount = 0)
+PRINT '** Add FK to %File **';
+            #ENDIF
+            #SET(%TheCount,%TheCount+1)
+            #ADD(%NRelList,UPPER(%FileKey))
+            #IF(%SQLDrop)
+              #ADD(%ESdfk,'IF EXISTS(SELECT 1 FROM SYS.SYSFOREIGNKEY WHERE ROLE=''' & %ESdKeyName & ''') THEN')
+              #ADD(%ESdfk,'  ALTER TABLE ' & %NFileName &' DELETE FOREIGN KEY ' & %NKeyField)
+              #!ADD(%ESdfk,'    DELETE FOREIGN KEY ' & %NKeyField)
+              #ADD(%ESdfk,'END IF;')
+              #ADD(%ESdfk,'')
+            #ENDIF
+ALTER TABLE %NFileName
+   #!ADD CONSTRAINT %NKeyField
+   #!FOREIGN KEY (%Relationfield1)
+   #IF(%NRelationOpt2)                                                   #! ES 2006.09.20
+   ADD FOREIGN KEY %NRelationOpt2 (%Relationfield1)
+   #ELSE                                                                 #! ES 2006.09.20
+   ADD FOREIGN KEY %NKeyField (%Relationfield1)
+   #ENDIF                                                                #! ES 2006.09.20
+   REFERENCES %NRelateFile (%Relationfield2)
+            #IF(%RelationUpdate)                                         #! ES 2003.01.03
+   ON UPDATE %RelationUpdate
+            #ENDIF
+            #IF(%RelationDelete)                                         #! ES 2003.01.03
+   ON DELETE %RelationDelete
+            #ENDIF
+;
+
+          #ENDIF
+        #ENDIF
+      #ENDFOR
+    #ENDIF
+  #ENDFOR
+
+PRINT '** Add FK Script Complete **';
+--
+-- EOF: %OutRelatName
+--
+  #CLOSE(%OutRelatName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLTable)
+  #SET(%OutTableName,%SQLDirectory & %SQLTableName)
+  #CREATE(%OutTableName)
+  #MESSAGE('The SYBASE Script Creator',0)
+  #MESSAGE('Creating: ' & %SQLTableName,1)
+--
+-- BOF: %OutTableName
+--
+-- SQL script creator for SYBASE database [TABLE]
+-- Created: %TheDate - %TheTime
+--
+PRINT '** Create Tables **';
+#!
+#FOR(%NFileList)                                                #! ES 2003.01.03
+  #FIX(%File,%NFileList)                                        #! ES 2003.01.03
+  #IF(%FileType = 'ALIAS')                                      #! ES 2003.01.03
+    #CYCLE                                                      #! ES 2003.01.03
+  #ENDIF
+  #SET(%nLoc1,INSTRING('RASQL(',%FileUserOptions,1,1))
+  #SET(%nLoc2,INSTRING(')',%FileUserOptions,1,%nLoc1))
+  #SET(%nFileUser,UPPER(SUB(%FileUserOptions,%nLoc1,%nLoc2)))
+  #!!SET(%NFileUser,UPPER(EXTRACT(%FileUserOptions,'RASQL')))
+  #SET(%NFileOpt1,EXTRACT(%NFileUser,'RASQL',1))
+  #SET(%NFileOpt2,EXTRACT(%NFileUser,'RASQL',2))
+  #SET(%NFileOpt3,EXTRACT(%NFileUser,'RASQL',3))
+  #SET(%NFileOpt4,EXTRACT(%NFileUser,'RASQL',4))
+  #MESSAGE('Table of: ' & %File,2)
+#!
+#!---------------------------------------------------------------------
+#! Add Comments for table ES 2003.01.03
+#!---------------------------------------------------------------------
+  #IF(%NFileOpt2 = 'NC')  #!Override PKClustered Flag
+    #SET(%ESSetPKClustered,%False)
+  #ELSE
+    #SET(%ESSetPKClustered,%PKClustered)
+  #ENDIF
+  #IF(%FileLongDesc AND %NFileOpt4 <> 'IC')
+    #ADD(%ESComments,'COMMENT ON TABLE  ' & %ESFileName & ' IS "' & %FileLongDesc &'";')
+  #ELSIF(%FileDescription)
+    #ADD(%ESComments,'COMMENT ON TABLE  ' & %ESFileName & ' IS "' & %FileDescription &'";')
+  #ENDIF
+#!
+PRINT '** Create Table: %ESFileName **';
+#IF(%SQLDrop)
+  #IF(%NFileOpt3='GT' OR %NFileOpt3='PR')                             #! ES 2003 05 31
+    #IF(%SQLPrefix)                                                 #! ES 2003.01.03
+      #ADD(%ESdTable,'IF EXISTS(SELECT 1 FROM SYS.SYSTABLE WHERE TABLE_NAME=''' & %ESdFileName & ''' AND TABLE_TYPE=''GBL TEMP'' AND CREATOR=USER_ID(''' & %SQLPrefix & ''')) THEN')
+    #ELSE
+      #ADD(%ESdTable,'IF EXISTS(SELECT 1 FROM SYS.SYSTABLE WHERE TABLE_NAME=''' & %ESdFileName & ''' AND TABLE_TYPE=''GBL TEMP'' AND CREATOR=USER_ID(''DBA'')) THEN')
+    #ENDIF
+  #ELSE
+    #IF(%SQLPrefix)                                                 #! ES 2003.01.03
+      #ADD(%ESdTable,'IF EXISTS(SELECT 1 FROM SYS.SYSTABLE WHERE TABLE_NAME=''' & %ESdFileName & ''' AND TABLE_TYPE=''BASE'' AND CREATOR=USER_ID(''' & %SQLPrefix & ''')) THEN')
+    #ELSE
+      #ADD(%ESdTable,'IF EXISTS(SELECT 1 FROM SYS.SYSTABLE WHERE TABLE_NAME=''' & %ESdFileName & ''' AND TABLE_TYPE=''BASE'' AND CREATOR=USER_ID(''DBA'')) THEN')
+    #ENDIF
+  #ENDIF
+  #ADD(%ESdTable,'  DROP TABLE ' & %ESFileName)
+  #ADD(%ESdTable,'END IF;')
+  #ADD(%ESdTable,'')
+#ENDIF
+#!
+#IF(%NFileOpt3='GT' OR %NFileOpt3='PR')                             #! ES 2003 05 31
+CREATE GLOBAL TEMPORARY TABLE %ESFileName (
+#ELSE
+CREATE TABLE %ESFileName (
+#ENDIF
+#INSERT(%SYSqlIndex)
+#INSERT(%EdSySqlField)                                              #! Process fields
+  #IF(%NPrimaryKeyDef)
+  %NPrimaryKeyDef
+  #ENDIF
+#IF(%NFileOpt3='PR')
+) ON COMMIT PRESERVE ROWS ;
+#ELSE
+);
+#ENDIF
+
+  #IF(%ESIndexDef)
+#!PRINT '** Create Index for Table: %File **';
+    #FOR(%ESIndexDef)
+%ESIndexDef
+    #ENDFOR
+
+  #ENDIF
+  #IF(%NFileOpt4='IC')                                              #! ES 2003 05 31
+
+%FileLongDesc
+
+  #ENDIF
+#ENDFOR
+#!
+#IF(ITEMS(%ESComments))
+
+--
+-- Table & Column Comments
+--
+
+  #FOR(%ESComments)
+%ESComments
+  #ENDFOR
+#ENDIF
+#!
+#IF(%AddTempTable)                                                                            #! ES 2003.01.24
+
+  #IF(%SQLPrefix)
+  CREATE GLOBAL TEMPORARY TABLE "%SQLPrefix"."TempTable"
+  #ELSE
+  CREATE GLOBAL TEMPORARY TABLE "DBA"."TempTable"
+  #END
+(
+  "Int1"                                    INTEGER NULL,
+  "Int2"                                    INTEGER NULL,
+  "Char1"                                   CHAR(200) NULL,
+  "Char2"                                   CHAR(200) NULL,
+  "Dec1"                                    DECIMAL(30,6) NULL,
+  "Dec2"                                    DECIMAL(30,6) NULL
+) ON COMMIT PRESERVE ROWS
+;
+
+-------------------------------------------------
+--   Create triggers
+-------------------------------------------------
+
+SETUSER "%SQLPrefix"
+;
+
+CREATE TRIGGER %SQLPrefix.tib_TempTable BEFORE INSERT ORDER 1 ON
+%SQLPrefix.TempTable
+FOR EACH ROW
+BEGIN
+  DELETE FROM %SQLPrefix.TempTable
+END
+;
+#ENDIF
+#IF(%IncludeDctComments)                                        #! ES 2003.09.16
+
+%DictionaryDescription
+#ENDIF
+#!
+
+PRINT '** Create Table Script Complete **';
+--
+-- EOF: %OutTableName
+--
+  #CLOSE(%OutTableName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLGrant)
+  #SET(%OutGrantName,%SQLDirectory & %SQLGrantName)
+  #CREATE(%OutGrantName)
+  #MESSAGE('The SYBASE Script Creator',0)
+  #MESSAGE('Creating: ' & %SQLGrantName,1)
+--
+-- BOF: %OutGrantName
+--
+-- SQL script creator for SYBASE database [GRANT]
+-- Created: %TheDate - %TheTime
+--
+PRINT '** Grant Rights **';
+
+#FOR(%NFileList)                                                #! ES 2003.01.03
+  #FIX(%File,%NFileList)                                        #! ES 2003.01.03
+  #IF(%FileType = 'ALIAS')                                      #! ES 2003.01.03
+    #CYCLE                                                      #! ES 2003.01.03
+  #ENDIF                                                        #! ES 2003.01.03
+  #MESSAGE('Table of: ' & %NFileList,2)
+#!
+GRANT SELECT, INSERT, DELETE, UPDATE ON %ESFileName TO %GrantUser;
+#ENDFOR
+PRINT '** Grant Script Complete **';
+--
+-- EOF: %OutGrantName
+--
+  #CLOSE(%OutGrantName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLIndex)
+  #SET(%OutIndexName,%SQLDirectory & %SQLIndexName)
+  #CREATE(%OutIndexName)
+  #MESSAGE('The SYBASE Script Creator',0)
+  #MESSAGE('Creating: ' & %SQLIndexName,1)
+--
+-- BOF: %OutIndexName
+--
+-- SQL script creator for SYBASE database [KEYS]
+-- Created: %TheDate - %TheTime
+--
+PRINT '** Create Indexes **';
+
+#FOR(%NFileList)                                                #! ES 2003.01.03
+  #FIX(%File,%NFileList)                                        #! ES 2003.01.03
+  #IF(%FileType = 'ALIAS')                                      #! ES 2003.01.03
+    #CYCLE                                                      #! ES 2003.01.03
+  #ENDIF                                                        #! ES 2003.01.03
+  #MESSAGE('Table: ' & %File,2)
+#!PRINT '** Create Index for Table: %File **';
+  #SET(%PrimaryCount,0)                                         #! Primary key exists
+  #SET(%SecondaryCount,0)                                       #! Secondary key exists
+  #IF(ITEMS(%Key))
+    #FOR(%Key)
+      #IF(NOT ITEMS(%KeyField))                                 #! Key has fields? No!
+        #CYCLE                                                  #! Then go to the next
+      #ENDIF                                                    #! key to be processed
+#!
+      #IF(NOT %KeyPrimary)                                      #! ES 2003.01.03
+        #FIND(%NRelList,UPPER(%Key))                            #! ES 2003.01.03
+        #IF(%NRelList)                                          #! ES 2003.01.03
+          #CYCLE                                                #! ES 2003.01.03 Do not create index for fks
+        #ENDIF                                                  #! ES 2003.01.03
+      #ENDIF                                                    #! ES 2003.01.03
+      #SET(%nLoc1,INSTRING('RASQL(',%KeyUserOptions,1,1))
+      #SET(%nLoc2,INSTRING(')',%KeyUserOptions,1,%nLoc1))
+      #SET(%nKeyUser,UPPER(SUB(%KeyUserOptions,%nLoc1,%nLoc2)))
+      #!SET(%NKeyUser,UPPER(EXTRACT(%KeyUserOptions,'RASQL')))
+      #SET(%NKeyOpt1,EXTRACT(%NKeyUser,'RASQL',1))
+      #SET(%NKeyOpt2,EXTRACT(%NKeyUser,'RASQL',2))
+      #SET(%NKeyOpt3,EXTRACT(%NKeyUser,'RASQL',3))
+      #SET(%NKeyOpt4,EXTRACT(%NKeyUser,'RASQL',4))
+#!%NKeyUser, %NKeyOpt1, %NKeyOpt2, %NKeyOpt3, %NKeyOpt4
+      #!------------------------------------------------------------!
+      #! The first option RASQL(NO) controls if a key is processed. !
+      #!------------------------------------------------------------!
+      #IF(SUB(%NKeyOpt1,1,1)='N')
+        #CYCLE
+      #ENDIF
+      #IF(%NKeyOpt2 = 'C')  #!Override PKClustered Flag
+        #SET(%ESSetClustered,%True)
+      #ELSE
+        #SET(%ESSetClustered,%False)
+      #ENDIF
+#!
+      #SET(%NKeyName,%KeyID)
+      #IF(%UsePrefix)
+        #SET(%NKeyName,%FilePrefix & '_' & %KeyID)
+      #ENDIF
+      #SET(%SqlWordItem,UPPER(%NKeyName))
+      #FIND(%SqlWordList, %SqlWordItem)
+      #IF(%SqlWordList)
+        #ADD(%ReservedFieldList, %FoundKeyName & %FilePrefix & ':' & %NKeyName)
+        #SET(%NKeyName, %NKeyName & '_')
+      #ENDIF
+      #SET(%ESdKeyName,%NKeyName)                                              #! ES 2003.01.03
+      #IF(%UseQuotes)                                                          #! ES 2003.01.03
+        #SET(%NKeyName, '"' & %NKeyName & '"')                                 #! ES 2003.01.03
+      #ENDIF                                                                   #! ES 2003.01.03
+#!
+      #SET(%NKeyFields,'')
+      #SET(%NKeyFieldCount,0)
+      #FOR(%KeyField)
+        #SET(%NKeyField, SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1 , 50))
+        #!--------------------------------------------------------------------------!
+        #! RAS.2001.12.15 - Table of keyfield-table to be able to create relations. !
+        #!--------------------------------------------------------------------------!
+        #IF(%DoFieldFile)
+          #ADD(%FieldTableList, %NKeyField & ' ==> ' & %File)
+        #ENDIF
+        #!
+        #IF(%UsePrefix)
+          #SET(%NKeyField, %FilePrefix & '_' & %NKeyField)
+        #ENDIF
+        #SET(%SqlWordItem, UPPER(%NKeyField))
+#!-- SqlWordItem = '%SqlWordItem'
+        #FIND(%SqlWordList, %SqlWordItem)
+#!-- SqlWordList = '%SqlWordList'
+        #IF(%SqlWordList)
+          #ADD(%ReservedFieldList, %FoundKeyField & %FilePrefix & ':' & %NKeyField)
+          #SET(%NKeyField, %NKeyField & '_')
+        #ENDIF
+        #IF(%KeyPrimary)                                                           #! ES 2003.01.03
+          #SET(%NKeyDir,'')                                                        #! ES 2003.01.03
+        #ELSE                                                                      #! ES 2003.01.03
+          #CASE(SUB(%KeyFieldSequence,1,1))                                        #! ES 2003.01.03
+          #OF('A')                                                                 #! ES 2003.01.03
+            #SET(%NKeyDir,' ASC')                                                  #! ES 2003.01.03
+          #OF('D')                                                                 #! ES 2003.01.03
+            #SET(%NKeyDir,' DESC')                                                 #! ES 2003.01.03
+          #ENDCASE                                                                 #! ES 2003.01.03
+        #ENDIF                                                                     #! ES 2003.01.03
+        #SET(%NKeyFieldCount,%NKeyFieldCount + 1 )
+        #IF(%NKeyFieldCount = 1)
+          #IF(%UseQuotes)                                                          #! ES 2003.01.03
+            #SET(%NKeyFields,'"' & %NKeyField & '"' & %NKeyDir)                    #! ES 2003.01.03
+          #ELSE                                                                    #! ES 2003.01.03
+            #SET(%NKeyFields,%NKeyField & %NKeyDir)                                #! ES 2003.01.03
+          #ENDIF                                                                   #! ES 2003.01.03
+        #ELSE                                                                      #! ES 2003.01.03
+          #IF(%UseQuotes)                                                          #! ES 2003.01.03
+            #SET(%NKeyFields, %NKeyFields & ', "' & %NKeyField & '"' & %NKeyDir)   #! ES 2003.01.03
+          #ELSE                                                                    #! ES 2003.01.03
+            #SET(%NKeyFields, %NKeyFields &', '& %NKeyField & %NKeyDir)            #! ES 2003.01.03
+          #ENDIF                                                                   #! ES 2003.01.03
+        #ENDIF
+      #ENDFOR
+      #IF(%KeyPrimary)
+        #SET(%PrimaryCount, 1)
+        #SET(%PKeyCount, %PKeyCount + 1)
+        #SET(%KeyCount, %KeyCount + 1)
+        #IF(NOT %PKInTable)
+          #IF(%ESSetPKClustered)
+            #IF(%PKConstraint)
+ALTER TABLE %ESFileName ADD CONSTRAINT %NKeyName PRIMARY KEY CLUSTERED (%NKeyFields);
+            ELSE
+ALTER TABLE %ESFileName ADD PRIMARY KEY CLUSTERED (%NKeyFields);
+            #ENDIF
+          #ELSE
+            #IF(%PKConstraint)
+ALTER TABLE %ESFileName ADD CONSTRAINT %NKeyName PRIMARY KEY (%NKeyFields);
+            ELSE
+ALTER TABLE %ESFileName ADD PRIMARY KEY (%NKeyFields);
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ELSIF(NOT %KeyPrimary)
+        #SET(%KeyOthers, %KeyOthers + 1)
+        #SET(%KeyCount, %KeyCount + 1)
+        #IF(%KeyIndex = 'KEY')
+          #IF(%ESSetClustered)
+            #IF(%KeyDuplicate)
+CREATE CLUSTERED INDEX        %[30]NKeyName ON %ESFileName (%NKeyFields);
+            #ELSE
+CREATE UNIQUE CLUSTERED INDEX %[30]NKeyName ON %ESFileName (%NKeyFields);
+            #ENDIF
+          #ELSE
+            #IF(%KeyDuplicate)
+CREATE INDEX                  %[30]NKeyName ON %ESFileName (%NKeyFields);
+            #ELSE
+CREATE UNIQUE INDEX           %[30]NKeyName ON %ESFileName (%NKeyFields);
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDFOR
+    #IF(NOT %PrimaryCount)
+--
+-- WARNING: %File(%FilePrefix) has no PRIMARY KEY defined.
+--
+    #ENDIF
+  #ELSE
+--
+-- WARNING: %File(%FilePrefix) has no KEYS defined.
+--
+  #ENDIF
+#ENDFOR
+
+PRINT '** Create Index Script Complete **';
+--
+-- EOF: %OutIndexName
+--
+  #CLOSE(%OutIndexName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLDrop)
+  #SET(%OutDropName,%SQLDirectory & %SQLDropName)
+  #CREATE(%OutDropName)
+  #MESSAGE('Writing: ' & %SQLDropName,1)
+--
+-- BOF: %OutDropName
+-- Created: %TheDate - %TheTime
+--
+PRINT '** Drop Indexes **';
+
+#!
+  #IF(ITEMS(%ESdindex))
+
+--
+-- Drop Index script
+--
+
+    #FOR(%ESdindex)
+%ESdIndex
+    #ENDFOR
+
+  #ENDIF
+PRINT '** Drop Foregin Keys **';
+#!
+  #IF(ITEMS(%ESdfk))
+
+--
+-- Drop FK script
+--
+
+    #FOR(%ESdfk)
+%ESdfk
+    #ENDFOR
+
+  #ENDIF
+PRINT '** Drop Tables **';
+#!
+  #IF(ITEMS(%ESdTable))
+
+--
+-- Drop Table script
+--
+
+    #FOR(%ESdTable)
+%ESdTable
+    #ENDFOR
+
+  #ENDIF
+#!
+PRINT '** Drop Script Complete **';
+--
+-- EOF: %OutDropName
+--
+  #CLOSE(%OutDropName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLCombined)
+  #SET(%OutCombinedName,%SQLDirectory & %SQLCombinedName)
+  #CREATE(%OutCombinedName)
+  #MESSAGE('Cobmine Files: ' & %SQLIndexName,1)
+--
+-- BOF: %OutCombinedName
+-- Created: %TheDate - %TheTime
+--
+
+  #IF(%SQLDrop AND FileExists(%OutDropName))
+    #OPEN(%OutDropName),READ                         #!Open it in read-only mode
+    #LOOP
+      #READ(%ASCIIFileRecord)
+      #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+      #ELSE
+%ASCIIFileRecord
+      #ENDIF
+    #ENDLOOP
+    #CLOSE(%OutDropName),READ
+
+  #ENDIF
+  #!
+  #IF(%SQLTable AND FileExists(%OutTableName))
+    #OPEN(%OutTableName),READ                         #!Open it in read-only mode
+    #LOOP
+      #READ(%ASCIIFileRecord)
+      #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+      #ELSE
+%ASCIIFileRecord
+      #ENDIF
+    #ENDLOOP
+    #CLOSE(%OutTableName),READ
+
+  #ENDIF
+  #!
+  #IF(%SQLRelat AND FileExists(%OutRelatName))
+    #OPEN(%OutRelatName),READ                         #!Open it in read-only mode
+    #LOOP
+      #READ(%ASCIIFileRecord)
+      #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+      #ELSE
+%ASCIIFileRecord
+      #ENDIF
+    #ENDLOOP
+    #CLOSE(%OutRelatName),READ
+
+  #ENDIF
+  #!
+  #IF(%SQLGrant AND FileExists(%OutGrantName))
+    #OPEN(%OutGrantName),READ                         #!Open it in read-only mode
+    #LOOP
+      #READ(%ASCIIFileRecord)
+      #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+      #ELSE
+%ASCIIFileRecord
+      #ENDIF
+    #ENDLOOP
+    #CLOSE(%OutGrantName),READ
+
+  #ENDIF
+
+PRINT '** Combined Script Complete **';
+--
+-- EOF: %OutCombinedName
+--
+  #CLOSE(%OutCombinedName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#IF(%SQLTable)
+  #!RUN('NOTEPAD.EXE "' & %OutTableName & '"')
+#ENDIF
+#IF(%SQLGrant)
+  #!RUN('NOTEPAD.EXE "' & %OutGrantName & '"')
+#ENDIF
+#IF(%SQLIndex)
+  #!RUN('NOTEPAD.EXE "' & %OutIndexName & '"')
+#ENDIF
+#IF(%SQLRelat)
+  #!RUN('NOTEPAD.EXE "' & %OutRelatName & '"')
+#ENDIF
+#!RUN('NOTEPAD.EXE "' & %OutCombinedName & '"')          #! RAS.2002.01.05
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%EdSySqlField)
+#!--------------------------------------------------------------------!
+#!--------------------------------------------------------------------!
+#!--------------------------------------------------------------------!
+#! Dump the fields here for a MSSQL database back end.                !
+#!--------------------------------------------------------------------!
+#!--------------------------------------------------------------------!
+#!--------------------------------------------------------------------!
+#SET(%InnerGroup, 0)
+#SET(%FieldComma, ITEMS(%Field))
+#!
+#IF(%NPrimaryKeyDef)                                                #! ES 2003.01.03
+  #SET(%FieldComma, %FieldComma + 1)                                #! ES 2003.01.03
+#ENDIF                                                              #! ES 2003.01.03
+#!
+#FOR(%Field)
+  #SET(%nLoc1,INSTRING('RASQL(',%FieldUserOptions,1,1))
+  #SET(%nLoc2,INSTRING(')',%FieldUserOptions,1,%nLoc1))
+  #SET(%nFieldUser,UPPER(SUB(%FieldUserOptions,%nLoc1,%nLoc2)))
+  #!SET(%NFieldUser,UPPER(EXTRACT(%FieldUserOptions,'RASQL')))
+  #SET(%NFieldOpt1,EXTRACT(%NFieldUser,'RASQL',1))
+  #SET(%NFieldOpt2,EXTRACT(%NFieldUser,'RASQL',2))
+  #SET(%NFieldOpt3,EXTRACT(%NFieldUser,'RASQL',3))
+  #SET(%NFieldOpt4,EXTRACT(%NFieldUser,'RASQL',4))
+#!%NFieldUser, %NFieldOpt1, %NFieldOpt2, %NFieldOpt3, %NFieldOpt4
+  #!--------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a field is processed. !
+  #!--------------------------------------------------------------!
+  #! WARNING: The last field can NOT be an ommited field.         !
+  #!--------------------------------------------------------------!
+  #! And if the last field happens to be and 'END', you will need !
+  #! to add a RASQL(END) to the last field before the 'END'. This !
+  #! will suppress the last comma. Reality sometimes happens.     !
+  #!                                                              !
+  #! RASQL(,,A,)     Default AutoIncrement                        !
+  #! RASQL(,,G,)     Default Global AutoIncrement                 !
+  #! RASQL(,,G,1024) Default Global AutoIncrement Partition Size  !
+  #!                 GLOBAL AUTOINCREMENT [ ( partition-size ) ]  !
+  #! RASQL(,,CP,)    Default Current Publisher                    !
+  #! RASQL(,,CDB,)   Default Current DataBase                     !
+  #! RASQL(,,CUTS,)  Default Current UTC TimeStamp                !
+  #! RASQL(,,CTS,)   Default Current TimeStamp                    !
+  #! RASQL(,,CD,)    Default Current Date                         !
+  #! RASQL(,,CT,)    Default Current Time                         !
+  #! RASQL(,,CU,)    Default Current User                         !
+  #! RASQL(,,LU,)    Default Last User
+  #! RASQL(,,UTS,)   Default UTC TimeStamp                        !
+  #! RASQL(,,TS,)    Default TimeStamp                            !
+  #!                                                              !
+  #!--------------------------------------------------------------!
+  #SET(%FieldComma, %FieldComma - 1)
+  #IF(SUB(%NFieldOpt1,1,1)='N')
+    #CYCLE
+  #ENDIF
+#!
+  #!------------------------------------------------!
+  #! Look For TimeStamps ES 2003.01.03              !
+  #! %PossibleTimeStamp                             !
+  #! 1 - String 8                                   !
+  #! 2 - Not a TimeStamp                            !
+  #! 3 - Group with Over                            !
+  #! 4 - Date Field in correct place                !
+  #!------------------------------------------------!
+  #IF(%FieldType = 'STRING' AND %FieldMemoSize = 8)             #! ES 2003.01.03 Could be TimeStamp
+    #IF(%PossibleTimeStamp = 0)                                 #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,1)                                #! ES 2003.01.03
+    #ELSIF(%PossibleTimeStamp = 2)                              #! ES 2003.01.03 Last field was String(8)
+      #INSERT(%ESWriteColumnDef),NOINDENT                       #! ES 2003.01.03 Write Last field
+      #SET(%PossibleTimeStamp,1)                                #! ES 2003.01.03
+    #ENDIF                                                      #! ES 2003.01.03
+  #ENDIF
+  #!------------------------------------------------!
+  #! Begin removal of types that are not processed. !
+  #!------------------------------------------------!
+  #IF(%FieldType='GROUP')
+    #SET(%InnerGroup, %InnerGroup + 1)
+    #IF(INSTRING('OVER(',%FieldStatement,1,1))
+      #SET(%GroupOver,%True)                                    #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,3)
+    #ELSIF(%PossibleTimeStamp)                                  #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,0)                                #! ES 2003.01.03
+      #INSERT(%ESWriteColumnDef),NOINDENT                       #! ES 2003.01.03
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!
+  #CASE(%PossibleTimeStamp)                                       #! ES 2003.01.03
+  #OF(1)                                                          #! ES 2003.01.03
+    #SET(%PossibleTimeStamp,2)                                    #! ES 2003.01.03
+  #OF(2)                                                          #! ES 2003.01.03
+    #SET(%PossibleTimeStamp,0)                                    #! ES 2003.01.03
+      #INSERT(%ESWriteColumnDef),NOINDENT                         #! ES 2003.01.03
+  #OF(3)                                                          #! ES 2003.01.03
+    #IF(%FieldType='DATE')                                        #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,4)                                  #! ES 2003.01.03
+      #CYCLE                                                      #! ES 2003.01.03
+    #ELSE                                                         #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,0)                                  #! ES 2003.01.03
+      #INSERT(%ESWriteColumnDef),NOINDENT                         #! ES 2003.01.03
+    #ENDIF                                                        #! ES 2003.01.03
+  #OF(4)                                                          #! ES 2003.01.03
+    #IF(%FieldType='TIME')                                        #! ES 2003.01.03
+      #INSERT(%ESReplaceString,%NFieldLine,'CHAR(8)','TIMESTAMP') #! ES 2003.01.03
+      #INSERT(%ESWriteColumnDef),NOINDENT                         #! ES 2003.01.03
+      #SET(%PossibleTimeStamp,0)                                  #! ES 2003.01.03
+      #CYCLE                                                      #! ES 2003.01.03
+    #ENDIF                                                        #! ES 2003.01.03
+    #SET(%PossibleTimeStamp,0)                                    #! ES 2003.01.03
+  #ENDCASE
+  #!
+  #IF(%FieldType='END')
+    #SET(%InnerGroup, %InnerGroup - 1)
+    #SET(%GroupOver,%False)
+    #CYCLE
+  #ENDIF
+  #IF(%GroupOver = %True)
+    #CYCLE
+  #ENDIF
+  #IF(%PossibleTimeStamp < 3)
+    #SET(%NFieldType, '')                                         #! Field type
+    #SET(%NFieldName, '')                                         #! Field name
+    #SET(%NFieldTSql, '')                                         #! Field SQL type
+    #SET(%NFieldDef,  '')                                         #! Field default
+    #SET(%NFieldAuto, '')                                         #! Field AUTO_INCREMENT
+    #SET(%NFieldSize, 0)                                          #! Field decimal size
+    #SET(%NFieldDec,  0)                                          #! Field decimal places
+    #SET(%NFieldCheck,'')                                         #! ES 2003.01.03
+    #SET(%NFieldNN,'NULL')                                        #! ES 2003.01.03
+  #ENDIF
+  #SET(%FD1L,%FieldDimension1)                                  #! Name 1 made shorter
+  #SET(%FD2L,%FieldDimension2)                                  #! Name 2 made shorter
+  #SET(%FD3L,%FieldDimension3)                                  #! Name 3 made shorter
+  #SET(%FD4L,%FieldDimension4)                                  #! Name 4 made shorter
+  #IF(%FD1L>0)                                                  #! IF we got array field,
+    #IF(NOT %NoArrayOver)                                       #! AND we got groups,
+      #CYCLE                                                    #! field since the fields
+    #ENDIF                                                      #! in the group are going
+  #ENDIF                                                        #! to define the array.
+  #!------------------------------------------------!
+  #! Ended removal of types that are not processed. !
+  #!------------------------------------------------!
+#!
+  #SET(%NFieldName, %FieldID)                                   #! Field Name
+  #IF(%UsePrefix)                                               #! RAS.2001.12.01
+    #SET(%NFieldName, %FilePrefix & '_' & %FieldID)             #! RAS.2001.10.24
+  #ENDIF                                                        #! RAS.2001.12.01
+  #SET(%SqlWordItem, UPPER(%NFieldName))                        #! Set up search of
+  #FIND(%SqlWordList, %SqlWordItem)                             #! SQL reserved words
+  #IF(%SqlWordList)                                             #! Found? Yes! We add
+    #ADD(%ReservedFieldList, %FoundFileField & %FilePrefix & ':' & %NFieldName)
+    #SET(%NFieldName, %NFieldName & '_')                        #! trailing underscore
+  #ENDIF                                                        #! to get it through
+  #IF(%UseQuotes)                                               #! ES.2002.12.03
+    #SET(%NFieldName, '"' & %NFieldName & '"')                  #! ES.2002.12.03
+  #ENDIF                                                        #! ES.2002.12.03
+#!
+  #SET(%FieldCount, %FieldCount + 1)                            #! Add to field count
+  #IF(%NFieldName=%NFieldPKey)                                  #! File Primary Key?
+    #IF(%NFieldOpt3)                                            #! Do I have options?
+      #IF(INSTRING('PKEYA',%NFieldOpt3,1,1))                    #! PKEYA already set?
+      #ELSE                                                     #! No. So add it on.
+        #SET(%NFieldOpt3,%NFieldOpt3 & '+PKEYA')                #! Just append option
+      #ENDIF                                                    #! at the end of all.
+    #ELSE                                                       #! No options found.
+      #SET(%NFieldOpt3,'PKEYA')                                 #! Set primary key on
+    #ENDIF                                                      #! as option and let
+  #ENDIF                                                        #! it be handled
+#!
+  #!----------------------------------------------------------------!
+  #! The second option RASQL(,<FieldType>) overrides the field type !
+  #! in the dictionary. This allows conversion of data types that   !
+  #! have no existance in the dictionary but exist in the SQL.      !
+  #!----------------------------------------------------------------!
+  #SET(%NFieldType, %FieldType)
+  #IF(%NFieldOpt2)
+    #SET(%NFieldType, %NFieldOpt2)
+  #ENDIF
+#!
+  #!----------------------------------------------------!
+  #! Calculate decimal size and places for some fields. !
+  #! Only DECIMAL fields have characters and decimals.  !
+  #! Everything else that needs it, is figured out from !
+  #! the display mask used.                             !
+  #!----------------------------------------------------!
+  #! RAS.2001.01.12 - Added additional MySQL types.     !
+  #!----------------------------------------------------!
+  #SET(%NLeadZero, 0)                                           #! NO leading zero
+  #SET(%NFieldSize, %FieldMemoSize)                             #! Field decimal size
+  #SET(%NFieldDec, %FieldPlaces)                                #! Field decimal places
+  #CASE(%NFieldType)
+  #OF  ('DEC')                                                  #! NFieldOpt2: MySQL
+  #OROF('NUMERIC')                                              #! NFieldOpt2: MySQL
+  #OROF('SREAL')
+  #OROF('BFLOAT4')
+  #OROF('FLOAT')                                                #! NFieldOpt2: MySQL
+  #OROF('FLOAT4')                                               #! NFieldOpt2: MySQL
+  #OROF('REAL')
+  #OROF('BFLOAT8')
+  #OROF('DOUBLE')                                               #! NFieldOpt2: MySQL
+  #OROF('FLOAT8')                                               #! NFieldOpt2: MySQL
+    #SET(%nLoc1,INSTRING('-',%FieldDisplayPicture,1,1))
+    #IF(NOT %nLoc1)
+      #SET(%nLoc1,INSTRING('N',UPPER(%FieldDisplayPicture),1,1))
+    #ENDIF
+    #SET(%nLoc2,INSTRING('.',%FieldDisplayPicture,1,1))
+    #SET(%NFieldSize,SUB(%FieldDisplayPicture,(%nLoc1+1),(%nLoc2-1)))
+    #SET(%NFieldDec,SUB(%FieldDisplayPicture,(%nLoc2+1),LEN(%FieldDisplayPicture)))
+  #!--------------------------------------------------------!
+  #! RAS.2001.10.23 - Parse sizes for non-decimal numerics. !
+  #! And set the leading zero flag if you find the need.    !
+  #!--------------------------------------------------------!
+  #OF  ('LONG')
+  #OROF('ULONG')
+  #OROF('SHORT')
+  #OROF('USHORT')
+  #OROF('BYTE')
+    #SET(%nLoc1,INSTRING('-',%FieldDisplayPicture,1,1))
+    #IF(NOT %nLoc1)
+      #SET(%nLoc1,INSTRING('_',UPPER(%FieldDisplayPicture),1,1))
+    #ENDIF
+    #IF(NOT %nLoc1)
+      #SET(%nLoc1,INSTRING('N',UPPER(%FieldDisplayPicture),1,1))
+    #ENDIF
+    #SET(%nLoc2,(LEN(%FieldDisplayPicture) - %nLoc1 + 1))
+    #SET(%NFieldSize,SUB(%FieldDisplayPicture,(%nLoc1+1),(%nLoc2-1)))
+    #SET(%NLeadZero,INSTRING('N0',UPPER(%FieldDisplayPicture),1,1))
+  #ENDCASE
+#!-- "%FieldDisplayPicture", %nLoc1, %nLoc2, (%NFieldSize, %NFieldDec), %NLeadZero
+  #!------------------------------------------------------!
+  #! Deal with the dictionary field type conversion here. !
+  #!------------------------------------------------------!
+  #CASE(%NFieldType)
+  #OF  ('BLOB')
+    #IF(%FieldMemoSize < 32767)                                 #! ES 2003.01.03 Changed to 32767 May not be right?
+      #SET(%NFieldTSql, 'BINARY(' & %FieldMemoSize & ')' )
+    #ELSE
+      #SET(%NFieldTSql, 'LONG BINARY')
+    #ENDIF
+  #OF  ('MEMO')
+  #OROF('STRING')
+    #IF(%FieldMemoSize < 32767)                                 #! ES 2003.01.03 Changed to 32767
+      #SET(%NFieldTSql, 'CHAR(' & %FieldMemoSize & ')' )
+    #ELSE
+      #SET(%NFieldTSql, 'LONG VARCHAR')
+    #ENDIF
+  #OF  ('CSTRING')
+  #OROF('PSTRING')
+      #SET(%CStringLen, %FieldMemoSize - 1)
+    #IF(%CStringLen < 32767)                                     #! ES 2003.01.03 Changed to 32767
+      #SET(%NFieldTSql, 'CHAR(' & %CStringLen & ')' )
+    #ELSE
+      #SET(%NFieldTSql, 'LONG VARCHAR')
+    #ENDIF
+  #OF  ('LONG')
+  #OROF('INT')
+  #OROF('INT4')
+  #OROF('INTEGER')
+    #SET(%NFieldTSql, 'INTEGER')                                  #! ES 2004.08.27  v
+    #!IF(INSTRING('@D',UPPER(%FieldRecordPicture),1,1) OR INSTRING('@D',UPPER(%FieldDisplayPicture),1,1))
+      #!SET(%NFieldTSql, 'DATE')
+    #!ELSIF(INSTRING('@T',UPPER(%FieldRecordPicture),1,1) OR INSTRING('@T',UPPER(%FieldDisplayPicture),1,1))
+      #!SET(%NFieldTSql, 'TIME')
+    #!ELSE
+      #!SET(%NFieldTSql, 'INTEGER')
+    #!ENDIF                                                       #! ES 2004.08.27  ^
+    #!IF(INSTRING('@D',UPPER(%FieldDisplayPicture),1,1))
+      #!SET(%NFieldTSql, 'DATE')
+    #!ENDIF
+    #!IF(INSTRING('@T',UPPER(%FieldDisplayPicture),1,1))
+      #!SET(%NFieldTSql, 'TIME')
+    #!ENDIF
+  #OF  ('SHORT')
+  #OROF('SMALLINT')
+  #OROF('INT2')
+      #SET(%NFieldTSql, 'SMALLINT')
+  #OF  ('BYTE')
+  #OROF('UTINYINT')
+  #OROF('UINT1')
+      #SET(%NFieldTSql, 'TINYINT')
+  #OF  ('ULONG')
+  #OROF('UINT')
+  #OROF('UINT4')
+      #SET(%NFieldTSql, 'UNSIGNED INTEGER')                      #! ES 2006.02.03 Added UNSIGNED
+  #OF  ('USHORT')
+  #OROF('USMALLINT')
+  #OROF('UINT2')
+      #SET(%NFieldTSql, 'UNSIGNED SMALLINT')                     #! ES 2006.02.03 Added UNSIGNED
+  #OF  ('DECIMAL')
+  #OROF('PDECIMAL')
+  #OROF('DEC')
+  #OROF('NUMERIC')
+    #SET(%NFieldTSql, 'DECIMAL(' & %NFieldSize & ',' & %NFieldDec & ')')
+  #!---------------------------------------------------------------------!
+  #! RAS.2001.01.09 - IMPORTANT - READ THIS NOW.                         !
+  #!---------------------------------------------------------------------!
+  #! There is a very big assumption here that your doing a business type !
+  #! application so you want to convert binary inaccurate formats to the !
+  #! totally binary (financial) accurate format of DECIMAL.              !
+  #!---------------------------------------------------------------------!
+  #! I get tired of those hours of time spent on penny off errors on     !
+  #! financial screens and reports with a calculator to finally come up  !
+  #! with the solution of "It is a rounding error!" due to the binary    !
+  #! inaccurate format representation of "floats" and "doubles" that     !
+  #! are often used to represent money amounts with an actual fractional !
+  #! point part for the cents. This happens often in older applications  !
+  #! written in languages that did not have a decimal type and with      !
+  #! people that did not have experience or knowledge enough to save     !
+  #! those financial amounts as whole pennies and adjust their formulas. !
+  #!---------------------------------------------------------------------!
+  #! If you need the SREAL (4 bytes) and REAL (8 bytes) left alone then  !
+  #! move them somewhere else.                                           !
+  #!---------------------------------------------------------------------!
+  #OF('SREAL')
+  #OROF('BFLOAT4')
+  #OROF('FLOAT')
+  #OROF('FLOAT4')
+    #SET(%NFieldTSql, 'REAL')
+  #OF('REAL')
+  #OROF('BFLOAT8')
+  #OROF('DOUBLE')
+  #OROF('FLOAT8')
+    #SET(%NFieldTSql, 'DOUBLE')
+  #OF  ('DATE')
+  #OROF('TIME')
+    #SET(%NFieldTSql, %NFieldType)
+#!
+  #ELSE
+      #!---------------------------------------------!
+      #! This is a field type not currently handled. !
+      #! Time to do some more template programming.  !
+      #!---------------------------------------------!
+      #SET(%NFieldTSql,'***' & %NFieldType & '***')
+  #ENDCASE
+  #!--------------------------------------------------------!
+  #! ES.2003.08.06 - Set Field type as string or numeric    !
+  #!--------------------------------------------------------!
+  #CASE(%NFieldType)
+  #OF  ('BLOB')
+  #OROF('MEMO')
+  #OROF('STRING')
+  #OROF('CSTRING')
+  #OROF('PSTRING')
+    #SET(%ESFieldNumeric,%False)
+  #ELSE
+    #SET(%ESFieldNumeric,%True)
+  #ENDCASE
+  #!----------------------------------------------------------!
+  #! Deal with default values in the dictionary.              !
+  #!----------------------------------------------------------!
+  #CASE(%NFieldOpt3)
+    #OF('A')
+      #SET(%NFieldDef,'DEFAULT AUTOINCREMENT')                                   #! ES 2003.01.03
+    #OF('G')
+      #IF(NUMERIC(%NFieldOpt4))                                                  #! ES 2003.01.03
+        #SET(%NFieldDef,'DEFAULT GLOBAL AUTOINCREMENT('& %NFieldOpt4 &')')       #! ES 2003.01.03
+      #ELSE                                                                      #! ES 2003.01.03
+        #SET(%NFieldDef,'DEFAULT GLOBAL AUTOINCREMENT')                          #! ES 2003.01.03
+      #ENDIF                                                                     #! ES 2003.01.03
+    #OF('CP')
+        #SET(%NFieldDef,'DEFAULT CURRENT PUBLISHER')                             #! ES 2003.03.17
+    #OF('CDB')
+        #SET(%NFieldDef,'DEFAULT CURRENT DATABASE')                              #! ES 2003.03.17
+    #OF('CUTS')
+        #SET(%NFieldDef,'DEFAULT CURRENT UTC TIMESTAMP')                         #! ES 2003.03.17
+    #OF('CTS')
+        #SET(%NFieldDef,'DEFAULT CURRENT TIMESTAMP')                             #! ES 2003.03.17
+    #OF('CD')
+        #SET(%NFieldDef,'DEFAULT CURRENT DATE')                                  #! ES 2003.03.17
+    #OF('CT')
+        #SET(%NFieldDef,'DEFAULT CURRENT TIME')                                  #! ES 2003.03.17
+    #OF('CU')
+        #SET(%NFieldDef,'DEFAULT CURRENT USER')                                  #! ES 2003.03.17
+    #OF('LU')
+        #SET(%NFieldDef,'DEFAULT LAST USER')                                     #! ES 2003.05.31
+    #OF('UTS')
+        #SET(%NFieldDef,'DEFAULT UTC TIMESTAMP')                                 #! ES 2003.03.17
+    #OF('TS')
+        #SET(%NFieldDef,'DEFAULT TIMESTAMP')                                     #! ES 2003.03.17
+  #ELSE
+    #IF(%FieldInitial)                                                           #! ES 2003.01.03
+      #SET(%NFieldDef,'DEFAULT ' & %FieldInitial)                                #! ES 2003.01.03
+    #ELSE                                                                        #! ES 2003.01.03
+      #SET(%NFieldDef,'')                                                        #! ES 2003.01.03
+    #ENDIF                                                                       #! ES 2003.01.03
+  #ENDCASE
+  #!----------------------------------------------------------!
+  #! Deal with field validation parameters in the dictionary. !
+  #!----------------------------------------------------------!
+  #! If you are validating something, that means it's going   !
+  #! to have some value. Mark it as NOT NULL.                 !
+  #!----------------------------------------------------------!
+#!
+#!    #FOR(%FieldScreenControl)
+#!%FieldID: FSC(%FieldValidation): %FieldScreenControl
+#!    #ENDFOR
+#!
+  #IF(%FieldValidation)
+    #SET(%NFieldNN,'NOT NULL')
+    #CASE(%FieldValidation)
+    #OF  ('NONZERO')
+    #OF  ('INRANGE')
+      #IF(%FieldRangeLow AND %FieldRangeHigh)                                                                            #! ES 2003.01.03
+        #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be between ' & %FieldRangeLow &' and '& %FieldRangeHigh &'" CHECK(@COLUMN BETWEEN ' & %FieldRangeLow &' AND '& %FieldRangeHigh &')') #! ES 2005.06.01
+      #ELSIF(%FieldRangeLow)                                                                                             #! ES 2003.01.03
+        #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be > ' & %FieldRangeLow &'" CHECK(@COLUMN > ' & %FieldRangeLow &')')                                                      #! ES 2005.06.01
+      #ELSE                                                                                                              #! ES 2003.01.03
+        #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be < ' & %FieldRangeHigh &'" CHECK(@COLUMN < ' & %FieldRangeHigh &')')                                                     #! ES 2005.06.01
+      #ENDIF                                                                                                             #! ES 2003.01.03
+    #OF  ('BOOLEAN')
+      #IF(%FieldFalseValue AND %FieldTrueValue)                                                                          #! ES 2003.01.03
+        #IF(NUMERIC(%FieldFalseValue) AND NUMERIC(%FieldTrueValue))                                                      #! ES 2003.01.03
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be either ' & %FieldFalseValue &' or '& %FieldTrueValue &'" CHECK(@COLUMN IN ('& %FieldFalseValue &','& %FieldTrueValue &'))')                          #! ES 2005.06.01
+        #ELSIF(NUMERIC(%FieldFalseValue))                                                                                #! ES 2003.01.03
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be either ' & %FieldFalseValue &' or '& %FieldTrueValue &'" CHECK(@COLUMN IN ('& %FieldFalseValue &','''& %FieldTrueValue &'''))')                      #! ES 2005.06.01
+        #ELSIF(NUMERIC(%FieldTrueValue))                                                                                 #! ES 2003.01.03
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be either ' & %FieldFalseValue &' or '& %FieldTrueValue &'" CHECK(@COLUMN IN ('''& %FieldFalseValue &''','& %FieldTrueValue &'))')                      #! ES 2005.06.01
+        #ELSE                                                                                                            #! ES 2003.01.03
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be either ' & %FieldFalseValue &' or '& %FieldTrueValue &'" CHECK(@COLUMN IN ('''& %FieldFalseValue &''','''& %FieldTrueValue &'''))')                  #! ES 2005.06.01
+        #ENDIF                                                                                                           #! ES 2003.01.03
+      #ELSE                                                                                                              #! ES 2003.01.03
+        #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID &' must be either 0 or 1" CHECK(@COLUMN IN (0,1))')                                                                     #! ES 2005.06.01
+      #ENDIF                                                                                                             #! ES 2003.01.03
+    #OF  ('INLIST')
+      #SET(%ChoiceLine, '')
+      #IF(ITEMS(%FieldValues))
+        #SET(%ChoiceComma,ITEMS(%FieldValues) - 1)
+        #FOR(%FieldValues)                                                                                               #! ES 2003.01.03
+          #IF(%ESFieldNumeric)                                                                                           #! ES 2003.08.06
+            #SET(%ChoiceLine,%ChoiceLine & %FieldValues)                                                                 #! ES 2003.01.03
+          #ELSE
+            #SET(%ChoiceLine,%ChoiceLine & '''' & %FieldValues & '''')                                                   #! ES 2003.01.03
+          #ENDIF
+          #IF(%ChoiceComma > 0)                                                                                          #! ES 2003.01.03
+            #SET(%ChoiceLine,%ChoiceLine & ',')                                                                          #! ES 2003.01.03
+            #SET(%ChoiceComma,%ChoiceComma - 1)                                                                          #! ES 2003.01.03
+          #ENDIF                                                                                                         #! ES 2003.01.03
+        #ENDFOR                                                                                                          #! ES 2003.01.03
+      #ELSIF(ITEMS(%FieldChoices))                                                                                       #! ES 2003.01.03
+        #SET(%ChoiceComma,ITEMS(%FieldChoices) - 1)
+        #FOR(%FieldChoices)
+          #IF(%ESFieldNumeric)                                                                                           #! ES 2003.08.06
+            #SET(%ChoiceLine,%ChoiceLine & %FieldChoices)
+          #ELSE
+            #SET(%ChoiceLine,%ChoiceLine & '''' & %FieldChoices & '''')
+          #ENDIF
+          #IF(%ChoiceComma > 0)
+            #SET(%ChoiceLine,%ChoiceLine & ',')
+            #SET(%ChoiceComma,%ChoiceComma - 1)
+          #ENDIF
+        #ENDFOR
+      #ENDIF
+      #IF(%ChoiceLine)
+        #IF(LEN(%ChoiceLine) + LEN(%FieldID) < 96)
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID & ' must be one of the following '& %ChoiceLine &'" CHECK(@COLUMN IN ('& %ChoiceLine &'))')          #! ES 2005.06.01
+        #ELSE
+          #SET(%NFieldCheck,'CONSTRAINT "'& %FieldID & ' must be INLIST()" CHECK(@COLUMN IN ('& %ChoiceLine &'))')          #! ES 2005.06.01
+        #ENDIF
+      #ENDIF
+    #OF  ('INFILE')
+    #ENDCASE
+  #ENDIF
+#!
+  #ADD(%FieldTable,   %FieldID)
+#!
+  #!SET(%IFieldInKey,%Field)                                     #! Field Name
+  #!FIND(%LFieldInKey,%IFieldInKey)                              #! Field In Key list lookup
+  #!IF(%LFieldInKey)                                             #! Found? Yes, part of key.
+    #!SET(%NFieldNN,     'NOT NULL')                             #! Primary keys fields can
+  #!ENDIF                                                        #! not be NULL. Make it so!
+#!
+  #!----------------------------------------------------------------------------!
+  #!----------------------------------------------------------------------------!
+  #! This is the actual SQL field data line creation.                           !
+  #!----------------------------------------------------------------------------!
+  #!----------------------------------------------------------------------------!
+#!
+  #IF(%FD1L>0)                                                  #! We GOT array field
+  #!----------------------------------------------------------------------------!
+  #! If we got an array field at this point, we do not have arrays over groups. !
+  #! We have simple array fields and must add additional fields to the table.   !
+  #!----------------------------------------------------------------------------!
+    #SET(%FldArray,'')                                          #! Clear created name
+    #SET(%FD1S,'')                                              #! Number dimension 1
+    #SET(%FD2S,'')                                              #! Number dimension 2
+    #SET(%FD3S,'')                                              #! Number dimension 3
+    #SET(%FD4S,'')                                              #! Number dimension 4
+    #!
+    #SET(%DimCount,1)                                           #! Got dimension 1
+    #IF(%FD2L>0)                                                #! Dimension 2?
+      #SET(%DimCount,%DimCount+1)                               #! Got dimension 2
+      #IF(%FD3L>0)                                              #! Dimension 3?
+        #SET(%DimCount,%DimCount+1)                             #! Got dimension 3
+        #IF(%FD4L>0)                                            #! Dimension 4?
+          #SET(%DimCount,%DimCount+1)                           #! Got dimension 4
+        #ENDIF                                                  #! Dimension 4?
+      #ENDIF                                                    #! Dimension 3?
+    #ENDIF                                                      #! Dimension 2?
+    #!
+    #CASE(%DimCount)                                            #! Logic on dimension
+    #OF(1)                                                      #! A 1 dimension array
+      #LOOP,FOR(%FD1I,1,%FD1L)
+        #SET(%FD1S,'_' & %FD1I)
+        #SET(%FldArray,%NFieldName & %FD1S)
+        #SET(%NFieldLine,   '')
+        #SET(%NFieldLine,   %NFieldLine & ''  & %FldArray)
+        #SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldTSql)
+        #IF(%NFieldAuto)
+          #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldAuto)
+        #ENDIF
+        #IF(%NFieldNN)
+          #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldNN)
+        #ENDIF
+        #IF(%NFieldDef)
+          #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldDef)
+        #ENDIF
+        #IF(%FD1I=%FD1L)                                        #! Last field?
+#!-- %FldArray
+          #IF(%FieldComma > 0)
+            #IF(SUB(%NFieldOpt1,1,1)='E')                       #! RASQL(END)
+  %NFieldLine
+            #ELSE
+  %NFieldLine ,
+            #ENDIF
+          #ELSE
+  %NFieldLine
+          #ENDIF
+        #ELSE                                                   #! Not last field
+  %NFieldLine ,
+        #ENDIF                                                  #! Just dump stuff
+      #ENDLOOP
+    #OF(2)                                                      #! A 2 dimension array
+      #LOOP,FOR(%FD1I,1,%FD1L)
+        #SET(%FD1S,'_' & %FD1I)
+        #LOOP,FOR(%FD2I,1,%FD2L)
+          #SET(%FD2S,'_' & %FD2I)
+          #SET(%FldArray,%NFieldName & %FD1S & %FD2S)
+          #SET(%NFieldLine,   '')
+          #SET(%NFieldLine,   %NFieldLine & ''  & %FldArray)
+          #SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldTSql)
+          #IF(%NFieldAuto)
+            #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldAuto)
+          #ENDIF
+          #IF(%NFieldNN)
+            #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldNN)
+          #ENDIF
+          #IF(%NFieldDef)
+            #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldDef)
+          #ENDIF
+          #IF((%FD1I=%FD1L)AND(%FD2I=%FD2L))                    #! Last field?
+#!-- %FldArray
+            #IF(%FieldComma > 0)
+              #IF(SUB(%NFieldOpt1,1,1)='E')                     #! RASQL(END)
+  %NFieldLine
+              #ELSE
+  %NFieldLine ,
+              #ENDIF
+            #ELSE
+  %NFieldLine
+            #ENDIF
+          #ELSE                                                 #! Not last field
+  %NFieldLine ,
+          #ENDIF                                                #! Just dump stuff
+        #ENDLOOP
+      #ENDLOOP
+    #OF(3)                                                      #! A 3 dimension array
+      #LOOP,FOR(%FD1I,1,%FD1L)
+        #SET(%FD1S,'_' & %FD1I)
+        #LOOP,FOR(%FD2I,1,%FD2L)
+          #SET(%FD2S,'_' & %FD2I)
+          #LOOP,FOR(%FD3I,1,%FD3L)
+            #SET(%FD3S,'_' & %FD3I)
+            #SET(%FldArray,%NFieldName & %FD1S & %FD2S & %FD3S)
+            #SET(%NFieldLine,   '')
+            #SET(%NFieldLine,   %NFieldLine & ''  & %FldArray)
+            #SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldTSql)
+            #IF(%NFieldAuto)
+              #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldAuto)
+            #ENDIF
+            #IF(%NFieldNN)
+              #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldNN)
+            #ENDIF
+            #IF(%NFieldDef)
+              #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldDef)
+            #ENDIF
+            #IF((%FD1I=%FD1L)AND(%FD2I=%FD2L)AND(%FD3I=%FD3L))  #! Last field?
+#!-- %FldArray
+              #IF(%FieldComma > 0)
+                #IF(SUB(%NFieldOpt1,1,1)='E')                   #! RASQL(END)
+  %NFieldLine
+                #ELSE
+  %NFieldLine ,
+                #ENDIF
+              #ELSE
+  %NFieldLine
+              #ENDIF
+            #ELSE                                               #! Not last field
+  %NFieldLine ,
+            #ENDIF                                              #! Just dump stuff
+          #ENDLOOP
+        #ENDLOOP
+      #ENDLOOP
+    #OF(4)                                                      #! A 4 dimension array
+      #LOOP,FOR(%FD1I,1,%FD1L)
+        #SET(%FD1S,'_' & %FD1I)
+        #LOOP,FOR(%FD2I,1,%FD2L)
+          #SET(%FD2S,'_' & %FD2I)
+          #LOOP,FOR(%FD3I,1,%FD3L)
+            #SET(%FD3S,'_' & %FD3I)
+            #LOOP,FOR(%FD4I,1,%FD4L)
+              #SET(%FD4S,'_' & %FD4I)
+              #SET(%FldArray,%NFieldName & %FD1S & %FD2S & %FD3S & %FD4S)
+              #SET(%NFieldLine,   '')
+              #SET(%NFieldLine,   %NFieldLine & ''  & %FldArray)
+              #SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldTSql)
+              #IF(%NFieldAuto)
+                #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldAuto)
+              #ENDIF
+              #IF(%NFieldNN)
+                #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldNN)
+              #ENDIF
+              #IF(%NFieldDef)
+                #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldDef)
+              #ENDIF
+              #IF((%FD1I=%FD1L)AND(%FD2I=%FD2L)AND(%FD3I=%FD3L)AND(%FD4I=%FD4L)) #! Last field?
+#!-- %FldArray
+                #IF(%FieldComma > 0)
+                  #IF(SUB(%NFieldOpt1,1,1)='E')                 #! RASQL(END)
+  %NFieldLine
+                  #ELSE
+  %NFieldLine ,
+                  #ENDIF
+                #ELSE
+  %NFieldLine
+                #ENDIF
+              #ELSE                                             #! Not last field
+  %NFieldLine ,
+              #ENDIF                                            #! Just dump stuff
+            #ENDLOOP
+          #ENDLOOP
+        #ENDLOOP
+      #ENDLOOP
+    #ENDCASE
+#!
+  #ELSE                                                         #! We GOT normal field
+  #!----------------------------------------------------------------------------!
+  #! This processes the normal fields that are NOT an array.                    !
+  #!----------------------------------------------------------------------------!
+    #SET(%NFieldLine,   '')
+    #!SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldName)        #! Field Name
+    #SET(%NFieldLine,   %NFieldLine & ' ' & %NFieldTSql)        #! SQL Type
+    #IF(%NFieldNN)
+      #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldNN)          #! NOT NULL
+    #ENDIF
+    #IF(%NFieldDef)
+      #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldDef)         #! DEFAULT
+    #ENDIF
+    #IF(%NFieldCheck)                                                                #! ES 2003.01.03
+      #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldCheck)       #! Check             #! ES 2003.01.03
+    #ENDIF                                                                           #! ES 2003.01.03
+    #IF(%NFieldAuto)
+      #SET(%NFieldLine, %NFieldLine & ' ' & %NFieldAuto)        #! AUTO_INCREMENT
+    #ENDIF
+    #!
+    #SET(%AddComma,'')
+    #IF(%FieldComma > 0)
+      #IF(SUB(%NFieldOpt1,1,1) NOT = 'E')                             #! RASQL(END)
+        #SET(%AddComma,',')
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IF(NOT %PossibleTimeStamp)
+  #!%[40]NFieldName %NFieldLine%AddComma %FieldComma
+    #INSERT(%ESWriteColumnDef),NOINDENT
+  #ENDIF
+  #!----------------------------------------------------------------------------!
+  #! Add Field Comments ES 2003.01.03                      .                    !
+  #!----------------------------------------------------------------------------!
+  #IF(%FieldLongDesc)
+    #ADD(%ESComments,'COMMENT ON COLUMN ' & %ESFileName &'.'& %NFieldName & ' IS "' & %FieldLongDesc &'";')
+  #ELSIF(%FieldDescription)
+    #ADD(%ESComments,'COMMENT ON COLUMN ' & %ESFileName &'.'& %NFieldName & ' IS "' & %FieldDescription &'";')
+  #ENDIF
+#!
+  #!----------------------------------------------------------------------------!
+  #!----------------------------------------------------------------------------!
+#!
+#ENDFOR
+#!---------------------------------------------------------------------
+#GROUP(%EdSySqlFieldEnd)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! Will Find OldString and replace it with NewString in ReplaceString
+#! ES 2003.01.03
+#!---------------------------------------------------------------------
+#GROUP(%ESReplaceString,*%ReplaceString,%OldString,%NewString)
+#DECLARE(%StringStartPos)
+#DECLARE(%ConstructedString)
+#SET(%StringStartPos,INSTRING(%OldString,%ReplaceString,1,1))
+#IF(%StringStartPos)
+  #SET(%ConstructedString,SLICE(%ReplaceString,1,%StringStartPos - 1) & %NewString)
+  #IF(%StringStartPos + LEN(%OldString) < LEN(%ReplaceString))
+    #SET(%ConstructedString,%ConstructedString & SLICE(%ReplaceString,%StringStartPos + LEN(%OldString),LEN(%ReplaceString)))
+  #ENDIF
+  #SET(%ReplaceString,%ConstructedString)
+  #!INSERT(%ESReplaceString,*%ReplaceString,%OldString,%NewString)
+#ENDIF
+#!---------------------------------------------------------------------
+#! Build Index with table def
+#!---------------------------------------------------------------------
+#GROUP(%SYSqlIndex)
+  #FREE(%ESIndexDef)
+  #SET(%NPrimaryKeyDef,'')
+  #SET(%PrimaryCount,0)
+  #IF(ITEMS(%Key))
+    #FOR(%Key)
+    #IF(NOT ITEMS(%KeyField))                                 #! Key has fields? No!
+        #CYCLE                                                  #! Then go to the next
+      #ENDIF                                                    #! key to be processed
+#!
+      #IF(NOT %KeyPrimary)                                      #! ES 2003.01.03
+        #FIND(%NRelList,UPPER(%Key))                            #! ES 2003.01.03
+        #IF(%NRelList)                                          #! ES 2003.01.03
+          #CYCLE                                                #! ES 2003.01.03 Do not create index for fks
+        #ENDIF                                                  #! ES 2003.01.03
+      #ENDIF                                                    #! ES 2003.01.03
+      #SET(%nLoc1,INSTRING('RASQL(',%KeyUserOptions,1,1))
+      #SET(%nLoc2,INSTRING(')',%KeyUserOptions,1,%nLoc1))
+      #SET(%nKeyUser,UPPER(SUB(%KeyUserOptions,%nLoc1,%nLoc2)))
+      #!SET(%NKeyUser,UPPER(EXTRACT(%KeyUserOptions,'RASQL')))
+      #SET(%NKeyOpt1,EXTRACT(%NKeyUser,'RASQL',1))
+      #SET(%NKeyOpt2,EXTRACT(%NKeyUser,'RASQL',2))
+      #!SET(%NKeyOpt3,EXTRACT(%NKeyUser,'RASQL',3))
+      #!SET(%NKeyOpt4,EXTRACT(%NKeyUser,'RASQL',4))
+#!%NKeyUser, %NKeyOpt1, %NKeyOpt2, %NKeyOpt3, %NKeyOpt4
+      #!------------------------------------------------------------!
+      #! The first option RASQL(NO) controls if a key is processed. !
+      #!------------------------------------------------------------!
+      #IF(SUB(%NKeyOpt1,1,1)='N')
+        #CYCLE
+      #ENDIF
+      #IF(%NFileOpt2 = 'NC')  #!Override PKClustered Flag
+        #SET(%ESSetPKClustered,%False)
+        #IF(%NKeyOpt2 = 'C')  #!Override PKClustered Flag
+          #SET(%ESSetClustered,%True)
+        #ELSE
+          #SET(%ESSetClustered,%False)
+        #ENDIF
+      #ELSE
+        #SET(%ESSetPKClustered,%PKClustered)
+      #ENDIF
+#!
+      #SET(%NKeyName,%KeyID)
+      #IF(%UsePrefix)
+        #SET(%NKeyName,%FilePrefix & '_' & %KeyID)
+      #ENDIF
+      #SET(%SqlWordItem,UPPER(%NKeyName))
+      #FIND(%SqlWordList, %SqlWordItem)
+      #IF(%SqlWordList)
+        #ADD(%ReservedFieldList, %FoundKeyName & %FilePrefix & ':' & %NKeyName)
+        #SET(%NKeyName, %NKeyName & '_')
+      #ENDIF
+      #SET(%ESdKeyName,%NKeyName)                                              #! ES 2003.01.03
+      #IF(%UseQuotes)                                                          #! ES 2003.01.03
+        #SET(%NKeyName, '"' & %NKeyName & '"')                                 #! ES 2003.01.03
+      #ENDIF                                                                   #! ES 2003.01.03
+#!
+      #SET(%NKeyFields,'')
+      #SET(%NKeyFieldCount,0)
+      #FOR(%KeyField)
+        #SET(%NKeyField, SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1 , 50))
+        #!--------------------------------------------------------------------------!
+        #! RAS.2001.12.15 - Table of keyfield-table to be able to create relations. !
+        #!--------------------------------------------------------------------------!
+        #IF(%DoFieldFile)
+          #ADD(%FieldTableList, %NKeyField & ' ==> ' & %File)
+        #ENDIF
+        #!
+        #IF(%UsePrefix)
+          #SET(%NKeyField, %FilePrefix & '_' & %NKeyField)
+        #ENDIF
+        #SET(%SqlWordItem, UPPER(%NKeyField))
+#!-- SqlWordItem = '%SqlWordItem'
+        #FIND(%SqlWordList, %SqlWordItem)
+#!-- SqlWordList = '%SqlWordList'
+        #IF(%SqlWordList)
+          #ADD(%ReservedFieldList, %FoundKeyField & %FilePrefix & ':' & %NKeyField)
+          #SET(%NKeyField, %NKeyField & '_')
+        #ENDIF
+        #IF(%KeyPrimary)                                                           #! ES 2003.01.03
+          #SET(%NKeyDir,'')                                                        #! ES 2003.01.03
+        #ELSE                                                                      #! ES 2003.01.03
+          #CASE(SUB(%KeyFieldSequence,1,1))                                        #! ES 2003.01.03
+          #OF('A')                                                                 #! ES 2003.01.03
+            #SET(%NKeyDir,' ASC')                                                  #! ES 2003.01.03
+          #OF('D')                                                                 #! ES 2003.01.03
+            #SET(%NKeyDir,' DESC')                                                 #! ES 2003.01.03
+          #ENDCASE                                                                 #! ES 2003.01.03
+        #ENDIF                                                                     #! ES 2003.01.03
+        #SET(%NKeyFieldCount,%NKeyFieldCount + 1 )
+        #IF(%NKeyFieldCount = 1)
+          #IF(%UseQuotes)                                                          #! ES 2003.01.03
+            #SET(%NKeyFields,'"' & %NKeyField & '"' & %NKeyDir)                    #! ES 2003.01.03
+          #ELSE                                                                    #! ES 2003.01.03
+            #SET(%NKeyFields,%NKeyField & %NKeyDir)                                #! ES 2003.01.03
+          #ENDIF                                                                   #! ES 2003.01.03
+        #ELSE                                                                      #! ES 2003.01.03
+          #IF(%UseQuotes)                                                          #! ES 2003.01.03
+            #SET(%NKeyFields, %NKeyFields & ', "' & %NKeyField & '"' & %NKeyDir)   #! ES 2003.01.03
+          #ELSE                                                                    #! ES 2003.01.03
+            #SET(%NKeyFields, %NKeyFields &', '& %NKeyField & %NKeyDir)            #! ES 2003.01.03
+          #ENDIF                                                                   #! ES 2003.01.03
+        #ENDIF
+      #ENDFOR
+      #IF(%KeyPrimary)
+        #SET(%PrimaryCount, 1)
+        #SET(%PKeyCount, %PKeyCount + 1)
+        #SET(%KeyCount, %KeyCount + 1)
+        #IF(NOT %PKInTable)
+          #IF(%ESSetPKClustered)
+            #IF(%PKConstraint)
+ALTER TABLE %ESFileName ADD CONSTRAINT %NKeyName PRIMARY KEY CLUSTERED (%NKeyFields);
+            ELSE
+ALTER TABLE %ESFileName ADD PRIMARY KEY CLUSTERED (%NKeyFields);
+            #ENDIF
+          #ELSE
+            #IF(%PKConstraint)
+ALTER TABLE %ESFileName ADD CONSTRAINT %NKeyName PRIMARY KEY (%NKeyFields);
+            ELSE
+ALTER TABLE %ESFileName ADD PRIMARY KEY (%NKeyFields);
+            #ENDIF
+          #ENDIF
+        #ENDIF
+        #IF(%PKInTable)
+          #IF(%ESSetPKClustered)
+            #IF(%PKConstraint)
+              #SET(%NPrimaryKeyDef,'CONSTRAINT '& %NKeyName &' PRIMARY KEY CLUSTERED (' & %NKeyFields & ')')
+            #ELSE
+              #SET(%NPrimaryKeyDef,'PRIMARY KEY CLUSTERED (' & %NKeyFields & ')')
+            #ENDIF
+          #ELSE
+            #IF(%PKConstraint)
+              #SET(%NPrimaryKeyDef,'CONSTRAINT '& %NKeyName &' PRIMARY KEY (' & %NKeyFields & ')')
+            #ELSE
+              #SET(%NPrimaryKeyDef,'PRIMARY KEY (' & %NKeyFields & ')')
+            #ENDIF
+          #ENDIF
+        #ELSE
+          #IF(%ESSetPKClustered)
+            #ADD(%ESIndexDef,'ALTER TABLE ' & %ESFileName & ' ADD CONSTRAINT '& %NKeyName &' PRIMARY KEY CLUSTERED (' & %NKeyFields & ');')
+          #ELSE
+            #ADD(%ESIndexDef,'ALTER TABLE ' & %ESFileName & ' ADD CONSTRAINT '& %NKeyName &' PRIMARY KEY (' & %NKeyFields & ');')
+          #ENDIF
+        #ENDIF
+        #IF(%SQLDrop AND %DropPK)
+          #ADD(%ESdIndex,'ALTER TABLE ' & %ESFileName &' DROP PRIMARY KEY;')
+          #ADD(%ESdIndex,'')
+        #ENDIF
+      #ELSIF(NOT %KeyPrimary)
+        #SET(%KeyOthers, %KeyOthers + 1)
+        #SET(%KeyCount, %KeyCount + 1)
+        #IF(%KeyIndex = 'KEY')
+          #IF(%ESSetClustered)
+            #IF(%KeyDuplicate)
+              #ADD(%ESIndexDef,'CREATE CLUSTERED INDEX        ' & %NKeyName & ' ON ' & %ESFileName & ' (' & %NKeyFields & ');')
+            #ELSE
+              #ADD(%ESIndexDef,'CREATE UNIQUE CLUSTERED INDEX ' & %NKeyName & ' ON ' & %ESFileName &' (' & %NKeyFields & ');')
+            #ENDIF
+          #ELSE
+            #IF(%KeyDuplicate)
+              #ADD(%ESIndexDef,'CREATE INDEX                  ' & %NKeyName & ' ON ' & %ESFileName & ' (' & %NKeyFields & ');')
+            #ELSE
+              #ADD(%ESIndexDef,'CREATE UNIQUE INDEX           ' & %NKeyName & ' ON ' & %ESFileName &' (' & %NKeyFields & ');')
+            #ENDIF
+          #ENDIF
+        #ENDIF
+        #IF(%SQLDrop)
+          #ADD(%ESdIndex,'IF EXISTS(SELECT 1 FROM SYS.SYSINDEX I, SYS.SYSTABLE T')
+          #ADD(%ESdIndex,'  WHERE I.TABLE_ID   = T.TABLE_ID')
+          #ADD(%ESdIndex,'    AND I.INDEX_NAME = ''' & %ESdKeyName & '''')
+          #ADD(%ESdIndex,'    AND T.TABLE_NAME = ''' & %ESdFileName & '''')
+          #ADD(%ESdIndex,'    AND I.CREATOR    = USER_ID(''' & %SQLPrefix & ''')')
+          #ADD(%ESdIndex,') THEN')
+          #ADD(%ESdIndex,'  DROP INDEX ' & %ESFileName & '.' & %NKeyName)
+          #ADD(%ESdIndex,'END IF;')
+          #ADD(%ESdIndex,'')
+        #ENDIF
+      #ENDIF
+    #ENDFOR
+    #IF(NOT %PrimaryCount)
+--
+-- WARNING: %File(%FilePrefix) has no PRIMARY KEY defined.
+--
+    #ENDIF
+  #ELSE
+--
+-- WARNING: %File(%FilePrefix) has no KEYS defined.
+--
+  #ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ESWriteColumnDef)
+  %[40]NFieldName %NFieldLine%AddComma
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%Dct2EDSIZEEnd)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

@@ -1,0 +1,401 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_011.tpw
+#! Purpose:     METABASE: Triggers to SQL (GUID support [???]) 
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.08.15:        Roberto Artigas
+#!  *   Made changes for the field externals. Commented out the replaced code for now.
+#! 2019.08.14:        Roberto Artigas [short quotes from conversation with Dennis E Evans]
+#!  *   ... Postgre, Oracle [SQLAnywhere] triggers are row based, MS is set based so they are not only
+#!      using different syntax but they are logically different. 
+#!      ... converting this stuff is difficult.  MS has extensions to the merge statement, 
+#!      Oracle has their own extensions, neither are part of the standard, just a mine field of issues.
+#!  *   Mr. Dennis has clearly stated in the above statements the why this area of databases is "difficult"
+#!      to deal with. And while ANSI has standards, there is no "efforcement" of those standards thru
+#!      incentives or disincentives monetary or otherwise. Vendors +1, customers -1.
+#!      The reality is that vendor lock-in can happen. There are current trends that are helping that.
+#! 2019.07.28         Roberto Artigas
+#!  *   Creation of this generic structured template
+#!      Triggers in it's own source do to complexity and GUID customization.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VariablesCreate011)
+#IF(NOT VAREXISTS(%NextLine))
+  #DECLARE(%NextLine)
+#ENDIF
+#IF(NOT VAREXISTS(%FieldNameExt))
+  #DECLARE(%FieldNameExt)
+#ENDIF
+#IF(NOT VAREXISTS(%TimeStamp))
+  #DECLARE(%TimeStamp)
+#ENDIF
+#IF(NOT VAREXISTS(%ServerTimeStamp))
+  #DECLARE(%ServerTimeStamp)
+#ENDIF
+#IF(NOT VAREXISTS(%DeletedTimeStamp))
+  #DECLARE(%DeletedTimeStamp)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerCreateGenerate                       ,%pBaseName)        #! TRIGGER create generate
+#INSERT(%ProcessTriggerCreate                               ,%pBaseName)        #! RA.2019.10.11: Tested
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ProcessTriggerCreate,%pBaseName)
+#INSERT(%VariablesCreate011)
+#IF(%TraceFlow)
+  #SET(%CountNFiles,ITEMS(%NFiles))
+---- #GROUP(%%ProcessTriggerCreate,'%pBaseName'): CountNFiles: %CountNFiles
+#ENDIF
+#FOR(%NFiles)
+  #FIX(%File,%NFilesName)
+  #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
+  #SET(%TheTable,'')
+  #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CASE(%pBaseName)
+  #OF  ('POSTGRESQL')
+#INSERT(%PostgreSQLCreateTrigger)
+  #OF  ('METABASE')
+  #OROF('SQLANYWHERE')
+  #OROF('MIMER')
+  #OROF('MYSQL')
+  #OROF('MSSQL')
+  #OROF('MYSQL')
+  #OROF('ORACLE')
+  #OROF('DB2')
+-- No TRIGGER CREATE generated [No CODE exists]
+  #ENDCASE
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MetabaseTriggerDropItGenerate                       ,%pBaseName)        #! TRIGGER drop generate
+#INSERT(%ProcessTriggerDropIt                               ,%pBaseName)        #! RA.2019.10.11: Tested
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ProcessTriggerDropIt,%pBaseName)
+#IF(%TraceFlow)
+  #SET(%CountNFiles,ITEMS(%NFiles))
+---- #GROUP(%%ProcessTriggerDropIt,'%pBaseName'): CountNFiles: %CountNFiles
+#ENDIF
+#FOR(%NFiles)
+  #FIX(%File,%NFilesName)
+  #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
+  #SET(%TheTable,'')
+  #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CASE(%pBaseName)
+  #OF  ('POSTGRESQL')
+#INSERT(%PostgreSQLDropItTrigger)
+  #OF  ('METABASE')
+  #OROF('SQLANYWHERE')
+  #OROF('MIMER')
+  #OROF('MYSQL')
+  #OROF('MSSQL')
+  #OROF('MYSQL')
+  #OROF('ORACLE')
+  #OROF('DB2')
+-- No TRIGGER DROP generated [No CODE exists]
+  #ENDCASE
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%PostgreSQLCreateTrigger)
+CREATE OR REPLACE FUNCTION %TheTable_trigger()
+  RETURNS "trigger"
+AS $$
+BEGIN
+IF    (TG_WHEN = 'BEFORE') THEN
+  IF    (TG_OP = 'INSERT') THEN
+    #FOR(%Field)
+      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+        #CYCLE
+      #ENDIF
+      #IF(%FieldType='GROUP' OR %FieldType='END')
+        #CYCLE
+      #ENDIF
+      #!!!
+      #SET(%FieldNameExt,%FieldID)
+      #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #!!!
+      #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
+      #! RA.2019.08.01: Doing something at the console.
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #!IF (NEW.%FieldID IS NULL OR NEW.%FieldID = 0) THEN %NextLine = define.ryb_sf_getelapsedtimeutc(); END IF;
+    IF (%NextLine IS NULL OR %NextLine = 0) THEN %NextLine = define.ryb_sf_getelapsedtimeutc(); END IF;
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'STS' OR UPPER(%FieldID) = 'SERVERTIMESTAMP')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = define.ryb_sf_getelapsedtimeutc();   
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = 0;   
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'GUID')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #!IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = define.ryb_sf_makeguid(); END IF;
+    IF (%NextLine IS NULL OR %NextLine = '') THEN %NextLine = define.ryb_sf_makeguid(); END IF;
+      #ENDIF
+      #! RA.2019.07.28: Standards for this database.
+      #IF (UPPER(%FieldID) = 'DATE_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_date;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'TIME_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_time;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'USER_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_user;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #! RA.2019.08.23: Replace if it is incorrect
+    IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = 'A'; END IF;
+    #!%[29]NextLine = 'A';  
+      #ENDIF
+      #! RA.2019.07.28: Standards for a specific field.
+      #IF (UPPER(%FieldID) = 'LED')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #! RA.2019.08.23: Replace if it is incorrect
+    IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = 'ENG'; END IF;
+    #!%[29]NextLine = 'ENG';  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'LE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #! RA.2019.08.23: Replace if it is incorrect
+    IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = 'ENG'; END IF;
+    #!%[29]NextLine = 'ENG';  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'P_ORDER')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    #! RA.2019.08.23: We are defaulting to 100. Leave whatever the user set.
+    #!%[29]NextLine = 100;  
+      #ENDIF
+    #ENDFOR
+  ELSIF (TG_OP = 'UPDATE') THEN
+    #FOR(%Field)
+      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+        #CYCLE
+      #ENDIF
+      #IF(%FieldType='GROUP' OR %FieldType='END')
+        #CYCLE
+      #ENDIF
+      #!!!
+      #SET(%FieldNameExt,%FieldID)
+      #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #!!!
+      #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
+        #!SET(%TimeStamp         , 'NEW.' & %FieldID)
+        #!SET(%NextLine          , 'NEW.' & %FieldID)
+        #SET(%TimeStamp         , 'NEW.' & %FieldNameExt)
+        #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'STS' OR UPPER(%FieldID) = 'SERVERTIMESTAMP')
+        #!SET(%NextLine          , 'NEW.' & %FieldID)
+        #!SET(%ServerTimeStamp   , 'NEW.' & %FieldID)
+        #SET(%ServerTimeStamp   , 'NEW.' & %FieldNameExt)
+        #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+    %[29]NextLine = define.ryb_sf_getelapsedtimeutc();   
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
+        #!SET(%NextLine          , 'NEW.' & %FieldID)
+        #!SET(%DeletedTimeStamp  , 'NEW.' & %FieldID)
+        #SET(%DeletedTimeStamp  , 'NEW.' & %FieldNameExt)
+        #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'GUID')
+      #ENDIF
+      #! RA.2019.08.01: IF deleting something that is needed, THEN put it back.
+      #IF (UPPER(%FieldID) = 'LED')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = 'ENG'; END IF;
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'LE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    IF (NEW.%FieldID IS NULL OR NEW.%FieldID = '') THEN %NextLine = 'ENG'; END IF;
+      #ENDIF
+      #! RA.2019.07.28: Standards for this database.
+      #IF (UPPER(%FieldID) = 'DATE_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_date;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'TIME_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_time;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'USER_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_user;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
+      #ENDIF
+    #ENDFOR
+    #! RA.2019.08.01: Check for consistency in record status changes.
+    #FOR(%Field)
+      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+        #CYCLE
+      #ENDIF
+      #IF(%FieldType='GROUP' OR %FieldType='END')
+        #CYCLE
+      #ENDIF
+      #!!!
+      #SET(%FieldNameExt,%FieldID)
+      #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #!!!
+      #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    IF (%NextLine = '')  THEN %Nextline = 'A'; END IF;
+        #IF(%DeletedTimeStamp)
+    IF (%NextLine = 'A') THEN %DeletedTimeStamp = 0; END IF;
+    IF (%NextLine = 'I') THEN %DeletedTimeStamp = 0; END IF;
+    IF (%NextLine = 'D'  AND  %DeletedTimeStamp = 0) THEN %DeletedTimeStamp = define.ryb_sf_getelapsedtimeutc(); END IF;
+    IF (%NextLine = 'P'  AND  %DeletedTimeStamp = 0) THEN %DeletedTimeStamp = define.ryb_sf_getelapsedtimeutc(); END IF;
+        #ELSE
+    ! Missing %%DeletedTimeStamp 
+        #ENDIF
+      #ENDIF
+    #ENDFOR
+    #!
+  ELSIF (TG_OP = 'DELETE') THEN
+    #FOR(%Field)
+      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+        #CYCLE
+      #ENDIF
+      #IF(%FieldType='GROUP' OR %FieldType='END')
+        #CYCLE
+      #ENDIF
+      #!!!
+      #SET(%FieldNameExt,%FieldID)
+      #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #!!!
+      #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'STS' OR UPPER(%FieldID) = 'SERVERTIMESTAMP')
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'GUID')
+      #ENDIF
+      #! RA.2019.07.28: Standards for this database.
+      #IF (UPPER(%FieldID) = 'DATE_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_date;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'TIME_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_time;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'USER_UPDATE')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = current_user;  
+      #ENDIF
+      #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%Nextline, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = 'D';  
+      #ENDIF
+    #ENDFOR
+  END IF;
+  RETURN NEW;
+ELSIF (TG_WHEN = 'AFTER') THEN
+  IF    (TG_OP = 'INSERT') THEN
+  ELSIF (TG_OP = 'UPDATE') THEN
+  ELSIF (TG_OP = 'DELETE') THEN
+  END IF;
+  RETURN OLD;
+END IF;
+END $$
+LANGUAGE plpgsql VOLATILE
+;
+#!DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable;
+CREATE TRIGGER trigger_before_%NFilesName
+  BEFORE INSERT OR UPDATE OR DELETE ON %TheTable
+  FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
+;
+#!DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable;
+CREATE TRIGGER trigger_after_%NFilesName
+  AFTER INSERT OR UPDATE OR DELETE ON %TheTable
+  FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
+;
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%PostgreSQLDropItTrigger)
+DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable
+;
+DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable
+;
+DROP FUNCTION IF EXISTS %TheTable_trigger
+;
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#! --
+#! -- EXAMPLE: TRIGGERS
+#! --
+#! -- CREATE OR REPLACE FUNCTION define.users_trigger()
+#! --   RETURNS "trigger"
+#! -- AS $$
+#! -- BEGIN
+#! -- IF    (TG_WHEN = 'BEFORE') THEN
+#! --   IF    (TG_OP = 'INSERT') THEN
+#! --   ELSIF (TG_OP = 'UPDATE') THEN
+#! --   ELSIF (TG_OP = 'DELETE') THEN
+#! --   END IF;
+#! --   RETURN NEW;
+#! -- ELSIF (TG_WHEN = 'AFTER') THEN
+#! --   IF    (TG_OP = 'INSERT') THEN
+#! --   ELSIF (TG_OP = 'UPDATE') THEN
+#! --   ELSIF (TG_OP = 'DELETE') THEN
+#! --   END IF;
+#! --   RETURN OLD;
+#! -- END IF;
+#! -- END $$
+#! -- LANGUAGE plpgsql VOLATILE
+#! -- ;
+#! -- DROP TRIGGER IF EXISTS trigger_before_users ON define.users;
+#! -- CREATE TRIGGER trigger_before_users
+#! --   BEFORE INSERT OR UPDATE OR DELETE ON define.users
+#! --   FOR EACH ROW EXECUTE PROCEDURE define.users_trigger()
+#! -- ;
+#! -- DROP TRIGGER IF EXISTS trigger_after_users ON define.users;
+#! -- CREATE TRIGGER trigger_after_users
+#! --   AFTER INSERT OR UPDATE OR DELETE ON define.users
+#! --   FOR EACH ROW EXECUTE PROCEDURE define.users_trigger()
+#! -- ;
+#! --
+#!
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

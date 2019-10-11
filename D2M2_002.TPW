@@ -1,0 +1,410 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_002.tpw
+#! Purpose:     METABASE: Self contained #GROUPs used everywhere
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.07.26:  Roberto Artigas
+#!  *   Separated self contained #GROUPs to their own source file.
+#!      Re-worked the OPTIONS declarions due to the AUDIT untilities.
+#! 2017.09.29   Roberto Artigas
+#!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VarOptFile)                                                             #! RA.2019.07.26: Added
+#!DECLARE(%NFileUser)                    #! File user options [RASQL(,,,)]
+#!DECLARE(%NFileOpt1)                    #! File option 1 [NO]                   #! Ignore this table
+#!DECLARE(%NFileOpt2)                    #! File option 2
+#!DECLARE(%NFileOpt3)                    #! File option 3
+#!DECLARE(%NFileOpt4)                    #! File option 4 [EXTERNAL name]        #! External table name    
+#IF(NOT VAREXISTS(%NFileUser))
+  #DECLARE(%NFileUser)
+#ENDIF
+#IF(NOT VAREXISTS(%NFileOpt1))
+  #DECLARE(%NFileOpt1)
+#ENDIF
+#IF(NOT VAREXISTS(%NFileOpt2))
+  #DECLARE(%NFileOpt2)
+#ENDIF
+#IF(NOT VAREXISTS(%NFileOpt3))
+  #DECLARE(%NFileOpt3)
+#ENDIF
+#IF(NOT VAREXISTS(%NFileOpt4))
+  #DECLARE(%NFileOpt4)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VarOptField)                                                            #! RA.2019.07.26: Added
+#!DECLARE(%NFieldUser)                   #! Field user options [RASQL(,,,)]
+#!DECLARE(%NFieldOpt1)                   #! Field option 1 [NO]                  #! Ignore this field
+#!DECLARE(%NFieldOpt2)                   #! Field option 2 [<FieldType>]         #! SQL field type override
+#!DECLARE(%NFieldOpt3)                   #! Field option 3 [<Default>]           #! SQL field default override
+#!DECLARE(%NFieldOpt4)                   #! Field option 4 [EXTERNAL name]       #! External field name
+#IF(NOT VAREXISTS(%NFieldUser))
+  #DECLARE(%NFieldUser)
+#ENDIF
+#IF(NOT VAREXISTS(%NFieldOpt1))
+  #DECLARE(%NFieldOpt1)
+#ENDIF
+#IF(NOT VAREXISTS(%NFieldOpt2))
+  #DECLARE(%NFieldOpt2)
+#ENDIF
+#IF(NOT VAREXISTS(%NFieldOpt3))
+  #DECLARE(%NFieldOpt3)
+#ENDIF
+#IF(NOT VAREXISTS(%NFieldOpt4))
+  #DECLARE(%NFieldOpt4)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VarOptKey)                                                              #! RA.2019.07.26: Added
+#!DECLARE(%NKeyUser)                     #! Key user options [RASQL(,,,)]
+#!DECLARE(%NKeyOpt1)                     #! Key option 1 [NO]                    #! Ignore this key
+#!DECLARE(%NKeyOpt2)                     #! Key option 2
+#!DECLARE(%NKeyOpt3)                     #! Key option 3
+#!DECLARE(%NKeyOpt4)                     #! Key option 4 [EXTERNAL name]         #! External key name
+#IF(NOT VAREXISTS(%NKeyUser))
+  #DECLARE(%NKeyUser)
+#ENDIF
+#IF(NOT VAREXISTS(%NKeyOpt1))
+  #DECLARE(%NKeyOpt1)
+#ENDIF
+#IF(NOT VAREXISTS(%NKeyOpt2))
+  #DECLARE(%NKeyOpt2)
+#ENDIF
+#IF(NOT VAREXISTS(%NKeyOpt3))
+  #DECLARE(%NKeyOpt3)
+#ENDIF
+#IF(NOT VAREXISTS(%NKeyOpt4))
+  #DECLARE(%NKeyOpt4)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VarOptRelation)                                                         #! RA.2019.07.26: Added
+#!DECLARE(%NRelationUser)                #! Relation user options [RASQL(,,,)]
+#!DECLARE(%NRelationOpt1)                #! Relation option 1 [NO]               #! Ignore this relation
+#!DECLARE(%NRelationOpt2)                #! Relation option 2
+#!DECLARE(%NRelationOpt3)                #! Relation option 3
+#!DECLARE(%NRelationOpt4)                #! Relation option 4 [EXTERNAL name]    #! External relation name
+#IF(NOT VAREXISTS(%NRelationUser))
+  #DECLARE(%NRelationUser)
+#ENDIF
+#IF(NOT VAREXISTS(%NRelationOpt1))
+  #DECLARE(%NRelationOpt1)
+#ENDIF
+#IF(NOT VAREXISTS(%NRelationOpt2))
+  #DECLARE(%NRelationOpt2)
+#ENDIF
+#IF(NOT VAREXISTS(%NRelationOpt3))
+  #DECLARE(%NRelationOpt3)
+#ENDIF
+#IF(NOT VAREXISTS(%NRelationOpt4))
+  #DECLARE(%NRelationOpt4)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%GetFileOptions)                                                         #! RASQL(,,,) for Files
+#SET(%nLoc1,INSTRING('RASQL(',%FileUserOptions,1,1))
+#SET(%nLoc2,INSTRING(')',%FileUserOptions,1,%nLoc1))
+#SET(%NFileUser,UPPER(SUB(%FileUserOptions,%nLoc1,%nLoc2)))
+#!SET(%NFileUser,UPPER(EXTRACT(%FileUserOptions,'RASQL')))
+#SET(%NFileOpt1,EXTRACT(%NFileUser,'RASQL',1))
+#SET(%NFileOpt2,EXTRACT(%NFileUser,'RASQL',2))
+#SET(%NFileOpt3,EXTRACT(%NFileUser,'RASQL',3))
+#SET(%NFileOpt4,EXTRACT(%NFileUser,'RASQL',4))
+#IF(%TraceOption)
+  #IF(%NFileUser)
+---- %%GetFileOptions: [%NFilesName] 0"%NFileUser", 1"%NFileOpt1", 2"%NFileOpt2", 3"%NFileOpt3", 4"%NFileOpt4"
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%GetFieldOptions)                                                        #! RASQL(,,,) for Fields
+#SET(%nLoc1,INSTRING('RASQL(',%FieldUserOptions,1,1))
+#SET(%nLoc2,INSTRING(')',%FieldUserOptions,1,%nLoc1))
+#SET(%NFieldUser,UPPER(SUB(%FieldUserOptions,%nLoc1,%nLoc2)))
+#!SET(%NFieldUser,UPPER(EXTRACT(%FieldUserOptions,'RASQL')))
+#SET(%NFieldOpt1,EXTRACT(%NFieldUser,'RASQL',1))
+#SET(%NFieldOpt2,EXTRACT(%NFieldUser,'RASQL',2))
+#SET(%NFieldOpt3,EXTRACT(%NFieldUser,'RASQL',3))
+#SET(%NFieldOpt4,EXTRACT(%NFieldUser,'RASQL',4))
+#IF(%TraceOption)
+  #IF(%NFieldUser)
+---- %%GetFieldOptions: [%NFieldsName] 0"%NFieldUser", 1"%NFieldOpt1", 2"%NFieldOpt2", 3"%NFieldOpt3", 4"%NFieldOpt4"
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%GetKeyOptions)                                                          #! RASQL(,,,) for Keys
+#SET(%nLoc1,INSTRING('RASQL(',%KeyUserOptions,1,1))
+#SET(%nLoc2,INSTRING(')',%KeyUserOptions,1,%nLoc1))
+#SET(%NKeyUser,UPPER(SUB(%KeyUserOptions,%nLoc1,%nLoc2)))
+#!SET(%NKeyUser,UPPER(EXTRACT(%KeyUserOptions,'RASQL')))
+#SET(%NKeyOpt1,EXTRACT(%NKeyUser,'RASQL',1))
+#SET(%NKeyOpt2,EXTRACT(%NKeyUser,'RASQL',2))
+#SET(%NKeyOpt3,EXTRACT(%NKeyUser,'RASQL',3))
+#SET(%NKeyOpt4,EXTRACT(%NKeyUser,'RASQL',4))
+#IF(%TraceOption)
+  #IF(%NKeyUser)
+---- %%GetKeyOptions: [%NKeysName] 0"%NKeyUser", 1"%NKeyOpt1", 2"%NKeyOpt2", 3"%NKeyOpt3", 4"%NKeyOpt4"
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%GetRelationOptions)                                                     #! RASQL(,,,) for Relations
+#SET(%nLoc1,INSTRING('RASQL(',%RelationUserOptions,1,1))
+#SET(%nLoc2,INSTRING(')',%RelationUserOptions,1,%nLoc1))
+#SET(%NRelationUser,UPPER(SUB(%RelationUserOptions,%nLoc1,%nLoc2)))
+#!SET(%NRelationUser,UPPER(EXTRACT(%RelationUserOptions,'RASQL')))
+#SET(%NRelationOpt1,EXTRACT(%NRelationUser,'RASQL',1))
+#SET(%NRelationOpt2,EXTRACT(%NRelationUser,'RASQL',2))
+#SET(%NRelationOpt3,EXTRACT(%NRelationUser,'RASQL',3))
+#SET(%NRelationOpt4,EXTRACT(%NRelationUser,'RASQL',4))
+#IF(%TraceOption)
+  #IF(%NRelationUser)
+---- %%GetRelationOptions: [%NRelasFileFromKey] 0"%NRelationUser", 1"%NRelationOpt1", 2"%NRelationOpt2", 3"%NRelationOpt3", 4"%NRelationOpt4"
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2018.05.01: Is the field a numeric type?
+#GROUP(%IsFieldTypeNumeric,*%pResult,%pFieldType)
+  #SET(%pResult,FALSE)
+  #CASE(%pFieldType)
+  #OF  ('BYTE')           #! 01 bytes
+  #OROF('UTINYINT')
+  #OROF('UINT1')
+  #OROF('TINYINT')
+  #OROF('INT1')
+  #OROF('BIT')                            #! RA.2019.07.04: Added
+  #OROF('BOOL')                           #! RA.2019.07.04: Added
+  #OROF('BOOLEAN')                        #! RA.2019.07.04: Added
+  #!
+  #OROF('USHORT')         #! 02 bytes
+  #OROF('USMALLINT')
+  #OROF('UINT2')
+  #OROF('SHORT')
+  #OROF('SMALLINT')
+  #OROF('INT2')
+  #!
+  #OROF('ULONG')          #! 04 bytes
+  #OROF('UINT')
+  #OROF('UINT4')
+  #OROF('LONG')
+  #OROF('INT')
+  #OROF('INT4')
+  #OROF('INTEGER')
+  #OROF('SREAL')
+  #OROF('BFLOAT4')
+  #OROF('FLOAT')
+  #OROF('FLOAT4')
+  #!
+  #OROF('DATE')
+  #OROF('TIME')
+  #!
+  #OROF('UINT8')          #! 08 bytes
+  #OROF('INT8')
+  #OROF('REAL')
+  #OROF('BFLOAT8')
+  #OROF('DOUBLE')
+  #OROF('FLOAT8')
+  #OROF('BIGINT')                         #! RA.2019.07.04: Added
+  #!
+  #OROF('DECIMAL')        #! ?? bytes
+  #OROF('PDECIMAL')
+  #OROF('DEC')
+  #OROF('NUMERIC')
+    #SET(%pResult,TRUE)
+  #ENDCASE
+#!---- #GROUP(%%IsFieldTypeNumeric, %pResult, "%pFieldType")
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2018.04.21: Terminating with the terminator.
+#GROUP(%TerminatorTerminates,%pBaseName)
+  #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
+  #OF  ('MIMER')
+  #OROF('MSSQL')
+GO
+  #OF  ('METABASE')
+  #OROF('POSTGRESQL')
+  #OROF('SQLANYWHERE')
+  #OROF('MYSQL')
+  #OROF('ORACLE')
+  #OROF('DB2')
+  #OROF('TPLUTILITY')
+;
+  #ELSE
+---- [FIX IT: DDL TERMINATION] ----
+  #ENDCASE                                                                      #! BACKEND EXCEPTIONS
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2018.04.26: Processing the options in one place for consistency.
+#! This might be used when doing a really large dictionary where the
+#! tables are distributed accross many backends, databases, owners, etc.
+#! Example: Production database, Warehouse database, StarSchema database.
+#! RA.2018.04.25: Setup the TRUE file name for the DDL script.
+#! RA.2018.04.25: Setup in the create table. Got to add it everywhere
+#! that %TheTable is used to process a file loop. Many uses for this.
+#!---------------------------------------------------------------------
+#! %SetupTheTable             = #GROUP name
+#! *%pTheTable                = Return the table name to use
+#! %pBaseName                 = The backend that you are using
+#! %pCount                    = The table number being processed
+#! %pNameDo                   = Do the Table/File option [TRUE|FALSE]
+#! %pNameOption               = OPTION: 'Table Names' | 'File Names'
+#! %pNameTable                = TABLE name
+#! %pNameFile                 = FILE name
+#! %pOwnerDo                  = Prepend the Owner Name [TRUE|FALSE]
+#! %pOwnerName                = Owner to prepend to the table or file
+#! %pDatabaseName             = The Database Name (might be needed)
+#!---------------------------------------------------------------------
+#GROUP(%SetupTheTable,*%pTheTable,%pBaseName,%pCount,%pNameDo,%pNameOption,%pNameTable,%pNameFile,%pOwnerDo,%pOwnerName,%pDatabaseName)
+#!---------------------------------------------------------------------
+#IF(%TraceFlow)
+  #SET(%CountNFiles,ITEMS(%NFiles))
+---- #GROUP(%%SetupTheTable,'%pBaseName'): CountNFiles: %CountNFiles
+#ENDIF
+#IF(%TraceDetail)
+---- %[3]pCount , [%%SetupTheTable]
+---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable" 
+---- %[3]pCount , pNameDo = "%pNameDo", pNameOption = "%pNameOption", pNameTable = "%pNameTable", pNameFile = "%pNameFile"
+---- %[3]pCount , pOwnerDo = "%pOwnerDo", pOwnerName = "%pOwnerName", pDatabaseName = "%pDatabaseName"
+#ENDIF
+  #!---------------------------------------------------------------------
+  #! RA.2018.04.25: OPTION: Table Names | File Names
+  #SET(%pTheTable,%pNameTable)                                                  #! RA.2018.04.25: Default TABLE names
+  #IF(%pNameDo)
+    #IF(%pNameOption = 'File Names')
+      #SET(%pTheTable,%pNameFile)                                               #! RA.2018.04.25: Set FILE names
+    #ENDIF
+  #ENDIF
+  #! 
+  #IF(VAREXISTS(%LastPeriodBefore)=0)
+    #DECLARE(%LastPeriodBefore)
+  #ENDIF
+  #IF(VAREXISTS(%LastPeriodAfter)=0)
+    #DECLARE(%LastPeriodAfter)
+  #ENDIF
+  #!
+  #! RA.2018.04.26: Separate "<owner>.<table>" into pieces,
+  #! then check for both pieces being reserved words. 
+  #SET(%nLoc1, INSTRING('.',%pTheTable,-1,LEN(CLIP(%pTheTable))))
+  #IF(%nLoc1 > 0)
+    #SET(%LastPeriodBefore , SUB( %pTheTable ,        1 , %nLoc1-1              ))
+    #SET(%LastPeriodAfter  , SUB( %pTheTable , %nLoc1+1 , LEN(CLIP(%pTheTable)) ))
+#!--00 %[3]pCount , %[3]nLoc1 , LastPeriodBefore="%LastPeriodBefore", LastPeriodAfter="%LastPeriodAfter"
+    #CALL(%ReserveWordReplace,%LastPeriodBefore)
+    #CALL(%ReserveWordReplace,%LastPeriodAfter )
+#!--01 %[3]pCount , %[3]nLoc1 , LastPeriodBefore="%LastPeriodBefore", LastPeriodAfter="%LastPeriodAfter"
+    #SET(%pTheTable, %LastPeriodBefore & '.' & %LastPeriodAfter)
+#!--02 %[3]pCount , %[3]nLoc1 , pTheTable="%pTheTable"
+  #ELSE
+    #CALL(%ReserveWordReplace,%pTheTable)
+  #ENDIF
+  #! RA.2018.04.25: OPTION: Table Names | File Names
+  #!---------------------------------------------------------------------
+  #! RA.2018.04.27: CHECKBOX: Prefix the owner string?
+  #IF(%pOwnerDo)
+    #SET(%nLoc1, INSTRING('.',%pTheTable,-1,LEN(CLIP(%pTheTable))))
+    #SET(%nLoc2, LEN(%pOwnerName))
+#!--10 %[3]pCount , %[3]nLoc1 , %[3]nLoc2, pOwnerDo="%pOwnerDo", pOwnerName="%pOwnerName"
+    #IF((%nLoc1 < 1) AND (%nLoc2 > 0))
+      #IF(%pNameOption <> 'File Names')
+        #SET(%pTheTable, %pOwnerName & '.' & %pTheTable)
+      #ENDIF
+      #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+      #OF  ('METABASE')
+      #OROF('MIMER')
+      #OROF('MSSQL')
+      #OROF('POSTGRESQL')
+      #OROF('SQLANYWHERE')
+      #OROF('MYSQL')
+      #OROF('ORACLE')
+      #OROF('DB2')
+      #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+    #ENDIF
+  #ENDIF
+  #! RA.2018.04.27: CHECKBOX: Prefix the owner string?
+  #!---------------------------------------------------------------------
+#IF(%TraceDetail)
+---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable"
+#ENDIF 
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.10: External name changes need to be handled (time stamp and GUID processing)
+#! RA.2019.08.10-3:31PM: To Bruce Johnson: Skype (coding in the afternoon)
+#! Thank you Sir! DCT2SQL fixed for now and things are working with the external fields.
+#! RA.2019.08.10-3:36AM: Per Bruce Johnson: Skype (coding early in the morning)
+#! oh ok, so it'a bug in DcttoSql - fair enough. While you're at it remember that external names can contain 
+#! a pipe symbol ( | ) and then everything after the pipe is not part of the name. For example | Readonly and 
+#! | Binary etc. Although these are sometimes used to modify the type used by the CREATE statement.
+#!---------------------------------------------------------------------
+#GROUP(%SetupTheField,*%pTheField,%pBaseName,%pFieldID,%pFieldName)
+#!---------------------------------------------------------------------
+#IF(NOT VAREXISTS(%ExtFieldName))
+  #DECLARE(%ExtFieldName)
+#ENDIF
+#IF(NOT VAREXISTS(%ExtField1))
+  #DECLARE(%ExtField1)
+#ENDIF
+#SET(%ExtFieldName,%pFieldName)
+#CALL(%ReplaceSubString,%ExtFieldName,'''','')
+#!
+#! RA.2019.08.15: Tested: Working code to take out everything after the vertical bar.
+#! RA.2019.08.10: Handle the vertical BAR and extra parameters BEFORE comparison.
+#!
+#!--0-- %%ExtFieldName="%ExtFieldName"
+#SET(%ExtField1,INSTRING('|',%ExtFieldName,1,1)-1)
+#IF(%ExtField1 > 0)
+  #SET(%ExtFieldName,CLIP(SUB(%ExtFieldName,1,%ExtField1)))
+#ENDIF
+#!--1-- %%ExtFieldName="%ExtFieldName"
+#!
+  #IF(%TraceDetail)
+---- [%%SetupTheField], pBaseName = "%pBaseName", pFieldID = "%pFieldID", ExtFieldName = "%ExtFieldName", pFieldName = "%pFieldName"
+  #ENDIF
+#IF   (%ExtFieldName =  '')
+#ELSIF(%ExtFieldName =  %pFieldID)
+#ELSIF(%ExtFieldName <> %pFieldID)
+  #SET(%pTheField,%ExtFieldName)    
+  #IF(%TraceDetail)
+---- [%%SetupTheField], pBaseName = "%pBaseName", pFieldID = "%pFieldID", ExtFieldName = "%ExtFieldName", pFieldName = "%pFieldName"
+---- pTheField = "%pTheField" 
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#! RA.2019.08.10: External name changes need to be handled (time stamp and GUID processing)
+#!---------------------------------------------------------------------
+#GROUP(%SetupTheKey,*%pTheKey,%pBaseName,%pKeyID,%pKeyName)
+#!---------------------------------------------------------------------
+#IF(NOT VAREXISTS(%ExtKeyName))
+  #DECLARE(%ExtKeyName)
+#ENDIF
+#SET(%ExtKeyName,%pKeyName)
+#CALL(%ReplaceSubString,%ExtKeyName,'''','')
+#! RA.2019.08.10: Handle the vertical BAR and extra parameters BEFORE comparison.
+  #IF(%TraceDetail)
+---- [%%SetupTheKey], pBaseName = "%pBaseName", pKeyID = "%pKeyID", ExtKeyName = "%ExtKeyName", pKeyName = "%pKeyName"
+  #ENDIF
+#IF   (%ExtKeyName =  '')
+#ELSIF(%ExtKeyName =  %pKeyID)
+#ELSIF(%ExtKeyName <> %pKeyID)
+  #SET(%pTheKey,%ExtKeyName)    
+  #IF(%TraceDetail)
+---- [%%SetupTheKey], pBaseName = "%pBaseName", pKeyID = "%pKeyID", ExtKeyName = "%ExtKeyName", pKeyName = "%pKeyName"
+---- pTheKey = "%pTheKey" 
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

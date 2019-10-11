@@ -1,0 +1,308 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2UTIL2.tpw
+#! Purpose:     Utilites to deal with dictionaries
+#! Author:      Copyright © 1999-2013 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#UTILITY (UTIL_MSSQL_Connect, '2012.05.16: [DCT2SQL-UTIL] MSSQL database connect procedure'), WIZARD
+#!--------------------------------------------------------------------
+#! Changes:
+#! 2012.05.16    Roberto Artigas
+#!  *   Creates a procedure to connect into an MSSQL database
+#!--------------------------------------------------------------------
+#PREPARE
+#!
+#DECLARE(%DictName)                                             #! RA.2010.09.27
+#DECLARE(%DictPath)                                             #! RA.2010.09.27
+#DECLARE(%nLoc1)                                                #! RA.2010.09.27
+#DECLARE(%nLoc2)                                                #! RA.2010.09.27
+#DECLARE(%aFileUser)                                            #! RA.2010.09.27
+#DECLARE(%aFileOpt1)                                            #! RA.2010.09.27
+#DECLARE(%aFileOpt2)                                            #! RA.2010.09.27
+#DECLARE(%aFileOpt3)                                            #! RA.2010.09.27
+#DECLARE(%aFileOpt4)                                            #! RA.2010.09.27
+#!
+#SET(%nLoc1,INSTRING('\',%DictionaryFile,1,1))
+#LOOP,WHILE(%nLoc1)
+  #SET(%nLoc2,%nLoc1)
+  #SET(%nLoc1,INSTRING('\',%DictionaryFile,1,%nLoc1+1))
+#ENDLOOP
+#SET(%DictName,UPPER(SUB(%DictionaryFile,%nLoc2+1,LEN(%DictionaryFile)-%nLoc2-4)))
+#SET(%DictPath,UPPER(SUB(%DictionaryFile,1,%nLoc2)))
+#!
+#DECLARE(%appTables),UNIQUE
+#!
+#FOR(%File)
+  #!---------------------------------------------------------------!
+  #! RA.2001.12.01 - Ignore file place marker definitions.         !
+  #! These are files that are defined but that contain no fields.  !
+  #!---------------------------------------------------------------!
+  #IF(NOT ITEMS(%Field))                                        #! RA.2001.12.01
+    #CYCLE                                                      #! RA.2001.12.01
+  #ENDIF                                                        #! RA.2001.12.01
+  #SET(%nLoc1,INSTRING('RASQL(',%FileUserOptions,1,1))
+  #SET(%nLoc2,INSTRING(')',%FileUserOptions,1,%nLoc1))
+  #SET(%aFileUser,UPPER(SUB(%FileUserOptions,%nLoc1,%nLoc2)))
+  #!SET(%aFileUser,UPPER(EXTRACT(%FileUserOptions,'RASQL')))
+  #SET(%aFileOpt1,EXTRACT(%aFileUser,'RASQL',1))
+  #SET(%aFileOpt2,EXTRACT(%aFileUser,'RASQL',2))
+  #SET(%aFileOpt3,EXTRACT(%aFileUser,'RASQL',3))
+  #SET(%aFileOpt4,EXTRACT(%aFileUser,'RASQL',4))
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%aFileOpt1,1,1)='N')
+    #CYCLE
+  #ENDIF
+#!
+  #CASE(%FileType)
+  #OF  ('VIEW')
+  #OROF('ALIAS')
+    #CYCLE
+  #ENDCASE
+  #!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('IN-MEMORY')
+    #CYCLE
+  #ENDCASE
+  #!
+  #ADD(%appTables, %File)
+#ENDFOR
+#ENDPREPARE
+#!-----------------------------------------------------------------------------------!
+#!-----------------------------------------------------------------------------------!
+#SHEET
+  #TAB ('MSSQL Connect Database Procedure Wizard')
+    #DISPLAY('The MSSQL Connect Database Procedure Utility.')
+    #DISPLAY('Copyright 2009-2013 © by Roberto Artigas Jr.')
+    #DISPLAY('All Rights Reserved World Wide.')
+    #DISPLAY('')
+    #DISPLAY('This wizard will create a procedure to connect to the PostgreSQL database.')
+    #DISPLAY('To specify how you want the procedure constructed, click on the Next button.')
+  #ENDTAB
+  #TAB ('MSSQL Database Connect Procedure Wizard - Connect ALL'), FINISH(1)
+    #DISPLAY('You can connect to all files in your dictionary, or you can select individual files to connect.')
+    #DISPLAY('')
+    #PROMPT ('Connect to all files in my dictionary.', CHECK), %DictionaryReportUseAllFiles, DEFAULT(1), AT(10)
+  #ENDTAB
+  #TAB ('MSSQL Database Connect Procedure Wizard - Connect SOME'), WHERE(~%DictionaryReportUseAllFiles), FINISH(1)
+    #PROMPT ('Table Selection', FROM (%appTables)), %DictionaryReportFileSelection, INLINE, SELECTION('Table Selection')
+  #ENDTAB
+  #TAB ('MSSQL Database Connect Procedure Wizard - Generate Procedure'), FINISH(1)
+    #DISPLAY('Generate the PostgreSQL database connect procedure.')
+    #DISPLAY('')
+    #PROMPT ('Generate database connect procedure.', CHECK), %InitializeGenerate, DEFAULT(1), AT(10)
+    #PROMPT ('Import database connect procedure.', CHECK), %InitializeImport, DEFAULT(0), AT(10)
+    #DISPLAY('')
+  #ENDTAB
+  #TAB ('MSSQL Database Connect Procedure Wizard - Finally...')
+    #DISPLAY ('This concludes the MSSQL database connect wizard.')
+    #DISPLAY ('Click on the Finish button to generate the procedure file.')
+  #ENDTAB
+#ENDSHEET
+#!--------------------------------------------------------------------
+#DECLARE(%ReportedFiles),UNIQUE
+#DECLARE(%filName,%ReportedFiles)
+#!#DECLARE(%filDB,%ReportedFiles)
+#!#DECLARE(%filSC,%ReportedFiles)
+#!
+#DECLARE(%sFileName)                                                    #! RA.2010.09.27
+#DECLARE(%sFileNameInternal)                                            #! RA.2010.09.27
+#DECLARE(%sFileNameExternal)                                            #! RA.2010.09.27
+#DECLARE(%OutputFile)
+#DECLARE(%CountFiles)
+#DECLARE(%txaLine)
+#EQUATE (%AtColPos, 19)
+#!
+#EQUATE (%AtColPos1, 35)                                                #! RA.2010.09.27
+#EQUATE (%AtColPos2, 91)                                                #! RA.2010.09.27
+#!--------------------------------------------------------------------
+#IF (%DictionaryReportUseAllFiles)
+  #FOR (%appTables)
+    #FIX (%File, %appTables)
+    #ADD (%ReportedFiles, %appTables)
+    #SET (%filName, %appTables)
+  #ENDFOR
+#ELSE
+  #FOR (%DictionaryReportFileSelection)
+    #FIX (%File, %DictionaryReportFileSelection)
+    #ADD (%ReportedFiles, %DictionaryReportFileSelection)
+    #SET (%filName, %DictionaryReportFileSelection)
+  #ENDFOR
+#ENDIF
+#!--------------------------------------------------------------------
+#!--------------------------------------------------------------------
+#! RA.2007.12.29 - Generate so I do not have to code it by hand.
+#!--------------------------------------------------------------------
+#IF(%InitializeGenerate)
+#SET(%OutputFile, UPPER(SUB(%DictionaryFile, 1, LEN(%DictionaryFile) - 4)) & '_MSSQL_CONNECT.TXA')
+#CREATE (%OutputFile)
+#INSERT(%TxaMsSqlConnect)
+#CLOSE (%OutputFile)
+#ENDIF
+#!--------------------------------------------------------------------
+#IF(%InitializeImport)
+#IMPORT(%OutputFile),REPLACE
+#ENDIF
+#!--------------------------------------------------------------------
+#!--------------------------------------------------------------------
+#!--------------------------------------------------------------------
+#!--------------------------------------------------------------------
+#GROUP(%TxaMsSqlConnect)
+[PROCEDURE]
+NAME MSSQL_Database_Connect
+NOEXPORT
+[COMMON]
+DESCRIPTION '%@D010.@(TODAY()): Connect to MSSQL database.'
+FROM ABC Source
+CATEGORY 'MSSQL'
+MODIFIED '%@D010@(TODAY())' '%@T04@(CLOCK())'
+[FILES]
+[OTHERS]
+[PROMPTS]
+%%ProcedureParameters MULTI LONG  ()
+%%ProcedureParameterName DEPEND %%ProcedureParameters DEFAULT TIMES 0
+
+%%ProcedureParameterType DEPEND %%ProcedureParameters DEFAULT TIMES 0
+
+%%ProcedureParameterDefault DEPEND %%ProcedureParameters DEFAULT TIMES 0
+
+%%ProcedureParameterOmitted DEPEND %%ProcedureParameters LONG TIMES 0
+
+%%ProcedureParameterByReference DEPEND %%ProcedureParameters LONG TIMES 0
+
+%%Parameters DEFAULT  ('')
+%%GenerateOpenClose LONG  (0)
+%%GenerateSaveRestore LONG  (0)
+[EMBED]
+EMBED %%DataSection
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 3400
+PROPERTY:END
+!=====================================================!
+! 2012.05.16 - Roberto Artigas                        !
+! This procedure is used to set any global variables, !
+! file varibles, and database connections you need to !
+! make happen before any files open.                  !
+!=====================================================!
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 3500
+PROPERTY:END
+  #SET(%txaLine, 'WAIT_WINDOW' & ALL(' ', %AtColPos - LEN('WAIT_WINDOW')) & ' EQUATE(1)')
+%txaLine #<! Show 'Please Wait...' message
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 3500
+PROPERTY:END
+SQLOpenWindow WINDOW('Datatabase Connect'),AT(,,247,26),FONT('MS Sans Serif',8,,FONT:regular),CENTER, |
+         GRAY,DOUBLE
+       STRING('Please wait while the program connects to the database.'),AT(35,3)
+       STRING('This process could take several seconds.'),AT(58,12)
+     END
+[END]
+EMBED %%ProcessedCode
+[DEFINITION]
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 5100
+PROPERTY:END
+  COMPILE('!***WAIT***', WAIT_WINDOW)
+  SETCURSOR(Cursor:Wait)
+  OPEN(SQLOpenWindow)
+  ACCEPT
+    IF EVENT() = Event:OpenWindow
+  !***WAIT***
+
+  !-----------------------------------------------!
+  ! RA.2012.05.16 - Connect to the Database here. !
+  !-----------------------------------------------!
+  g:SQLConnectString = ''
+#!
+#!
+#![SOURCE]
+#!PROPERTY:BEGIN
+#!PRIORITY 5200
+#!PROPERTY:END
+      #SET(%CountFiles,0)
+      #FOR(%ReportedFiles)
+        #FIX(%File,%ReportedFiles)                          #! Just in case you need something
+        #!----------------------------------------!
+        #! RA.2010.09.27 - Get the EXTERNAL name. !
+        #!----------------------------------------!
+        #SET(%nLoc1,INSTRING('RASQL(',%FileUserOptions,1,1))
+        #SET(%nLoc2,INSTRING(')',%FileUserOptions,1,%nLoc1))
+        #SET(%aFileUser,LOWER(SUB(%FileUserOptions,%nLoc1,%nLoc2)))
+        #!SET(%aFileUser,LOWER(EXTRACT(%FileUserOptions,'RASQL')))
+        #SET(%aFileOpt1,EXTRACT(%aFileUser,'RASQL',1))
+        #SET(%aFileOpt2,EXTRACT(%aFileUser,'RASQL',2))
+        #SET(%aFileOpt3,EXTRACT(%aFileUser,'RASQL',3))
+        #SET(%aFileOpt4,EXTRACT(%aFileUser,'RASQL',4))
+        #!
+        #SET(%sFileNameInternal, %File)                     #! Internal File Name
+        #SET(%sFileNameExternal, %aFileOpt2)                #! External File Name
+        #SET(%sFileName, %sFileNameInternal)
+        #IF(%sFileNameExternal <> '')
+          #SET(%sFileName, %sFileNameExternal)
+        #ENDIF
+#!!! %FilePrefix , %File [ %sFileNameInternal , %sFileNameExternal ] %sFileName
+        #!----------------------------------------!
+        #!----------------------------------------!
+        #IF((%CountFiles % 20) = 0)
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 5200
+PROPERTY:END
+        #ENDIF
+        #IF(SUB(%FileName,1,1) <> '''')
+          #SET(%txaLine, '  ' & %FileName & ALL(' ', %AtColPos1 - (LEN(%FileName) + LEN(' '))) & '=')
+          #SET(%txaLine, %txaLine & ' ''dbo.' & %sFileName & '''')
+          #SET(%txaLine, %txaLine & ALL(' ', %AtColPos2 - (LEN(%txaLine) + LEN(' '))) & ' ! ' & %FilePrefix & ':' & %sFileNameInternal & ' [' & %sFileNameExternal & '] - ' & %FileDriver)
+%txaLine
+        #ELSE
+  ! %ReportedFiles #<! (%FilePrefix , %sFileNameInternal, --%FileName--) [%sFileNameExternal] - %FileDriver - has no name assignment
+        #ENDIF
+        #SET(%CountFiles,%CountFiles + 1)
+      #ENDFOR
+#!
+#!
+[SOURCE]
+PROPERTY:BEGIN
+PRIORITY 5300
+PROPERTY:END
+  #SET(%CountFiles,ITEMS(%ReportedFiles))
+  ! There are %CountFiles tables that had their name set up.
+
+  COMPILE('!***WAIT***', WAIT_WINDOW)
+      POST(EVENT:CloseWindow)
+    END
+  END
+  CLOSE(SQLOpenWindow)
+  SETCURSOR()
+  !***WAIT***
+
+  MESSAGE('Globals have been intitalized and database connection has occured!', 'MSSQL_Database_Connect')
+  RETURN
+[END]
+[END]
+#GROUP(%TxaMSSqlConnectEnd)
+#!--------------------------------------------------------------------
+#!--------------------------------------------------------------------
+#GROUP(%UTILMSSQLConnectEnd)
+#!--------------------------------------------------------------------
+
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

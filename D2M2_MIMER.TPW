@@ -1,0 +1,80 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_MIMER.tpw
+#! Purpose:     METABASE: DCT to MIMER creation script
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.07.04:  Roberto Artigas
+#!  *   Added option to select files to do SQL generation.
+#! 2018.04.04   Roberto Artigas
+#!  *   Mimer template creation. This is the same as the METABASE.
+#!      The thing to check is the usage of #CALL vs #INSERT.
+#! 2018.03.15   Roberto Artigas
+#!  *   Metabase and Mimer templates use WinSQL to process DDL statements.
+#!      This means the semi-colons at the end get replaced with GO.
+#!  *   Seems that WinSQL has a problem with comments being submitted
+#!      by themselves and then reaching the end of a DDL script.
+#!      You get a syntax error that has nothing to do with anything.
+#! 2017.09.29   Roberto Artigas
+#!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2MIMER)
+#TAB('MIT'),PROP(PROP:FontStyle,700)
+#INSERT(%MITLicense)
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#UTILITY(D2M2_MIMER, '2019.07.28: [MB] METABASE-MIMER script')
+#!-----------------------------------------------------------------------------
+#! RA.2018.04.02 - Mimer: WinSQL does not like trailing comments. Gives errors.
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'MIMER')                                                        #! MIMER: Specific. Same as METABASE.
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%Preamble)                                                              #! Basic copyright message
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#!---------------------------------------------------------------------
+#!SHEET,HSCROLL,AT(,,288)
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%ShowVariables)
+  #INSERT(%MITLicenseD2M2MIMER)
+  #INSERT(%MetabaseTabSelection)                                                #! RA.2019.07.04: Added FILE selection
+  #INSERT(%MetabaseTabNames)
+  #INSERT(%MetabaseTabCreateDropOther)
+  #INSERT(%MetabaseTabCreateDropScripting)                                      #! RA.2019.07.28: Added
+  #INSERT(%MetabaseTabOptions)
+  #INSERT(%MetabaseTabStrings)
+  #INSERT(%MetabaseTabArrays)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#CALL(%MetabaseGenerate,%BaseName)                                              #! DDL scripts for MIMER
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

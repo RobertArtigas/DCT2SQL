@@ -1,0 +1,572 @@
+#!----------------------------------------------------------------------------------------
+#!TEMPLATE(SMSSQL,'MS-SQL Templates Afiq Systems Ltd.'),FAMILY('ABC')
+#!----------------------------------------------------------------------------------------
+#! Vadim Berman (c) 1999 Vadim Berman Ltd.
+#! http://www.power10.co.il
+#! mailto:vadim@power10.co.il
+#!
+#! Version 2
+#!
+#UTILITY(SaveDICasSQL, '2002.11.14: Generate MSSQL or Oracle conversion / creation script')
+  #DISPLAY('Generate MSSQL conversion / creation script')
+  #DISPLAY('1999 (c) by Vadim Berman')
+  #DISPLAY('')
+  #PROMPT('Backend ',OPTION),%BackendDriver,DEFAULT('MSSQL')
+    #PROMPT('MS SQL Server',RADIO),VALUE('MSSQL')
+    #PROMPT('Oracle',RADIO),VALUE('Oracle')
+  #PROMPT('Script Type',OPTION),%ScriptType,DEFAULT(2)
+    #PROMPT('Creation only script',RADIO),VALUE(1)
+    #PROMPT('Conversion and creation script',RADIO),VALUE(2)
+  #PROMPT('Save as: ',SAVEDIALOG('Save as file','SQL Script (*.sql)|*.sql')),%OutputFile,default(SUB(%DictionaryFile,1,LEN(%DictionaryFile)-4) & '.sql')
+  #PROMPT('Include script from: ',OPENDIALOG('Included script','SQL Script (*.sql)|*.sql')),%IncludedScript,default(SUB(%DictionaryFile,1,LEN(%DictionaryFile)-4) & 'con.sql')
+  #PROMPT('Load list from file: ',OPENDIALOG('Load definitions from file','All files (*.*)|*.*')),%LoadFromFile,DEFAULT('')
+  #PROMPT('Create all Tables',Check),%AllTables,default(1)
+  #PROMPT('Create relations',Check),%CreateRelation,default(0)
+  #ENABLE(%LoadFromFile = '')
+    #PROMPT('Drop Table',CHECK),%DropTable,DEFAULT(0)
+    #BUTTON ('Script only for Tables...'), MULTI(%InclTables, %InclTable)
+      #PROMPT ('Table :', FROM(%File)), %InclTable,REQ
+    #ENDBUTTON
+  #ENDENABLE
+  #PROMPT('Autoincrementing fields',@s35),%UnqID,DEFAULT('UnqID')
+  #PROMPT('Warnings in the script',CHECK),%VerboseMode,DEFAULT(1)
+#!
+  #DECLARE(%FldList)
+  #DECLARE(%AlterMode)
+  #DECLARE(%TPrefix)
+  #DECLARE(%TGenFldList)
+  #DECLARE(%TFileName)
+  #DECLARE(%NFieldType)
+  #DECLARE(%NFieldName)
+  #DECLARE(%NFieldDefault)
+  #DECLARE(%NKeyName)
+  #DECLARE(%NKeyFields)
+  #DECLARE(%NKeyField)
+  #DECLARE(%NAdditAttrib)
+  #DECLARE(%NKeyFieldCount)
+  #DECLARE(%TableCount)
+  #DECLARE(%KeyCount)
+  #DECLARE(%FieldCount)
+  #DECLARE(%PKeyCount)
+  #DECLARE(%OptComma)
+  #DECLARE(%NRelateFile)
+  #DECLARE(%Relationfield1)
+  #DECLARE(%Relationfield2)
+  #DECLARE(%CStringLen)
+  #DECLARE(%LastField)
+  #DECLARE(%InnerGroup)
+  #DECLARE(%EndLblPos)
+  #DECLARE(%IDSymbol)
+#!
+  #CASE(%BackendDriver)
+  #OF('MSSQL')
+    #SET(%IDSymbol,'"')
+  #OF('Oracle')
+    #SET(%IDSymbol,'')
+  #ENDCASE
+#!
+ #CREATE(%OutputFile)
+#!
+ #IF(%ScriptType = 1)
+   #MESSAGE('Generating creation script',0)
+ #ELSE
+   #MESSAGE('Generating creation / conversion script',0)
+ #ENDIF
+#!
+ #MESSAGE(%OutputFile,1)
+#!
+  #CASE(%BackendDriver)
+  #OF('MSSQL')
+SET QUOTED_IDENTIFIER ON
+-- saving triggers
+if not exists(SELECT name
+       FROM sysobjects
+       WHERE name = N'triggersav')
+    create table triggersav
+  (contents    nvarchar(4000))
+
+insert into triggersav
+select syscomments.text
+from syscomments,sysobjects
+where syscomments.id = OBJECT_ID(sysobjects.name) and sysobjects.type = 'TR'
+  #OF('Oracle')
+  #ENDCASE
+ #IF(%LoadFromFile)
+   #OPEN(%LoadFromFile),READ
+   #DECLARE(%ListFileRecord)
+   #LOOP
+     #READ(%ListFileRecord)
+     #IF(%ListFileRecord = %EOF)
+       #BREAK
+     #ENDIF
+     #SET(%EndLblPos,INSTRING(' ',%ListFileRecord,1,1))
+     #IF(%EndLblPos < 1)
+       #SET(%EndLblPos,LEN(%ListFileRecord))
+     #ELSE
+       #SET(%EndLblPos,%EndLblPos - 1)
+     #ENDIF
+     #FIX(%File,SLICE(%ListFileRecord,1,%EndLblPos))
+     #IF(%File = '')   #! Just dump it as comments
+/* %ListFileRecord */
+       #CYCLE
+     #ENDIF
+     #IF(INSTRING('DROP',UPPER(%ListFileRecord),1,1) < 1)
+       #SET(%DropTable,0)
+     #ELSE
+       #SET(%DropTable,1)
+     #ENDIF
+     #INSERT(%ScriptPerFile)
+   #END
+   #CLOSE(%LoadFromFile),READ
+ #ELSE
+   #FOR( %File )
+   #INSERT(%ScriptPerFile)
+   #ENDFOR
+ #ENDIF
+ #!
+
+  #CASE(%BackendDriver)
+  #OF('MSSQL')
+-- restoring triggers
+DECLARE triggerList CURSOR FOR
+ SELECT contents
+   FROM triggersav
+
+declare @createQuery nvarchar(4000)
+OPEN triggerList
+FETCH NEXT FROM triggerList INTO @createQuery
+WHILE @@FETCH_STATUS <> -1
+BEGIN
+  EXEC(@createQuery)
+  FETCH NEXT FROM triggerList INTO @createQuery
+END
+DEALLOCATE triggerList
+drop table triggersav
+  #ENDCASE
+ #IF(%IncludedScript <> '')
+ /* included from %IncludedScript */
+   #OPEN(%IncludedScript),READ
+   #DECLARE(%IncludedScriptRecord)
+   #LOOP
+    #READ(%IncludedScriptRecord)
+    #IF(%IncludedScriptRecord = %EOF)
+      #BREAK
+    #ENDIF
+%IncludedScriptRecord
+   #ENDLOOP
+   #CLOSE(%IncludedScript),READ
+ /* end included from %IncludedScript */
+ #ENDIF
+/* Tables       : %TableCount */
+/* Primary Keys : %PKeyCount */
+/* Keys         : %KeyCount */
+/* Fields       : %FieldCount */
+ #CLOSE
+ #RUN('NOTEPAD.EXE "' & %OutputFile & '"')
+#!---------------------------------------------
+#!---------------------------------------------
+#GROUP(%FileDeclaration)
+   #SET(%TGenFldList,'')
+   #FOR(%Field)
+     #! Beny
+     #IF(%FieldName)
+       #SET(%NFieldName,SLICE(%FieldName,2,LEN(%FieldName)-1))
+     #ELSE
+       #SET(%NFieldName,%FieldID)
+       #IF(%NFieldName AND %VerboseMode AND %FieldType <> 'GROUP' AND %FieldType <> 'END')
+       /* warning: using Clarion internal name */
+       #END
+     #ENDIF
+     #SET(%NAdditAttrib,'')
+     #!#IF(%FieldValidation = 'NONZERO') #! we'll use it anyway so on insert it will insert 0's
+     #IF(%BackendDriver = 'MSSQL')
+       #SET(%NAdditAttrib,%NAdditAttrib & ' NOT NULL')
+     #ENDIF
+     #!#ENDIF
+     #IF((UPPER(%FieldID) = UPPER(%UnqID) OR INSTRING(UPPER(%UnqID),UPPER(%FieldUserOptions),1,1) > 0) AND (%UnqID <> ''))
+       #SET(%TGenFldList,'1')
+       #IF(%BackendDriver = 'MSSQL')
+         #SET(%NAdditAttrib,%NAdditAttrib & ' IDENTITY(1,1)')
+       #ENDIF
+     #ENDIF
+     #IF(%FieldType = 'STRING' AND %FieldMemoSize = 8)
+       #SET(%LastField, %Field)
+       #CYCLE
+     #ENDIF
+     #IF(%FieldType='GROUP')
+       #SET(%InnerGroup,1)
+       #IF(INSTRING('OVER(',%FieldStatement,1,1))
+     %IDSymbol%LastField%IDSymbol  DATETIME,
+         #SET(%FieldCount, %FieldCount + 1)
+       #ENDIF
+       #CYCLE
+     #ENDIF
+     #IF(%FieldType='END')
+       #SET(%InnerGroup,0)
+       #CYCLE
+     #ENDIF
+     #IF(%InnerGroup = 1)
+       #!#CYCLE
+     #ENDIF
+     #SET(%FieldCount, %FieldCount + 1)
+     #SET(%NFieldDefault,'')
+     #CASE(%FieldType)
+       #OF('SHORT')
+          #SET(%NFieldType,'SMALLINT')
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('USHORT')
+          #SET(%NFieldType,'SMALLINT')
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('ULONG')
+          #SET(%NFieldType,'INT')
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('LONG')
+          #SET(%NFieldType,'INT')
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('REAL')
+          #SET(%NFieldType,'FLOAT')
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('STRING')
+          #IF (%FieldMemoSize > 8000)   #! which is VARCHAR limit, according to M$
+            #CASE(%BackendDriver)
+            #OF('MSSQL')
+              #SET(%NFieldType,'TEXT' )
+            #OF('Oracle')
+              #SET(%NFieldType,'LONG' )  #! pay attention: NOT long integer
+            #ENDCASE
+          #ELSIF (%FieldMemoSize > 250)
+            #CASE(%BackendDriver)
+            #OF('MSSQL')
+              #SET(%NFieldType,'VARCHAR(' & %FieldMemoSize & ')' )
+            #OF('Oracle')
+              #SET(%NFieldType,'VARCHAR2(' & %FieldMemoSize & ')' )
+            #ENDCASE
+            #SET(%NFieldDefault,' DEFAULT ''''')
+          #ELSE
+            #SET(%NFieldType,'CHAR(' & %FieldMemoSize & ')' )
+            #SET(%NFieldDefault,' DEFAULT ''''')
+          #ENDIF
+       #OF('CSTRING')
+          #SET(%CStringLen,%FieldMemoSize - 1)
+          #IF (%CStringLen > 8000)   #! which is VARCHAR limit, according to M$
+            #CASE(%BackendDriver)
+            #OF('MSSQL')
+              #SET(%NFieldType,'TEXT' )
+            #OF('Oracle')
+              #SET(%NFieldType,'LONG' )  #! pay attention: NOT long integer
+            #ENDCASE
+          #ELSE
+            #CASE(%BackendDriver)
+            #OF('MSSQL')
+              #SET(%NFieldType,'VARCHAR(' & %CStringLen & ')' )
+            #OF('Oracle')
+              #SET(%NFieldType,'VARCHAR2(' & %CStringLen & ')' )
+            #ENDCASE
+          #ENDIF
+          #SET(%NFieldDefault,' DEFAULT ''''')
+       #OF('BYTE')
+          #CASE(%BackendDriver)
+          #OF('MSSQL')
+            #SET(%NFieldType,'TINYINT')
+          #OF('Oracle')
+            #SET(%NFieldType,'SMALLINT')
+          #ENDCASE
+          #SET(%NFieldDefault,' DEFAULT 0')
+       #OF('DATE')
+          #SET(%NFieldType,'DATETIME')
+       #OF('DECIMAL')
+          #CASE(%BackendDriver)
+          #OF('MSSQL')
+            #SET(%NFieldType,'DECIMAL(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+          #OF('Oracle')
+            #SET(%NFieldType,'NUMBER(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+          #ENDCASE
+          #SET(%NFieldDefault,' DEFAULT ''0''')
+     #ENDCASE
+     #IF(INSTRING('IDENTITY',UPPER(%NAdditAttrib),1,1) < 1)
+       #SET(%NAdditAttrib,%NAdditAttrib & %NFieldDefault)
+       #IF(UPPER(%NFieldType)<>'TEXT' AND %AlterMode = '1')
+         #SET(%NAdditAttrib,%NAdditAttrib & ' WITH VALUES')
+       #ENDIF
+     #ENDIF
+     #IF(%NAdditAttrib)
+       #IF(%AlterMode = '1')
+  IF NOT EXISTS (SELECT SYSCOLUMNS.name FROM syscolumns where SYSCOLUMNS.name='%NFieldName')
+  BEGIN
+    ALTER TABLE %IDSymbol%TFileName%IDSymbol  ADD %IDSymbol%NFieldName%IDSymbol %NFieldType %NAdditAttrib
+    SELECT @FldName = '%TFileName was upgraded'
+  END
+       #ELSE
+       %IDSymbol%NFieldName%IDSymbol %NFieldType %NAdditAttrib,
+       #ENDIF
+     #ELSE
+       #IF(%AlterMode = '1')
+  IF NOT EXISTS (SELECT SYSCOLUMNS.name FROM syscolumns where SYSCOLUMNS.name='%NFieldName')
+  BEGIN
+    ALTER TABLE %IDSymbol%TFileName%IDSymbol  ADD %IDSymbol%NFieldName%IDSymbol %NFieldType
+    SELECT @FldName = '%TFileName was upgraded'
+  END
+       #ELSE
+       %IDSymbol%NFieldName%IDSymbol %NFieldType,
+       #ENDIF
+     #ENDIF
+   #ENDFOR
+  #IF(%AlterMode = '1')
+    #RETURN  #! Yet to be solved
+  #ENDIF
+#! primary key & all the constraints (unique keys)
+   #SET(%OptComma,'')
+   #FOR(%Key),WHERE(NOT %KeyDuplicate)
+     #IF(%KeyName)
+       #SET(%NKeyName,SLICE(%KeyName,2,LEN(%KeyName)-1))
+     #ELSE
+       #SET(%NKeyName,%KeyID)
+     #END
+     #SET(%NKeyFields,'')
+     #SET(%NKeyFieldCount,0)
+     #FOR(%KeyField)
+       #FIND(%Field,%KeyField)
+       #IF(%FieldName)
+         #SET(%NKeyField,SLICE(%FieldName,2,LEN(%FieldName)-1))
+       #ELSE
+         #SET(%NKeyField, SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1 , 50))
+       #ENDIF
+       #SET(%NKeyFieldCount,%NKeyFieldCount + 1 )
+       #IF(%NKeyFieldCount = 1)
+         #SET(%NKeyFields,%IDSymbol & %NKeyField & %IDSymbol)
+       #ELSE
+         #SET(%NKeyFields, %NKeyFields & ' ,' & %IDSymbol & %NKeyField & %IDSymbol)
+      #ENDIF
+     #ENDFOR
+     #SET(%NKeyName,%TPrefix & %NKeyName)
+     #SET(%PKeyCount, %PKeyCount + 1)
+     #SET(%KeyCount, %KeyCount + 1)
+     #IF(%KeyPrimary)
+     %OptComma CONSTRAINT %IDSymbol%NKeyName%IDSymbol PRIMARY KEY (%NKeyFields)
+     #ELSE
+     %OptComma CONSTRAINT %IDSymbol%NKeyName%IDSymbol UNIQUE (%NKeyFields)
+     #ENDIF
+     #SET(%OptComma,',')
+   #ENDFOR
+   #! Close declaration
+  #CASE(%BackendDriver)
+  #OF('MSSQL')
+    )
+  #OF('Oracle')
+    );
+  #ENDCASE
+#!
+#!---------------------------------------------
+#GROUP(%IndicesDeclaration)
+#! keys without the primary - outside the file declaration
+   #FOR(%Key)
+       #IF(%KeyName)
+         #SET(%NKeyName,SLICE(%KeyName,2,LEN(%KeyName)-1))
+       #ELSE
+         #SET(%NKeyName,UPPER(%KeyID))
+       #END
+       #SET(%NKeyFields,'')
+       #SET(%NKeyFieldCount,0)
+       #FOR(%KeyField)
+         #FIND(%Field,%KeyField)
+         #IF(%FieldName)
+           #SET(%NKeyField,SLICE(%FieldName,2,LEN(%FieldName)-1))
+         #ELSE
+           #SET(%NKeyField, sub(%KeyField, instring(':',%KeyField,1,1) + 1 , 50))
+         #ENDIF
+         #SET(%NKeyFieldCount,%NKeyFieldCount + 1 )
+         #IF(%NKeyFieldCount = 1)
+           #SET(%NKeyFields,%IDSymbol & %NKeyField & %IDSymbol)
+         #ELSE
+           #SET(%NKeyFields, %NKeyFields & ' ,' & %IDSymbol & %NKeyField & %IDSymbol)
+         #ENDIF
+       #ENDFOR
+     #IF(NOT %KeyPrimary)
+     #SET(%KeyCount, %KeyCount + 1)
+       #IF(%AlterMode = '1')
+     #!IF EXISTS (SELECT sysindexes.name FROM sysindexes WHERE sysindexes.name = '%NKeyName') DROP INDEX %TFileName.%NKeyName
+       #ENDIF
+       #IF(%KeyDuplicate)
+         #CASE(%BackendDriver)
+         #OF('MSSQL')
+     CREATE INDEX %IDSymbol%NKeyName%IDSymbol ON %IDSymbol%TFileName%IDSymbol (%NKeyFields)
+         #OF('Oracle')
+     CREATE INDEX %IDSymbol%NKeyName%IDSymbol ON %IDSymbol%TFileName%IDSymbol (%NKeyFields);
+         #ENDCASE
+       #ELSE
+     #! CREATE UNIQUE INDEX %IDSymbol%NKeyName%IDSymbol ON %IDSymbol%TFileName%IDSymbol (%NKeyFields)
+       #ENDIF
+     #ENDIF
+   #ENDFOR
+
+#! Relations
+ #IF(%CreateRelation)
+   #FOR( %File )
+   #IF (%AllTables = 0)
+     #FIND (%InclTable, %File)
+     #IF (%InclTable = '')
+       #CYCLE
+     #ENDIF
+   #ENDIF
+   #IF (SUB(%FileDriver,1,5) = 'MSSQL' )
+    #FOR(%Key)
+      #FOR(%Relation),WHERE(%FileKey = %Key)
+        #IF(%FileRelationType = 'MANY:1')
+          #SET(%NKeyField, sub(%FileKey, instring(':',%FileKey,1,1) + 1 , 50))
+          #SET(%NRelateFile, sub(%RelationKey, 1, instring(':',%RelationKey,1,1) -1 ))
+          #FOR(%KeyField)
+            #FIX(%FileKeyField,%KeyField)
+            #IF(%FileKeyField)
+              #FIND(%Field,%FileKeyField)
+              #IF(%FieldName)
+                #SET(%Relationfield1,SLICE(%FieldName,2,LEN(%FieldName)-1))
+              #ELSE
+                #SET(%Relationfield1,SUB(%FileKeyField, INSTRING(':',%FileKeyField,1,1)+1, 50))
+              #ENDIF
+              #FIND(%Field,%FileKeyFieldLink)
+              #IF(%FieldName)
+                #SET(%Relationfield2,SLICE(%FieldName,2,LEN(%FieldName)-1))
+              #ELSE
+                #SET(%Relationfield2,SUB(%FileKeyFieldLink, INSTRING(':',%FileKeyFieldLink,1,1)+1, 50))
+              #ENDIF
+            #ENDIF
+          #ENDFOR
+        #ENDIF
+        #IF(%Relationfield1)
+
+ALTER TABLE %IDSymbol%TFileName%IDSymbol ADD
+   CONSTRAINT %IDSymbol%NKeyField%IDSymbol FOREIGN KEY (%IDSymbol%Relationfield1%IDSymbol)
+   REFERENCES %IDSymbol%NRelateFile%IDSymbol(%IDSymbol%Relationfield2%IDSymbol)
+
+          #SET(%Relationfield1,'')
+          #SET(%Relationfield2,'')
+        #ENDIF
+      #ENDFOR
+    #ENDFOR
+  #ENDIF
+ #ENDFOR
+#ENDIF
+#!
+#!---------------------------------------------
+#GROUP(%ConversionScript)
+DECLARE @FldName VARCHAR(101)
+SELECT @FldName = ''
+IF EXISTS (SELECT sysobjects.name FROM sysobjects WHERE sysobjects.name = 'T_%TFileName')
+BEGIN
+  DROP TABLE T_%TFileName
+END
+IF NOT EXISTS (SELECT sysobjects.name FROM sysobjects WHERE sysobjects.name = '%TFileName')
+  SELECT @FldName = '%TFileName was created'
+ELSE
+BEGIN
+#SET(%TPrefix,'')
+#SET(%AlterMode,'1')
+  #INSERT(%FileDeclaration)
+  #!#INSERT(%IndicesDeclaration)
+END
+#SET(%AlterMode,'')
+#SET(%TPrefix,'T_')
+IF NOT @FldName = '%TFileName was created'
+BEGIN
+  CREATE TABLE %IDSymbol%TPrefix%FILE%IDSymbol(
+  #INSERT(%FileDeclaration)
+  INSERT INTO %IDSymbol%TPrefix%FILE%IDSymbol
+  #INSERT(%CommaDelimitedFields)
+    SELECT %FldList FROM %IDSymbol%TFileName%IDSymbol
+  DROP TABLE %IDSymbol%TFileName%IDSymbol
+END
+#SET(%TPrefix,'')
+  CREATE TABLE %IDSymbol%TFileName%IDSymbol(
+  #INSERT(%FileDeclaration)
+  #INSERT(%IndicesDeclaration)
+IF NOT @FldName = '%TFileName was created'
+BEGIN
+#SET(%TPrefix,'T_')
+  INSERT INTO %IDSymbol%TFileName%IDSymbol
+  #INSERT(%CommaDelimitedFields)
+    SELECT %FldList FROM %IDSymbol%TPrefix%FILE%IDSymbol
+  DROP TABLE %IDSymbol%TPrefix%FILE%IDSymbol
+END
+IF NOT @FldName = '' PRINT @FldName
+GO
+/*------------------------------------------------------------------------------------------*/
+#!
+#GROUP(%CommaDelimitedFields),AUTO
+#DECLARE(%WasUnqID)
+  #SET(%FldList,'')
+  #SET(%WasUnqID,'')
+  #FOR(%Field)
+    #IF(%FieldType='GROUP')
+      #CYCLE
+    #ENDIF
+    #IF(%FieldType='END')
+      #CYCLE
+    #ENDIF
+    #IF((UPPER(%FieldID) = UPPER(%UnqID) OR INSTRING(UPPER(%UnqID),UPPER(%FieldUserOptions),1,1) > 0) AND (%UnqID <> ''))
+      #SET(%WasUnqID,'1')
+      #CYCLE
+    #ENDIF
+    #IF(%FieldName)
+      #SET(%NFieldName,%IDSymbol & SLICE(%FieldName,2,LEN(%FieldName)-1) & %IDSymbol)
+    #ELSE
+      #SET(%NFieldName,%IDSymbol & %FieldID & %IDSymbol)
+    #ENDIF
+    #IF(%FldList = '')
+      #SET(%FldList,%NFieldName)
+    #ELSE
+      #SET(%FldList,%FldList & ',' & %NFieldName)
+    #ENDIF
+  #ENDFOR
+  #IF(%WasUnqID = '')
+    #SET(%FldList,'* ') #! no need to elongate the list
+  #ENDIF
+#!---------------------------------------------
+#GROUP(%ScriptPerFile)
+ #IF( %AliasFile ) #! This file is an alias. We don't need to generate script for it
+   #RETURN #!#CYCLE
+ #ENDIF
+ #IF( INSTRING('/NOSQL',%FileUserOptions,1,1) > 0 )
+   #RETURN #!#CYCLE
+ #ENDIF
+ #MESSAGE(%File,2)
+ #IF(%FileName AND INSTRING('!',%FileName,1,1) < 1 AND INSTRING(':',%FileName,1,1) < 1)
+   #SET(%TFileName,UPPER(%FileName))
+   #IF(SLICE(%TFileName,1,1) = '''') #! eliminate quotes
+     #SET(%TFileName,SLICE(%TFileName,2,LEN(%TFileName)-1))
+   #ENDIF
+ #ELSE
+   #SET(%TFileName,UPPER(%File))
+ #ENDIF
+ #IF(%ScriptType = 2)
+/* Table %File */
+   #INSERT(%ConversionScript)
+   #RETURN
+ #ENDIF
+ #IF (%AllTables = 0)
+   #FIND (%InclTable, %File)
+   #IF (%InclTable = '')
+     #RETURN #!#CYCLE
+   #ENDIF
+ #ELSE
+ #ENDIF
+ #SET(%TableCount, %TableCount + 1)
+/* Table %File */
+ #IF(%DropTable)
+  #CASE(%BackendDriver)
+  #OF('MSSQL')
+DROP TABLE %TFileName
+  #OF('Oracle')
+DROP TABLE %TFileName;
+  #ENDCASE
+ #ENDIF
+CREATE TABLE %IDSymbol%TFileName%IDSymbol(
+#INSERT(%FileDeclaration)
+#INSERT(%IndicesDeclaration)
+#!
+#CASE(%BackendDriver)
+#OF('MSSQL')
+PRINT %TFileName
+#OF('Oracle')
+PROMPT %TFileName;
+#ENDCASE
+#!---------------------------------------------

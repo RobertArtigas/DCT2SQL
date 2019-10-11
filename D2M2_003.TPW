@@ -1,0 +1,803 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_003.tpw
+#! Purpose:     METABASE: variable related #GROUPs used everywhere
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.07.28:  Roberto Artigas
+#!  *   Separated variable related #GROUPs to their own source file.
+#!      Set up the TRIGGER named variables and options.
+#! 2017.09.29   Roberto Artigas
+#!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VariablesCommon)                                                        #! Need a few simple variables
+#PREPARE
+#DECLARE(%TheDate                         ,STRING)                              #! Display current date
+#DECLARE(%TheTime                         ,STRING)                              #! Display current time
+#!---------------------------------------------------------------------
+#DECLARE(%DictPath                        ,STRING)
+#DECLARE(%DictName                        ,STRING)
+#DECLARE(%nLoc1                           ,LONG)
+#DECLARE(%nLoc2                           ,LONG)
+#!---------------------------------------------------------------------
+#! RA.2018.04.21: "Trace" options show a lot for testing CORE functionality.
+#DECLARE(%Comments                        ,LONG)                                #! RA.2018.04.08 - Generate comments
+#SET(%Comments                            ,TRUE)
+#DECLARE(%TraceFlow                       ,LONG)                                #! RA.2018.04.07 - Trace the call flow
+#SET(%TraceFlow                           ,FALSE)
+#DECLARE(%TraceDetail                     ,LONG)                                #! RA.2018.04.15 - Trace detail items
+#SET(%TraceDetail                         ,FALSE)
+#DECLARE(%TraceOption                     ,LONG)                                #! RA.2018.05.03 - Trace the options
+#SET(%TraceOption                         ,FALSE)
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VariablesDeclare)                                                       #! Option checks and output file names
+#PREPARE
+#!---------------------------------------------------------------------
+#! RA.2019.07.04: Added option to select files to do SQL generation.
+#DECLARE(%optUseAllFiles                  ,LONG)                                #! RA.2019.07.04: Select all files
+#DECLARE(%optFileSelection),MULTI,UNIQUE                                        #! RA.2019.07.04: File selection
+#DECLARE(%NFilesSort),MULTI,UNIQUE                                              #! RA.2019.07.04: Define a bit earlier
+#!---------------------------------------------------------------------
+#DECLARE(%NameDatabase                    ,STRING)
+#DECLARE(%NameOwner                       ,STRING)
+#DECLARE(%optNameEnable                   ,LONG)
+#DECLARE(%optNameOwnerEnable              ,LONG)
+#DECLARE(%optNameOwnerUse                 ,LONG)
+#!---------------------------------------------------------------------         #! RA.2019.08.14.WED: Added
+#DECLARE(%CreateChekCombined              ,LONG)
+#DECLARE(%CreateNameCombined              ,STRING)
+#DECLARE(%CreateNameCombinedOut           ,STRING)
+#DECLARE(%BuildsChekCombined              ,LONG)
+#DECLARE(%BuildsNameCombined              ,STRING)
+#DECLARE(%BuildsNameCombinedOut           ,STRING)
+#DECLARE(%DropItChekCombined              ,LONG)
+#DECLARE(%DropItNameCombined              ,STRING)
+#DECLARE(%DropItNameCombinedOut           ,STRING)
+#!---------------------------------------------------------------------
+#DECLARE(%UtilityChekTable                ,LONG)                                #! RA.2019.07.07.SUN: Added
+#DECLARE(%UtilityNameTable                ,STRING)                              #! RA.2019.07.07.SUN: Added
+#DECLARE(%UtilityNameTableOut             ,STRING)                              #! RA.2019.07.07.SUN: Added
+#!---------------------------------------------------------------------
+#DECLARE(%CreateChekTable                 ,LONG)
+#DECLARE(%CreateNameTable                 ,STRING)
+#DECLARE(%CreateNameTableOut              ,STRING)
+#DECLARE(%CreateChekSequence              ,LONG)
+#DECLARE(%CreateNameSequence              ,STRING)
+#DECLARE(%CreateNameSequenceOut           ,STRING)
+#DECLARE(%CreateChekKeyPrimary            ,LONG)
+#DECLARE(%CreateNameKeyPrimary            ,STRING)
+#DECLARE(%CreateNameKeyPrimaryOut         ,STRING)
+#DECLARE(%CreateChekIndexUnique           ,LONG)
+#DECLARE(%CreateNameIndexUnique           ,STRING)
+#DECLARE(%CreateNameIndexUniqueOut        ,STRING)
+#DECLARE(%CreateChekIndexNotUnique        ,LONG)
+#DECLARE(%CreateNameIndexNotUnique        ,STRING)
+#DECLARE(%CreateNameIndexNotUniqueOut     ,STRING)
+#DECLARE(%CreateChekRelation              ,LONG)
+#DECLARE(%CreateNameRelation              ,STRING)
+#DECLARE(%CreateNameRelationOut           ,STRING)
+#DECLARE(%CreateChekGrant                 ,LONG)
+#DECLARE(%CreateNameGrant                 ,STRING)
+#DECLARE(%CreateNameGrantOut              ,STRING)
+#!---------------------------------------------------------------------
+#DECLARE(%DropItChekTable                 ,LONG)
+#DECLARE(%DropItNameTable                 ,STRING)
+#DECLARE(%DropItNameTableOut              ,STRING)
+#DECLARE(%DropItChekSequence              ,LONG)
+#DECLARE(%DropItNameSequence              ,STRING)
+#DECLARE(%DropItNameSequenceOut           ,STRING)
+#DECLARE(%DropItChekKeyPrimary            ,LONG)
+#DECLARE(%DropItNameKeyPrimary            ,STRING)
+#DECLARE(%DropItNameKeyPrimaryOut         ,STRING)
+#DECLARE(%DropItChekIndexUnique           ,LONG)
+#DECLARE(%DropItNameIndexUnique           ,STRING)
+#DECLARE(%DropItNameIndexUniqueOut        ,STRING)
+#DECLARE(%DropItChekIndexNotUnique        ,LONG)
+#DECLARE(%DropItNameIndexNotUnique        ,STRING)
+#DECLARE(%DropItNameIndexNotUniqueOut     ,STRING)
+#DECLARE(%DropItChekRelation              ,LONG)
+#DECLARE(%DropItNameRelation              ,STRING)
+#DECLARE(%DropItNameRelationOut           ,STRING)
+#DECLARE(%DropItChekGrant                 ,LONG)
+#DECLARE(%DropItNameGrant                 ,STRING)
+#DECLARE(%DropItNameGrantOut              ,STRING)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#DECLARE(%CreateChekTrigger               ,LONG)                                #! RA.2019.07.28: Added
+#DECLARE(%CreateNameTrigger               ,STRING)
+#DECLARE(%CreateNameTriggerOut            ,STRING)
+#!---------------------------------------------------------------------
+#DECLARE(%DropItChekTrigger               ,LONG)                                #! RA.2019.07.28: Added
+#DECLARE(%DropItNameTrigger               ,STRING)
+#DECLARE(%DropItNameTriggerOut            ,STRING)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.11: Individual OTHER tab utilities
+#!---------------------------------------------------------------------
+#DECLARE(%BuildChekIndexGUID              ,LONG)                                #! RA.2019.08.11: Added
+#DECLARE(%BuildNameIndexGUID              ,STRING)
+#DECLARE(%BuildNameIndexOutGUID           ,STRING)
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%VariablesSetup)                                                         #! Setup output file names
+#PREPARE
+#SET(%TheDate                             ,FORMAT(TODAY(),@D010))               #! Set current date
+#SET(%TheTime                             ,FORMAT(CLOCK(),@T06))                #! Set current time
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RA.2019.07.20: Added 
+#! RA.2019.07,28: Moved all the the diffent OPTIONS declarations here.
+#! The different AUDIT utilities might need options without the other variable overhead.
+#! RA.2019.07.20: This works but is messy. MOVE THE OPTIONS DECLARES HERE ???
+#! The one or more file selection uses the options qualify for valid generation files.
+#INSERT(%VarOptFile)                                                            #! RA.2019.07.28: Options: File
+#INSERT(%VarOptField)                                                           #! RA.2019.07.28: Options: Field
+#INSERT(%VarOptKey)                                                             #! RA.2019.07.28: Options: Key
+#INSERT(%VarOptRelation)                                                        #! RA.2019.07.28: Options: Relation
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.07.28: The scripting backend flag is used ENABLE additional output file options.
+#! For example: If you need to create TRIGGERs or VALIDATIONs for a backend, you will need to
+#! know some SQL, but also how to script the different backend languages for the creation
+#! of FUNCTIONS that will get called by the SQL TRIGGERs and VALIDATIONs. Are we having fun yet?
+#! This is where the BACKENDs have the greatest difference in SYNTAX and FUNCTIONS available.
+#! For PostgreSQL I can enable some of those options and code them for the GUID functionality.
+#! So as other volunteers "appear" or other backends get coded the options should appear.
+#DECLARE(%optUseScripting                 ,LONG)                                #! RA.2019.07.28: Scripting backend
+#SET(%optUseScripting                     ,FALSE)                               #! RA.2019.07.28: Scripting backend
+#!---------------------------------------------------------------------
+#CASE(%BaseName)
+#OF  ('POSTGRESQL')
+  #SET(%optUseScripting                   ,TRUE)                                #! RA.2019.07.28: ENABLE options
+#OF  ('METABASE')
+#OROF('MIMER')
+#OROF('MYSQL')
+#OROF('MSSQL')
+#OROF('SQLANYWHERE')
+#OROF('MYSQL')
+#OROF('ORACLE')
+#OROF('DB2')
+#ENDCASE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.04: We need to filter these before presenting for selections.
+#! FOR NOW: We are going copy the filter code and take the other code out later.
+#! After you start adding aliases and vendor tools/utilities it gets messy.
+#! FILTER CODE IS A CANDIDATE FOR IT'S OWN GROUP: CHECK FOR REFACTOR OPTIONS!
+#! RA.2019.07.04: Added option to select files to do SQL generation.
+#! You can select one or more files now. Or do the whole dictionary.
+#!
+#INSERT(%SelectQualified)
+#!INSERT(%SelectEverything)
+#!
+#!---------------------------------------------------------------------
+#! RA.2018.04.21: The 'METABASE' is NOT A VALID backend. It is a CORE template testing strap.
+#!                What it generates can be examined for obvious DDL and generation errors.
+#!                The VALID backends get tested by running the DDL on the backend database. 
+#! RA.2018.04.11: Normally the defaults DCT name will be the dictionary name.
+#!                Additionally the <database>,<schema|owner)> can be defined as file properties.
+#!                This might be needed for a larger dictionary. Ponder the wisdom of doing that.
+#!                You can also define this in the DCT file "Full Path Name:" variable.
+#!                Examples: master.Users, user.Addresses, user.Departments (this does happen)
+#! RA.2018.04.08: Set up defaults and specify names for all the backends
+#SET(%NameDatabase                        , 'test')
+#SET(%NameDatabase                        , LOWER(%DictName))                   #! RA.2018.04.11 - The DCT name 
+#SET(%NameOwner                           , 'public')
+#SET(%optNameEnable                       , FALSE)
+#SET(%optNameOwnerEnable                  , FALSE)
+#SET(%optNameOwnerUse                     , FALSE)
+#!---------------------------------------------------------------------
+#CASE(%BaseName)
+#OF  ('METABASE')
+  #SET(%optNameEnable                     , TRUE)
+  #SET(%optNameOwnerEnable                , TRUE)
+  #!SET(%NameDatabase                     , '')
+  #!SET(%NameOwner                        , '')
+#OF  ('MIMER')
+  #SET(%NameDatabase                      , '')
+  #SET(%NameOwner                         , '')
+#OF  ('MSSQL')
+  #SET(%optNameEnable                     , TRUE)
+  #SET(%optNameOwnerEnable                , TRUE)
+  #SET(%optNameOwnerUse                   , TRUE)
+  #!SET(%NameDatabase                     , '')
+  #SET(%NameOwner                         , 'dbo')
+#OF  ('POSTGRESQL')
+  #SET(%optNameEnable                     , TRUE)
+  #SET(%optNameOwnerUse                   , TRUE)
+  #SET(%optNameOwnerEnable                , TRUE)
+  #!SET(%NameDatabase                     f, '')
+  #SET(%NameOwner                         , 'define')
+#OF  ('SQLANYWHERE')
+  #SET(%NameDatabase                      , '')
+  #SET(%NameOwner                         , '')
+#OF  ('MYSQL')
+  #SET(%NameDatabase                      , '')
+  #SET(%NameOwner                         , '')
+#OF  ('ORACLE')
+  #SET(%NameDatabase                      , '')
+  #SET(%NameOwner                         , '')
+#OF  ('DB2')
+  #SET(%NameDatabase                      , '')
+  #SET(%NameOwner                         , '')
+#ENDCASE
+#!----------------------------------------------------------------------------- 
+#INSERT(%FileNamesAreNormal)
+#!-----------------------------------------------------------------------------
+#ENDPREPARE
+#!-----------------------------------------------------------------------------
+#!----------------------------------------------------------------------------- RA.2019.08.12: Separate group
+#GROUP(%FileNamesAreNormal)
+#!-----------------------------------------------------------------------------
+#!----------------------------------------------------------------------------- (01-10)
+#SET(%CreateChekTable                     , %FALSE)
+#SET(%CreateNameTable                     , %DictName & '_' & %BaseName & '_01_Create_Table.SQL')
+#SET(%CreateNameTableOut                  , %DictPath & %CreateNameTable)
+#SET(%CreateChekSequence                  , %FALSE)
+#SET(%CreateNameSequence                  , %DictName & '_' & %BaseName & '_02_Create_Sequence.SQL')
+#SET(%CreateNameSequenceOut               , %DictPath & %CreateNameSequence)
+#SET(%CreateChekKeyPrimary                , %FALSE)
+#SET(%CreateNameKeyPrimary                , %DictName & '_' & %BaseName & '_03_Create_Key_Primary.SQL')
+#SET(%CreateNameKeyPrimaryOut             , %DictPath & %CreateNameKeyPrimary)
+#SET(%CreateChekIndexUnique               , %FALSE)
+#SET(%CreateNameIndexUnique               , %DictName & '_' & %BaseName & '_04_Create_Index_Unique.SQL')
+#SET(%CreateNameIndexUniqueOut            , %DictPath & %CreateNameIndexUnique)
+#SET(%CreateChekIndexNotUnique            , %FALSE)
+#SET(%CreateNameIndexNotUnique            , %DictName & '_' & %BaseName & '_05_Create_Index_Not_Unique.SQL')
+#SET(%CreateNameIndexNotUniqueOut         , %DictPath & %CreateNameIndexNotUnique)
+#SET(%CreateChekRelation                  , %FALSE)
+#SET(%CreateNameRelation                  , %DictName & '_' & %BaseName & '_06_Create_Relation.SQL')
+#SET(%CreateNameRelationOut               , %DictPath & %CreateNameRelation)
+#SET(%CreateChekGrant                     , %FALSE)
+#SET(%CreateNameGrant                     , %DictName & '_' & %BaseName & '_07_Create_Grant.SQL')
+#SET(%CreateNameGrantOut                  , %DictPath & %CreateNameGrant)
+#!----------------------------------------------------------------------------- (11-30)
+#SET(%CreateChekTrigger                   , %FALSE)
+#SET(%CreateNameTrigger                   , %DictName & '_' & %BaseName & '_11_Create_Trigger.SQL')
+#SET(%CreateNameTriggerOut                , %DictPath & %CreateNameTrigger)
+#!-----------------------------------------------------------------------------
+#!----------------------------------------------------------------------------- (21-30)
+#SET(%DropItChekTable                     , %FALSE)
+#SET(%DropItNameTable                     , %DictName & '_' & %BaseName & '_21_Drop_Table.SQL')
+#SET(%DropItNameTableOut                  , %DictPath & %DropItNameTable)
+#SET(%DropItChekSequence                  , %FALSE)
+#SET(%DropItNameSequence                  , %DictName & '_' & %BaseName & '_22_Drop_Sequence.SQL')
+#SET(%DropItNameSequenceOut               , %DictPath & %DropItNameSequence)
+#SET(%DropItChekKeyPrimary                , %FALSE)
+#SET(%DropItNameKeyPrimary                , %DictName & '_' & %BaseName & '_23_Drop_Key_Primary.SQL')
+#SET(%DropItNameKeyPrimaryOut             , %DictPath & %DropItNameKeyPrimary)
+#SET(%DropItChekIndexUnique               , %FALSE)
+#SET(%DropItNameIndexUnique               , %DictName & '_' & %BaseName & '_24_Drop_Index_Unique.SQL')
+#SET(%DropItNameIndexUniqueOut            , %DictPath & %DropItNameIndexUnique)
+#SET(%DropItChekIndexNotUnique            , %FALSE)
+#SET(%DropItNameIndexNotUnique            , %DictName & '_' & %BaseName & '_25_Drop_Index_Not_Unique.SQL')
+#SET(%DropItNameIndexNotUniqueOut         , %DictPath & %DropItNameIndexNotUnique)
+#SET(%DropItChekRelation                  , %FALSE)
+#SET(%DropItNameRelation                  , %DictName & '_' & %BaseName & '_26_Drop_Relation.SQL')
+#SET(%DropItNameRelationOut               , %DictPath & %DropItNameRelation)
+#SET(%DropItChekGrant                     , %FALSE)
+#SET(%DropItNameGrant                     , %DictName & '_' & %BaseName & '_27_Drop_Grant.SQL')
+#SET(%DropItNameGrantOut                  , %DictPath & %DropItNameGrant)
+#!----------------------------------------------------------------------------- (31-40)
+#SET(%DropItChekTrigger                   , %FALSE)
+#SET(%DropItNameTrigger                   , %DictName & '_' & %BaseName & '_31_Drop_Trigger.SQL')
+#SET(%DropItNameTriggerOut                , %DictPath & %DropItNameTrigger)
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#! RA.2019.08.11: Individual OTHER tab utilities
+#!----------------------------------------------------------------------------- (81-99)
+#SET(%BuildChekIndexGUID                  , %FALSE)
+#SET(%BuildNameIndexGUID                  , %DictName & '_' & %BaseName & '_81_Build_Index_GUID.SQL')
+#SET(%BuildNameIndexOutGUID               , %DictPath & %BuildNameIndexGUID)
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#SET(%CreateChekCombined                  , %FALSE)
+#SET(%CreateNameCombined                  , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameCombinedOut               , %DictPath & %CreateNameCombined)
+#!-----------------------------------------------------------------------------
+#SET(%DropItChekCombined                  , %FALSE)
+#SET(%DropItNameCombined                  , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameCombinedOut               , %DictPath & %DropItNameCombined)
+#!-----------------------------------------------------------------------------
+#SET(%BuildsChekCombined                  , %FALSE)
+#SET(%BuildsNameCombined                  , %DictName & '_' & %BaseName & '_98_Build_Combined.SQL')
+#SET(%BuildsNameCombinedOut               , %DictPath & %BuildsNameCombined)
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#GROUP(%FileNamesAreOne)
+#!-----------------------------------------------------------------------------
+#PREPARE
+#!-----------------------------------------------------------------------------
+#SET(%Comments                            , %FALSE)                             #! RA.2019.08.14: Combined is better without comments
+#SET(%CreateChekTable                     , %FALSE)
+#SET(%CreateNameTable                     , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameTableOut                  , %DictPath & %CreateNameTable)
+#SET(%CreateChekSequence                  , %FALSE)
+#SET(%CreateNameSequence                  , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameSequenceOut               , %DictPath & %CreateNameSequence)
+#SET(%CreateChekKeyPrimary                , %FALSE)
+#SET(%CreateNameKeyPrimary                , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameKeyPrimaryOut             , %DictPath & %CreateNameKeyPrimary)
+#SET(%CreateChekIndexUnique               , %FALSE)
+#SET(%CreateNameIndexUnique               , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameIndexUniqueOut            , %DictPath & %CreateNameIndexUnique)
+#SET(%CreateChekIndexNotUnique            , %FALSE)
+#SET(%CreateNameIndexNotUnique            , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameIndexNotUniqueOut         , %DictPath & %CreateNameIndexNotUnique)
+#SET(%CreateChekRelation                  , %FALSE)
+#SET(%CreateNameRelation                  , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameRelationOut               , %DictPath & %CreateNameRelation)
+#SET(%CreateChekGrant                     , %FALSE)
+#SET(%CreateNameGrant                     , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameGrantOut                  , %DictPath & %CreateNameGrant)
+#!----------------------------------------------------------------------------- (11-30)
+#SET(%CreateChekTrigger                   , %FALSE)
+#SET(%CreateNameTrigger                   , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameTriggerOut                , %DictPath & %CreateNameTrigger)
+#!-----------------------------------------------------------------------------
+#!----------------------------------------------------------------------------- (21-30)
+#SET(%DropItChekTable                     , %FALSE)
+#SET(%DropItNameTable                     , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameTableOut                  , %DictPath & %DropItNameTable)
+#SET(%DropItChekSequence                  , %FALSE)
+#SET(%DropItNameSequence                  , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameSequenceOut               , %DictPath & %DropItNameSequence)
+#SET(%DropItChekKeyPrimary                , %FALSE)
+#SET(%DropItNameKeyPrimary                , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameKeyPrimaryOut             , %DictPath & %DropItNameKeyPrimary)
+#SET(%DropItChekIndexUnique               , %FALSE)
+#SET(%DropItNameIndexUnique               , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameIndexUniqueOut            , %DictPath & %DropItNameIndexUnique)
+#SET(%DropItChekIndexNotUnique            , %FALSE)
+#SET(%DropItNameIndexNotUnique            , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameIndexNotUniqueOut         , %DictPath & %DropItNameIndexNotUnique)
+#SET(%DropItChekRelation                  , %FALSE)
+#SET(%DropItNameRelation                  , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameRelationOut               , %DictPath & %DropItNameRelation)
+#SET(%DropItChekGrant                     , %FALSE)
+#SET(%DropItNameGrant                     , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameGrantOut                  , %DictPath & %DropItNameGrant)
+#!----------------------------------------------------------------------------- (31-40)
+#SET(%DropItChekTrigger                   , %FALSE)
+#SET(%DropItNameTrigger                   , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameTriggerOut                , %DictPath & %DropItNameTrigger)
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#! RA.2019.08.11: Individual OTHER tab utilities
+#!----------------------------------------------------------------------------- (81-99)
+#SET(%BuildChekIndexGUID                  , %FALSE)
+#SET(%BuildNameIndexGUID                  , %DictName & '_' & %BaseName & '_98_Build_Combined.SQL')
+#SET(%BuildNameIndexOutGUID               , %DictPath & %BuildNameIndexGUID)
+#!-----------------------------------------------------------------------------
+#ENDPREPARE
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#GROUP(%FileNamesAreCombined)                                                    #! RA.2019.08.14: Making it real
+#!-----------------------------------------------------------------------------
+#PREPARE
+#!-----------------------------------------------------------------------------
+#SET(%CreateChekCombined                  , %FALSE)
+#SET(%CreateNameCombined                  , %DictName & '_' & %BaseName & '_96_Create_Combined.SQL')
+#SET(%CreateNameCombinedOut               , %DictPath & %CreateNameCombined)
+#!-----------------------------------------------------------------------------
+#SET(%DropItChekCombined                  , %FALSE)
+#SET(%DropItNameCombined                  , %DictName & '_' & %BaseName & '_97_Drop_Combined.SQL')
+#SET(%DropItNameCombinedOut               , %DictPath & %DropItNameCombined)
+#!-----------------------------------------------------------------------------
+#SET(%BuildsChekCombined                  , %FALSE)
+#SET(%BuildsNameCombined                  , %DictName & '_' & %BaseName & '_98_Build_Combined.SQL')
+#SET(%BuildsNameCombinedOut               , %DictPath & %BuildsNameCombined)
+#!-----------------------------------------------------------------------------
+#ENDPREPARE
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#! RA.2019.09.14: WTH!!! There is a bug here that is not setting the FLAGS for
+#! %CreateCheckCombined -AND- %DroItCheckCombined. Or something is setting these flags to zero.
+#! OR there is a scope bug somewhere [???]. I am missing somethings obvious somewhere.
+#! OUCH! Do not use #PREPARE/#ENDPREPARE if you DO NOT define variables [???]
+#GROUP(%CombinedCheckAndSetGenerateFlags)
+#!PREPARE
+#SET  (%CreateChekCombined                , %FALSE)
+#IF   (%CreateChekTable = %TRUE)
+  #!ERROR('CreateChekTable=[ ' & %CreateChekTable & ' ]')
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekSequence)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekKeyPrimary)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekIndexUnique)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekIndexNotUnique)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekRelation)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekGrant)
+  #SET(%CreateChekCombined                , %TRUE)
+#ELSIF(%CreateChekTrigger)
+  #SET(%CreateChekCombined                , %TRUE)
+#ENDIF
+#!ERROR('CreateChekCombined=[ ' & %CreateChekCombined & ' ]')
+#!
+#SET  (%DropItChekCombined                , %FALSE)
+#IF   (%DropItChekTable)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekSequence)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekKeyPrimary)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekIndexUnique)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekIndexNotUnique)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekRelation)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekGrant)
+  #SET(%DropItChekCombined                , %TRUE)
+#ELSIF(%DropItChekTrigger)
+  #SET(%DropItChekCombined                , %TRUE)
+#ENDIF
+#!ENDPREPARE
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#GROUP(%GetDictionaryPath)                                                      #! Get dictionary path and names
+#PREPARE
+#SET(%nLoc1,INSTRING('\',%DictionaryFile,1,1))
+#LOOP,WHILE(%nLoc1)
+  #SET(%nLoc2,%nLoc1)
+  #SET(%nLoc1,INSTRING('\',%DictionaryFile,1,%nLoc1+1))
+#ENDLOOP
+#SET(%DictName,UPPER(SUB(%DictionaryFile,%nLoc2+1,LEN(%DictionaryFile)-%nLoc2-4)))
+#SET(%DictPath,UPPER(SUB(%DictionaryFile,1,%nLoc2)))
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%DatabaseNamesSetup)
+#PREPARE
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! Variable options are all defined here. Different backends use different options.
+#! The internal names and GROUP's will make for one variable and the code in one place.
+#!---------------------------------------------------------------------
+#GROUP(%VariablesOptions)
+#PREPARE
+#!---------------------------------------------------------------------         #! RA.2019.07.19: Generate GUID support
+#DECLARE(%optEnableGenerateGUID           ,LONG)
+#SET(%optEnableGenerateGUID               ,FALSE)
+#DECLARE(%optGenerateGUID                 ,LONG)
+#SET(%optGenerateGUID                     ,FALSE)
+#!---------------------------------------------------------------------         #! RA.2019.07.19: Generate GUID support
+#CASE(%BaseName)
+#OF  ('POSTGRESQL')
+#OROF('MYSQL')
+  #SET(%optEnableGenerateGUID             ,TRUE)
+#OF  ('METABASE')
+#OROF('MIMER')
+#OROF('MSSQL')
+#OROF('SQLANYWHERE')
+#OROF('MYSQL')
+#OROF('ORACLE')
+#OROF('DB2')
+#ENDCASE
+#!---------------------------------------------------------------------
+#DECLARE(%optDefineNamesEnable            ,LONG)                                #! RA.2018.04.20: Added
+#SET(%optDefineNamesEnable                ,TRUE)
+#DECLARE(%optDefineNames                  ,STRING)                              #! OPTION: Table Names | File Names
+#SET(%optDefineNames                      ,'Table Names')
+#!---------------------------------------------------------------------
+#! RA.2018.09.03: We align the table DDL statements to allow verification by sight to be made easier.                
+#DECLARE(%optDoSpaceAlign                 ,LONG)                                #! RA.2018.09.03 - Align table DDL statements
+#SET(%optDoSpaceAlign                     ,TRUE)   
+#DECLARE(%optUnderReservedWords           ,LONG)                                #! Underscore RESERVED words
+#SET(%optUnderReservedWords               ,FALSE)
+#!---------------------------------------------------------------------
+#DECLARE(%optGenIntlString                ,LONG)                                #! Generate INTERNATIONAL strings
+#SET(%optGenIntlString                    ,FALSE)
+#DECLARE(%optGenNotNullKeys               ,LONG)                                #! Generate NOT NULL for all key fields
+#SET(%optGenNotNullKeys                   ,FALSE)
+#DECLARE(%optGenClobFields                ,LONG)                                #! Generate BLOB -> CLOB fields
+#SET(%optGenClobFields                    ,FALSE)
+#!---------------------------------------------------------------------
+#DECLARE(%optNoArrayOver                  ,LONG)                                #! DCT: No ARRAYS over FIELDS
+#SET(%optNoArrayOver                      ,FALSE)
+#!---------------------------------------------------------------------
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.04: This #INSERT has to be inside a #PREPARE/#ENPREPARE pair.
+#! RA.2019.08.04: We need to filter these before presenting for selections.
+#! FOR NOW: We are going copy the filter code and take the other code out later.
+#! After you start adding aliases and vendor tools/utilities it gets messy.
+#! RA.2019.07.04: Added option to select files to do SQL generation.
+#! You can select one or more files now. Or do the whole dictionary.
+#GROUP(%SelectQualified)
+#SET(%optUseAllFiles                      ,TRUE)                                #! RA.2019.07.04: Select all files
+#FREE(%optFileSelection)                                                        #! RA.2019.07.04: File selection
+#FREE(%NFilesSort)                                                              #! Name order for files
+#FOR(%File)                                                                     #! Read all the files
+  #!----------------------------------!
+  #! Ignore certain file DRIVER types !
+  #!----------------------------------!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('MEMORY')                                                              #! RA.2018.04.12 - Ignored
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [DRIVER type %FileDriver]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!---------------------------!
+  #! Ignore certain FILE types !
+  #!---------------------------!
+  #CASE(%FileType)
+  #OF  ('VIEW')
+  #OROF('ALIAS')
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE type %FileType]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!-------------------------------------!
+  #! Ignore FILES with NO FIELDS in them !
+  #!-------------------------------------!
+  #IF(NOT ITEMS(%Field))                                                        #! RA.2001.12.01
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [No fields]
+    #ENDIF
+    #CYCLE                                                                      #! RA.2001.12.01
+  #ENDIF                                                                        #! RA.2001.12.01
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFileOptions)
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE options say NO]
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!---------------------------!
+  #! We pass FILE requirements !
+  #!---------------------------!
+  #ADD(%NFilesSort,%File)                                                       #! Name sort them by
+#ENDFOR                                                                         #! processing them all
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.04: This #INSERT has to be inside a #PREPARE/#ENPREPARE pair.
+#! RA.2019.08.04: NOTE: There DOES NOT SEEM to be a way to add an option to
+#! an ALIAS table. So adding a RASQL(NO) option seems out of the question.
+#GROUP(%SelectQualifiedWithAlias)
+#SET(%optUseAllFiles                      ,TRUE)                                #! RA.2019.07.04: Select all files
+#FREE(%optFileSelection)                                                        #! RA.2019.07.04: File selection
+#FREE(%NFilesSort)                                                              #! Name order for files
+#FOR(%File)                                                                     #! Read all the files
+  #!----------------------------------!
+  #! Ignore certain file DRIVER types !
+  #!----------------------------------!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('MEMORY')                                                              #! RA.2018.04.12 - Ignored
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [DRIVER type %FileDriver]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!---------------------------!
+  #! Ignore certain FILE types !
+  #!---------------------------!
+  #CASE(%FileType)
+  #OF  ('VIEW')
+  #!OROF('ALIAS')                                                               #! RA.2019.08.04: NEED ALIAS HERE!
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE type %FileType]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!-------------------------------------!
+  #! Ignore FILES with NO FIELDS in them !
+  #!-------------------------------------!
+  #IF(NOT ITEMS(%Field))                                                        #! RA.2001.12.01
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [No fields]
+    #ENDIF
+    #CYCLE                                                                      #! RA.2001.12.01
+  #ENDIF                                                                        #! RA.2001.12.01
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFileOptions)
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE options say NO]
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!---------------------------!
+  #! We pass FILE requirements !
+  #!---------------------------!
+  #ADD(%NFilesSort,%File)                                                       #! Name sort them by
+#ENDFOR                                                                         #! processing them all
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.04: This #INSERT has to be inside a #PREPARE/#ENPREPARE pair.
+#GROUP(%SelectEverything)
+#SET(%optUseAllFiles                      ,TRUE)                                #! RA.2019.07.04: Select all files
+#FREE(%optFileSelection)                                                        #! RA.2019.07.04: File selection
+#FREE(%NFilesSort)                                                              #! Name order for files
+#FOR(%File)                                                                     #! Read all the files
+  #!----------------------------------!
+  #! Ignore certain file DRIVER types !
+  #!----------------------------------!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('MEMORY')                                                              #! RA.2018.04.12 - Ignored
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [DRIVER type %FileDriver]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!-------------------------------------!
+  #! Ignore FILES with NO FIELDS in them !
+  #!-------------------------------------!
+  #IF(NOT ITEMS(%Field))                                                        #! RA.2001.12.01
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [No fields]
+    #ENDIF
+    #CYCLE                                                                      #! RA.2001.12.01
+  #ENDIF                                                                        #! RA.2001.12.01
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFileOptions)
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE options say NO]
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!---------------------------!
+  #! We pass FILE requirements !
+  #!---------------------------!
+  #ADD(%NFilesSort,%File)                                                       #! Name sort them by
+#ENDFOR                                                                         #! processing them all
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%CombinedGenerate,%pBaseName)                                            #! RA.2019.09.14: Added
+#!---------------------------------------------------------------------
+#INSERT(%ReserveWordBuild)                                                      #! Reserved Words
+#INSERT(%BuildQualifiedFiles)                                                   #! List of QUALIFIED tables
+#INSERT(%BuildFieldsNOTNULL)                                                    #! Fields that are NOT NULL
+#!---------------------------------------------------------------------
+#CALL(%FileNamesAreCombined)                                                    #! RA.2019.08.14: Making it real
+#CALL(%CombinedCheckAndSetGenerateFlags)
+#!---------------------------------------------------------------------
+#CALL(%CombinedCreatePrefix                                 ,%pBaseName)
+#IF(%FALSE)                                                                      #! RA.2019.09.14: Find the BUG ???
+---- %%TRUE=%TRUE
+---- %%CreateChekTable=%CreateChekTable
+---- %%CreateChekSequence=%CreateChekSequence
+---- %%CreateChekKeyPrimary=%CreateChekKeyPrimary
+---- %%CreateChekIndexUnique=%CreateChekIndexUnique
+---- %%CreateChekIndexNotUnique=%CreateChekIndexNotUnique
+---- %%CreateChekRelation=%CreateChekRelation
+---- %%CreateChekGrant=%CreateChekGrant
+---- %%CreateChekTrigger=%CreateChekTrigger
+----
+---- %%CreateChekCombined=%CreateChekCombined
+
+#ENDIF
+#CALL(%CombinedCreateGenerate                               ,%pBaseName)
+#CALL(%CombinedCreateSuffix                                 ,%pBaseName)
+#!---------------------------------------------------------------------
+#CALL(%CombinedDropItPrefix                                 ,%pBaseName)
+#IF(%FALSE)                                                                      #! RA.2019.09.14: Find the BUG ???
+---- %%FALSE=%FALSE
+---- %%DropItChekTable=%DropItChekTable
+---- %%DropItChekSequence=%DropItChekSequence
+---- %%DropItChekKeyPrimary=%DropItChekKeyPrimary
+---- %%DropItChekIndexUnique=%DropItChekIndexUnique
+---- %%DropItChekIndexNotUnique=%DropItChekIndexNotUnique
+---- %%DropItChekRelation=%DropItChekRelation
+---- %%DropItChekGrant=%DropItChekGrant
+---- %%DropItChekTrigger=%DropItChekTrigger
+----
+---- %%DropItChekCombined=%DropItChekCombined
+
+#ENDIF
+#CALL(%CombinedDropItGenerate                               ,%pBaseName)
+#CALL(%CombinedDropItSuffix                                 ,%pBaseName)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2018.08.14 - While Mr. Michael Gorman's idea is very usefull for mass conversions
+#! there is also a requirement for one table creation at a time. This happens when you
+#! are incrementing the capabilities in an existing backend database or when you are
+#! developing (re-implementing) and existing database that no longer is as productive.
+#! When doing a MASS developing (re-implementation) it is prudent to test out what you are
+#! doing, before applying the process to a large backend. And the table, indexes, relations
+#! are the simple things. The time comsuming dificult things are going to be the backend
+#! scripting (triggers, views, etc.) with all the unique items for each backend.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%CombinedCreateGenerate,%pBaseName)                                      #! Combined create generate script
+#IF(%CreateChekTable)
+  #CALL(%ProcessTableCreate                                 ,%pBaseName)
+#ENDIF
+#IF(%CreateChekSequence)
+  #CALL(%ProcessSequenceCreate                              ,%pBaseName)
+#ENDIF
+#IF(%CreateChekKeyPrimary)
+  #CALL(%ProcessPrimaryCreate                               ,%pBaseName)
+#ENDIF
+#IF(%CreateChekIndexUnique)
+  #CALL(%ProcessIndexUniqueCreate                           ,%pBaseName)
+#ENDIF
+#IF(%CreateChekIndexNotUnique)
+  #CALL(%ProcessIndexNonUniqueCreate                        ,%pBaseName)
+#ENDIF
+#IF(%CreateChekRelation)
+  #CALL(%ProcessRelationCreate                              ,%pBaseName)
+#ENDIF
+#IF(%CreateChekGrant)
+  #CALL(%ProcessGrantCreate                                 ,%pBaseName)
+#ENDIF
+#IF(%CreateChekTrigger)
+  #CALL(%ProcessTriggerCreate                               ,%pBaseName)        #! RA.????.??.??: Tested
+#ENDIF
+#!
+#GROUP(%CombinedDropItGenerate,%pBaseName)                                      #! Combined dropit generate script
+#IF(%DropItChekTrigger)
+  #CALL(%ProcessTriggerDropIt                               ,%pBaseName)        #! RA.????.??.??: Tested
+#ENDIF
+#IF(%DropItChekGrant)
+  #CALL(%ProcessGrantDropIt                                 ,%pBaseName)
+#ENDIF
+#IF(%DropItChekRelation)
+  #CALL(%ProcessRelationDropIt                              ,%pBaseName)
+#ENDIF
+#IF(%DropItChekIndexNotUnique)
+  #CALL(%ProcessIndexNonUniqueDropIt                        ,%pBaseName)
+#ENDIF
+#IF(%DropItChekIndexUnique)
+  #CALL(%ProcessIndexUniqueDropIt                           ,%pBaseName)
+#ENDIF
+#IF(%DropItChekKeyPrimary)
+  #CALL(%ProcessPrimaryDropIt                               ,%pBaseName)
+#ENDIF
+#IF(%DropItChekSequence)
+  #CALL(%ProcessSequenceDropIt                              ,%pBaseName)
+#ENDIF
+#IF(%DropItChekTable)
+  #CALL(%ProcessTableDropIt                                 ,%pBaseName)
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

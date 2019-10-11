@@ -1,0 +1,678 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_UTL001.tpw
+#! Purpose:     UTILITY: Give table data load order
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2018.07.07   Roberto Artigas
+#!  *   Template utility creation.
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2UTL001)
+#TAB('UTIL_DLO'),PROP(PROP:FontStyle,700)
+#INSERT(%MITLicense)
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#UTILITY(D2M2_UTIL_DLO, '2019.07.07: [UTIL] Verify Data Load Order')
+#!-----------------------------------------------------------------------------
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#INSERT(%PreambleUtility)                                                       #! Basic copyright message
+#INSERT(%VariablesUtility001)                                                   #! RA.2019.07.07.SUN: Added 
+#!---------------------------------------------------------------------
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%ShowExplainUtilDLO)
+  #INSERT(%MITLicenseD2M2UTL001)
+  #INSERT(%MetabaseTabSelection)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#SET(%UtilityChekTable                    , %TRUE)
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseName & '_LOAD_DATA_ORDER.TXT')
+#SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
+#!
+#CALL(%UtilityPrefix                      , %BaseName)
+#CALL(%BuildSetOrderFiles001)
+#CALL(%ParChiRawDataCounts001)
+#CALL(%BuildConsolidatedFiles001)
+#CALL(%ParChiConsolidateCounts001)
+#CALL(%SortCompleteFiles001)
+#!
+#IF(%TRUE)
+#DECLARE(%AuditLines)
+#SET(%AuditLines, 0)
+-- BEGIN -- %[1]NULL SEQ %[1]NULL (PAR ) %[0]NULL (CHI ) %[0]NULL CHI PAR  FILENAME %[093]NULL PREFIX %[2]NULL FULLPATH
+--
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+-- PROCESSED: %@N04@(%CFilesCount) %[0]NULL (%[4]CFilesParCount) %[0]NULL (%[4]CFilesChiCount) %[0]NULL %[110]CFilesSortText %[0]NULL %[8]FilePrefix %[0]NULL %CFilesFullPath
+    #SET(%AuditLines, %AuditLines + 1)
+    #IF(%AuditLines % 20 = 0)
+--
+-- %[10]NULL SEQ %[1]NULL (PAR ) %[0]NULL (CHI ) %[0]NULL CHI PAR  FILENAME %[093]NULL PREFIX %[2]NULL FULLPATH
+==
+    #ENDIF
+  #ENDFOR
+--    
+-- ENDED -- %[1]NULL SEQ %[1]NULL (PAR ) %[0]NULL (CHI ) %[0]NULL CHI PAR  FILENAME %[093]NULL PREFIX %[2]NULL FULLPATH
+#ENDIF
+#!
+#IF(%TRUE)
+#DECLARE(%DefaultLines)
+#SET(%DefaultLines, 0)
+
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+#INSERT(%GenerateInsertSQL                , %BaseName)
+    #SET(%DefaultLines, %DefaultLines + 1)
+    #IF(%DefaultLines % 20 = 0)
+-- @N04@(%DefaultLines)      
+    #ENDIF
+  #ENDFOR  
+
+#ENDIF
+#!
+#CALL(%UtilitySuffix                      , %BaseName)
+#!
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilDLO)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextDLO))
+    #DECLARE(%ExplainTextDLO)
+  #ENDIF
+  #SET(%ExplainTextDLO, '')
+  #!SET(%ExplainTextDLO, %ExplainTextDLO & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'This generic utility will list the tables in the order to add the default data')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' so you do not have any constraint errors.')
+   #!SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #!SET(%ExplainTextDLO, %ExplainTextDLO & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilDLO)
+#INSERT(%ExplainUtilDLO)
+#TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Instructions'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextDLO),AT(,,436,144)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! BUILD SET ORDER FILES
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%BuildSetOrderFiles001)
+#FREE(%NFilesSort)                                                              #! Name order for files
+#!
+#!#FOR(%File)                                                                   #! Read all the files
+#!  #ADD(%NFilesSort,%File)                                                     #! Name sort them by
+#!#ENDFOR                                                                       #! processing them all
+#!
+#! RA.2019.07.04: Added option to select files to do SQL generation.
+#IF (%optUseAllFiles)
+  #FOR (%File)
+    #ADD (%NFilesSort, %File)
+  #ENDFOR
+#ELSE
+  #FOR (%optFileSelection)
+    #ADD (%NFilesSort, %optFileSelection)
+  #ENDFOR
+#ENDIF
+#!
+#FREE(%NFiles)                                                                  #! Valid file items here
+#FOR(%NFilesSort)                                                               #! VALID FILE: FOR
+  #FIX(%File,%NFilesSort)
+  #!
+  #IF(INSTRING('DB002:',UPPER(%FileName),1,1))
+    #CYCLE
+  #ENDIF
+  #IF(INSTRING('DB003:',UPPER(%FileName),1,1))
+    #CYCLE
+  #ENDIF
+  #!
+  #!----------------------------------!
+  #! Ignore certain file DRIVER types !
+  #!----------------------------------!
+  #CASE(%FileDriver)
+    #OF('ASCII')
+  #OROF('BASIC')
+  #OROF('DOS')
+  #OROF('MEMORY')                                                               #! RA.2018.04.12 - Ignored
+  #! RA.2019.07.07: IF I do NOT ignore the ALIAS below, THEN you will need to do an additional check
+  #!                to see if the alias'ed file contains the RASQL(NO). Just ignore topspeed files for now.
+  #!                Evertyhing should be an ODBC driver in what I am TESTING in this dictionary.
+  #OROF('TOPSPEED')                                                             #! RA.2019.07.07 - Ignored
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [DRIVER type %FileDriver]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!---------------------------!
+  #! Ignore certain FILE types !
+  #!---------------------------!
+  #CASE(%FileType)
+  #OF  ('VIEW')
+  #!OROF('ALIAS')
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE type %FileType]
+    #ENDIF
+    #CYCLE
+  #ENDCASE
+  #!-------------------------------------!
+  #! Ignore FILES with NO FIELDS in them !
+  #!-------------------------------------!
+  #IF(NOT ITEMS(%Field))                                                        #! RA.2001.12.01
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [No fields]
+    #ENDIF
+    #CYCLE                                                                      #! RA.2001.12.01
+  #ENDIF                                                                        #! RA.2001.12.01
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFileOptions)
+  #!-------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a file is processed. !
+  #!-------------------------------------------------------------!
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+    #IF(%TraceDetail)
+---- IGNORED: "%File" [FILE options say NO]
+    #ENDIF
+    #CYCLE
+  #ENDIF
+  #!---------------------------!
+  #! We pass FILE requirements !
+  #!---------------------------!
+  #ADD(%SFiles,ITEMS(%SFiles) + 1)                                              #! This FILE is processed
+  #SET(%SFilesCount         ,ITEMS(%SFiles))                                    #! Table ID number
+  #SET(%SFilesName          ,%File)                                             #! Table Name
+  #SET(%SFilesFullPath      ,%FileName)                                         #! Table Full Path Name
+  #CALL(%ReplaceSubString,%SFilesFullPath,'''','')
+  #SET(%SFilesParCount      ,0)                                                 #! Parent count
+  #SET(%SFilesChiCount      ,0)                                                 #! Child Count
+  #SET(%SFilesAlias         ,'')                                                #! Alias Name
+#!
+  #IF(%FileType='ALIAS')
+    #SET(%SFilesAlias       ,%AliasFile)                                        #! Alias Name    
+  #ENDIF
+#!
+#!
+#ENDFOR                                                                         #! VALID FILE: #ENDFOR
+#IF(%FALSE)
+
+---- Processed Files ---- BEGIN
+  #FOR(%SFiles)
+    #FIX(%File, %SFilesName)
+---- PROCESSED: %[3]SFilesCount %[50]SFilesName %[50]SFilesAlias (%[4]SFilesParCount) (%[4]SFilesChiCount) [%[6]FilePrefix] %[10]FileDriver "%SFilesFullPath"
+  #ENDFOR
+---- Processed Files ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------         #! RA.2019.07.07.SUN: Added
+#GROUP(%VariablesUtility001)
+#PREPARE
+#DECLARE(%SFiles),MULTI                             #!,UNIQUE
+#DECLARE(%SFilesCount       ,%SFiles)               #! ID: Table Count
+#DECLARE(%SFilesName        ,%SFiles)               #! Table Name
+#DECLARE(%SFilesFullPath    ,%SFiles)               #! Table Full Path Name
+#DECLARE(%SFilesParCount    ,%SFiles)               #! Parent count
+#DECLARE(%SFilesChiCount    ,%SFiles)               #! Child Count
+#DECLARE(%SFilesAlias       ,%SFiles)               #! Alias Name
+#!DECLARE(%SFilesParFmId     ,%SFiles)               #! From Id (Parent)
+#!DECLARE(%SFilesParFmName   ,%SFiles)               #! From Name (Parent)
+#!DECLARE(%SFilesChiToId     ,%SFiles)               #! To Id (Child)
+#!DECLARE(%SFilesChiToName   ,%SFiles)               #! To Name (Child)
+#!
+#DECLARE(%CFiles),MULTI                             #!,UNIQUE
+#DECLARE(%CFilesCount       ,%CFiles)               #! ID: Table Count
+#DECLARE(%CFilesName        ,%CFiles)               #! Table Name
+#DECLARE(%CFilesFullPath    ,%CFiles)               #! Table Full Path Name
+#DECLARE(%CFilesParCount    ,%CFiles)               #! Parent count
+#DECLARE(%CFilesChiCount    ,%CFiles)               #! Child Count
+#DECLARE(%CFilesSort        ,%CFiles)               #! Calculated sort
+#DECLARE(%CFilesSortText    ,%CFiles)               #! Calculated sort text
+#!
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#GROUP(%ParChiRawDataCounts001)
+#FOR(%SFiles)
+  #FIX(%File, %SFilesName)
+  #FOR(%Relation)
+#!-- %File %FileRelationType %Relation
+    #IF(%FileRelationType = '1:MANY')
+      #SET(%SFilesParCount, %SFilesParCount + 1)
+    #ELSE
+      #SET(%SFilesChiCount, %SFilesChiCount + 1)
+    #ENDIF
+  #ENDFOR
+#ENDFOR
+#!
+#IF(%FALSE)
+
+---- Relations Counted ---- BEGIN
+  #FOR(%SFiles)
+    #FIX(%File, %SFilesName)
+---- PROCESSED: %[3]SFilesCount %[50]SFilesName %[50]SFilesAlias (%[4]SFilesParCount) (%[4]SFilesChiCount) [%[6]FilePrefix] %[10]FileDriver "%SFilesFullPath"
+  #ENDFOR
+---- Relations Counted ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%BuildConsolidatedFiles001)
+#FOR(%SFiles)
+  #FIX(%File, %SFilesName)
+  #IF(%FileType='ALIAS')
+    #CYCLE
+  #ENDIF
+  #ADD(%CFiles,ITEMS(%CFiles) + 1)                                              #! This FILE is processed
+  #SET(%CFilesCount         ,ITEMS(%CFiles))                                    #! Table ID number
+  #SET(%CFilesName          ,%File)                                             #! Table Name
+  #SET(%CFilesFullPath      ,%FileName)                                         #! Table Full Path Name
+  #CALL(%ReplaceSubString,%CFilesFullPath,'''','')
+  #SET(%CFilesParCount      ,0)                                                 #! Parent count
+  #SET(%CFilesChiCount      ,0)                                                 #! Child Count
+  #SET(%CFilesSort          ,0)                                                 #! Calculated sort
+  #SET(%CFilesSortText      ,FORMAT(%CFilesSort,@N08) & ' ' & %CFilesName)      #! Calculated sort text
+#ENDFOR
+#IF(%FALSE)
+
+---- Build Consolidated ---- BEGIN
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+---- PROCESSED: %@N03@(%CFilesCount) %[50]CFilesName %@N03@(%CFilesCount) (%[4]CFilesParCount) (%[4]CFilesChiCount) %@N08@(%CFilesSort) %[60]CFilesSortText [%[6]FilePrefix] "%CFilesFullPath"
+  #ENDFOR
+---- Build Consolidated ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%ParChiConsolidateCounts001)
+#DECLARE(%WFilesParCount)                           #! Parent count
+#DECLARE(%WFilesChiCount)                           #! Child Count
+#FOR(%SFiles)
+  #FIX(%File, %SFilesName)
+  #SET(%WFilesParCount      ,%SFilesParCount)
+  #SET(%WFilesChiCount      ,%SFilesChiCount)
+  #IF(%FileType='ALIAS')
+    #FIX(%File, %SFilesAlias)
+  #ENDIF
+  #FOR(%CFiles)
+    #IF(%File = %CFilesName)
+      #SET(%CFilesParCount      ,%CFilesParCount + %WFilesParCount)
+      #SET(%CFilesChiCount      ,%CFilesChiCount + %WFilesChiCount)
+      #SET(%CFilesSort          ,(%CFilesChiCount * 10000) + %CFilesParCount)
+      #SET(%CFilesSortText      ,FORMAT(%CFilesSort,@N08) & ' ' & %CFilesName)
+      #BREAK
+    #ENDIF
+  #ENDFOR
+#ENDFOR
+#!
+#IF(%FALSE)
+
+---- Consolidate Counts ---- BEGIN
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+---- PROCESSED: %@N03@(%CFilesCount) %[50]CFilesName %@N03@(%CFilesCount) (%[4]CFilesParCount) (%[4]CFilesChiCount) %@N08@(%CFilesSort) %[60]CFilesSortText [%[6]FilePrefix] "%CFilesFullPath"
+  #ENDFOR
+---- Consolidate Counts ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------
+#GROUP(%SortCompleteFiles001)
+#!
+#EQUATE (%DoSort,1)
+#EQUATE (%I,0)
+#!
+#EQUATE (%w1CFilesCount           ,'')                    #! ID: Table Count
+#EQUATE (%w1CFilesName            ,'')                    #! Table Name
+#EQUATE (%w1CFilesFullPath        ,'')                    #! Table Full Path Name
+#EQUATE (%w1CFilesParCount        ,'')                    #! Parent count
+#EQUATE (%w1CFilesChiCount        ,'')                    #! Child Count
+#EQUATE (%w1CFilesSort            ,'')                    #! Calculated sort
+#EQUATE (%w1CFilesSortText        ,'')                    #! Calculated sort text
+#!
+#EQUATE (%w2CFilesCount           ,'')                    #! ID: Table Count
+#EQUATE (%w2CFilesName            ,'')                    #! Table Name
+#EQUATE (%w2CFilesFullPath        ,'')                    #! Table Full Path Name
+#EQUATE (%w2CFilesParCount        ,'')                    #! Parent count
+#EQUATE (%w2CFilesChiCount        ,'')                    #! Child Count
+#EQUATE (%w2CFilesSort            ,'')                    #! Calculated sort
+#EQUATE (%w2CFilesSortText        ,'')                    #! Calculated sort text
+#!
+#LOOP,WHILE(%DoSort)
+  #SET(%DoSort,0)
+  #LOOP,FOR(%I,2,ITEMS(%CFiles))
+    #SELECT(%CFiles,%I-1)
+#!
+#!  #SET(%CFilesCount             ,%CFilesCount       )   #! ID: Table Count
+#!  #SET(%CFilesName              ,%CFilesName        )   #! Table Name
+#!  #SET(%CFilesFullPath          ,%CFilesFullPath    )   #! Table Full Path Name
+#!  #SET(%CFilesParCount          ,%CFilesParCount    )   #! Parent count
+#!  #SET(%CFilesChiCount          ,%CFilesChiCount    )   #! Child Count
+#!  #SET(%CFilesSort              ,%CFilesSort        )   #! Calculated sort
+#!  #SET(%CFilesSortText          ,%CFilesSortText    )   #! Calculated sort text
+#!
+    #SET(%w1CFilesCount           ,%CFilesCount       )   #! ID: Table Count
+    #SET(%w1CFilesName            ,%CFilesName        )   #! Table Name
+    #SET(%w1CFilesFullPath        ,%CFilesFullPath    )   #! Table Full Path Name
+    #SET(%w1CFilesParCount        ,%CFilesParCount    )   #! Parent count
+    #SET(%w1CFilesChiCount        ,%CFilesChiCount    )   #! Child Count
+    #SET(%w1CFilesSort            ,%CFilesSort        )   #! Calculated sort
+    #SET(%w1CFilesSortText        ,%CFilesSortText    )   #! Calculated sort text
+    #SELECT(%CFiles,%I)
+    #SET(%w2CFilesCount           ,%CFilesCount       )   #! ID: Table Count
+    #SET(%w2CFilesName            ,%CFilesName        )   #! Table Name
+    #SET(%w2CFilesFullPath        ,%CFilesFullPath    )   #! Table Full Path Name
+    #SET(%w2CFilesParCount        ,%CFilesParCount    )   #! Parent count
+    #SET(%w2CFilesChiCount        ,%CFilesChiCount    )   #! Child Count
+    #SET(%w2CFilesSort            ,%CFilesSort        )   #! Calculated sort
+    #SET(%w2CFilesSortText        ,%CFilesSortText    )   #! Calculated sort text
+#!
+    #IF(%w1CFilesSortText > %w2CFilesSortText)
+      #SET(%DoSort,1)
+      #SET(%CFilesCount           ,%w1CFilesCount     )   #! ID: Table Count
+      #SET(%CFilesName            ,%w1CFilesName      )   #! Table Name
+      #SET(%CFilesFullPath        ,%w1CFilesFullPath  )   #! Table Full Path Name
+      #SET(%CFilesParCount        ,%w1CFilesParCount  )   #! Parent count
+      #SET(%CFilesChiCount        ,%w1CFilesChiCount  )   #! Child Count
+      #SET(%CFilesSort            ,%w1CFilesSort      )   #! Calculated sort
+      #SET(%CFilesSortText        ,%w1CFilesSortText  )   #! Calculated sort text
+      #SELECT(%CFiles,%I-1)
+      #SET(%CFilesCount           ,%w2CFilesCount     )   #! ID: Table Count
+      #SET(%CFilesName            ,%w2CFilesName      )   #! Table Name
+      #SET(%CFilesFullPath        ,%w2CFilesFullPath  )   #! Table Full Path Name
+      #SET(%CFilesParCount        ,%w2CFilesParCount  )   #! Parent count
+      #SET(%CFilesChiCount        ,%w2CFilesChiCount  )   #! Child Count
+      #SET(%CFilesSort            ,%w2CFilesSort      )   #! Calculated sort
+      #SET(%CFilesSortText        ,%w2CFilesSortText  )   #! Calculated sort text
+    #ENDIF
+  #ENDLOOP
+#ENDLOOP
+#!
+#! RA.2019.07.07: Resequence the file count after the sort.
+#EQUATE (%CountMe  , 0)
+#FOR(%CFiles)
+  #FIX(%File, %CFilesName)
+  #SET(%CountMe    , %CountMe + 1)
+  #SET(%CFilesCount, %CountMe)
+#ENDFOR
+#!
+#IF(%FALSE)
+
+---- Sorted ChiPar Files ---- BEGIN
+  #FOR(%CFiles)
+    #FIX(%File, %CFilesName)
+---- PROCESSED: %@N03@(%CFilesCount) %[50]CFilesName %@N03@(%CFilesCount) (%[4]CFilesParCount) (%[4]CFilesChiCount) %[60]CFilesSortText [%[6]FilePrefix] "%CFilesFullPath"
+  #ENDFOR
+---- Sorted ChiPar Files ---- ENDED
+
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%GenerateInsertSQL , %pBaseName)
+#IF(NOT VAREXISTS(%IsNumeric))
+  #DECLARE(%IsNumeric)
+#ENDIF
+#IF(NOT VAREXISTS(%NextLine))
+  #DECLARE(%NextLine)
+#ENDIF
+#IF(NOT VAREXISTS(%TheMethod))
+  #DECLARE(%TheMethod)
+#ENDIF
+#IF(NOT VAREXISTS(%TheParam))
+  #DECLARE(%TheParam)
+#ENDIF
+#IF(NOT VAREXISTS(%IndexFields))
+  #DECLARE(%IndexFields)
+#ENDIF
+#IF(NOT VAREXISTS(%CountFields))
+  #DECLARE(%CountFields)
+#ENDIF
+#IF(NOT VAREXISTS(%BuildQuery))
+  #DECLARE(%BuildQuery)
+#ENDIF
+#IF(NOT VAREXISTS(%BuildPart1))
+  #DECLARE(%BuildPart1)
+#ENDIF
+#IF(NOT VAREXISTS(%BuildField))
+  #DECLARE(%BuildField)
+#ENDIF
+#IF(NOT VAREXISTS(%BuildPart2))
+  #DECLARE(%BuildPart2)
+#ENDIF
+#IF(NOT VAREXISTS(%BuildValue))
+  #DECLARE(%BuildValue)
+#ENDIF
+#!
+#SET(%CountFields,0)
+#FOR(%Field)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+#!  #INSERT(%UseQualifiedFields)
+#!  #IF(SUB(%NFieldOpt1,1,1)='N')                                                   #! Ignore this field
+#!    #CYCLE
+#!  #ENDIF
+  #SET(%CountFields,%CountFields+1)  
+#ENDFOR
+#SET(%NextLine, 'Fields Processed:')
+
+--
+-- %[27]NextLine %CountFields
+#IF (%CountFields > 20)
+#SET(%NextLine, '')
+-- %[27]NextLine Greater than 20 fields being inserted
+#ENDIF
+--
+#!
+#SET(%BuildPart1,'')
+#SET(%BuildField,'')
+#SET(%BuildPart2,'')
+#SET(%BuildValue,'')
+#SET(%NextLine, %FileName)
+#CALL(%ReplaceSubString,%NextLine,'''','')
+#SET(%BuildQuery, 'INSERT INTO ' & %NextLine & ' (')
+#SET(%BuildPart1, 'INSERT INTO ' & %NextLine & '')
+#SET(%BuildField, ' (')
+#! (field1, ...)
+#SET(%IndexFields,0)
+#FOR(%Field)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+#!  #INSERT(%UseQualifiedFields)
+#!  #IF(SUB(%NFieldOpt1,1,1)='N')                                                   #! Ignore this field
+#!    #CYCLE
+#!  #ENDIF
+  #SET(%IndexFields,%IndexFields+1)
+  #SET(%BuildQuery, %BuildQuery & %FieldID)
+  #SET(%BuildField, %BuildField & %FieldID)
+  #IF(%IndexFields < %CountFields)
+    #SET(%BuildQuery, %BuildQuery & ', ')
+    #SET(%BuildField, %BuildField & ', ')
+  #ENDIF
+#ENDFOR
+#SET(%BuildQuery, %BuildQuery & ') VALUES (')
+#SET(%BuildField, %BuildField & ')')
+#SET(%BuildPart2, %BuildPart2 & ' VALUES')
+#SET(%BuildValue, %BuildValue & ' (')
+#! VALUES
+#SET(%IndexFields,0)
+#FOR(%Field)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+#!  #INSERT(%UseQualifiedFields)
+#!  #IF(SUB(%NFieldOpt1,1,1)='N')                                                   #! Ignore this field
+#!    #CYCLE
+#!  #ENDIF
+  #! RA.2019.07.10: First shot at this attempting something to later generalize.
+  #! RA.2019.01.27: Logic needed here to correctly deal with the data types and values.
+  #SET(%IndexFields,%IndexFields+1)
+#!
+  #CASE(%FieldType)
+  #OF  ('DATE')
+    #!SELF.Debug(SELF.Thread() & ' %TheMethod(%NextLine=<39>' & CLIP(FORMAT(SELF.%NextLine,@D08B)) & '<39>)')
+    #SET(%BuildQuery, %BuildQuery & '<39>' & CLIP(FORMAT(TODAY(),@D010-B)) & '<39>')
+    #SET(%BuildValue, %BuildValue & '<39>' & CLIP(FORMAT(TODAY(),@D010-B)) & '<39>')
+  #OF  ('TIME')
+    #!SELF.Debug(SELF.Thread() & ' %TheMethod(%NextLine=<39>' & CLIP(FORMAT(SELF.%NextLine,@T06B)) & '<39>)')
+    #SET(%BuildQuery, %BuildQuery & '<39>' & CLIP(FORMAT(CLOCK(),@T04B)) & '<39>')
+    #SET(%BuildValue, %BuildValue & '<39>' & CLIP(FORMAT(CLOCK(),@T04B)) & '<39>')
+  #ELSE
+    #!SELF.Debug(SELF.Thread() & ' %TheMethod(%NextLine=<39>' & CLIP(SELF.%NextLine) & '<39>)')
+    #CALL(%IsFieldTypeNumeric,%IsNumeric,%FieldType)
+    #IF(%IsNumeric)
+      #IF(%FieldInitial)
+        #SET(%NextLine,%FieldInitial)
+        #IF   (INSTRING('TODAY()'                        ,UPPER(%FieldInitial),1,1))
+          #SET(%NextLine, '<39>' & CLIP(FORMAT(TODAY(),@D010-B)) & '<39>')
+        #ELSIF(INSTRING('CLOCK()'                        ,UPPER(%FieldInitial),1,1))
+          #SET(%NextLine, '<39>' & CLIP(FORMAT(CLOCK(),@T04B)) & '<39>')
+        #! RA.2019.07.24: These are RYB procedure wrappers for DATE and TIME.
+        #ELSIF(INSTRING('RYB_SERVERDATE()'               ,UPPER(%FieldInitial),1,1))
+          #SET(%NextLine, '<39>' & CLIP(FORMAT(TODAY(),@D010-B)) & '<39>')
+        #ELSIF(INSTRING('RYB_SERVERTIME()'               ,UPPER(%FieldInitial),1,1))
+          #SET(%NextLine, '<39>' & CLIP(FORMAT(CLOCK(),@T04B)) & '<39>')
+        #! RA.2019.07.24: IF numeric AND got a function, THEN default a zero.
+        #ELSIF(INSTRING('(',%FieldInitial,1,1))
+          #SET(%BuildQuery, %BuildQuery & '0')
+          #SET(%BuildValue, %BuildValue & '0')
+        #ELSE
+          #SET(%BuildQuery, %BuildQuery & %FieldInitial)
+          #SET(%BuildValue, %BuildValue & %FieldInitial)
+        #ENDIF
+        #!
+      #ELSE
+        #SET(%BuildQuery, %BuildQuery & '0')
+        #SET(%BuildValue, %BuildValue & '0')
+      #ENDIF
+    #ELSE
+      #! RA.2019.07.24: SAME CODE IN TWO PLACES. TIME FOR A GROUP!!!!!!
+      #IF(%FieldInitial)
+        #SET(%NextLine, %FileName)
+        #CALL(%ReplaceSubString,%NextLine,'''','')
+        #IF   (INSTRING('GUID'                           ,UPPER(%FieldID),1,1))
+          #SET(%BuildQuery, %BuildQuery & '<39>0000000000000000<39>')
+          #SET(%BuildValue, %BuildValue & '<39>0000000000000000<39>')
+        #ELSIF(INSTRING('USER_UPDATE'                    ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>GENERATOR<39>')
+          #SET(%BuildValue, %BuildValue & '<39>GENERATOR<39>')
+        #ELSIF(INSTRING('COMMENT'                        ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>Comment for ' & %NextLine & '<39>')
+          #SET(%BuildValue, %BuildValue & '<39>Comment for ' & %NextLine & '<39>')
+        #ELSIF(INSTRING('DESCRIPTION'                    ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>Description for ' & %NextLine & '<39>')
+          #SET(%BuildValue, %BuildValue & '<39>Description for ' & %NextLine & '<39>')
+        #ELSIF(INSTRING('('                              ,UPPER(%FieldInitial),1,1))
+          #! RA.2019.07.20: Clarion function in this default (just ignore) 
+          #SET(%BuildQuery, %BuildQuery & '<39><39>')
+          #SET(%BuildValue, %BuildValue & '<39><39>')
+        #ELSE
+          #! RA.2019.07.20: Clean up a bit in the string constants
+          #SET(%NextLine,%FieldInitial)
+          #IF (INSTRING(''''                             ,%NextLine,1,1))
+            #CALL(%ReplaceSubString,%NextLine,'''','')
+          #ENDIF
+          #SET(%BuildQuery, %BuildQuery & '<39>' & %NextLine & '<39>')
+          #SET(%BuildValue, %BuildValue & '<39>' & %NextLine & '<39>')
+        #ENDIF
+      #ELSE
+        #SET(%NextLine, %FileName)
+        #CALL(%ReplaceSubString,%NextLine,'''','')
+        #IF   (INSTRING('GUID'                           ,UPPER(%FieldID),1,1))
+          #SET(%BuildQuery, %BuildQuery & '<39>0000000000000000<39>')
+          #SET(%BuildValue, %BuildValue & '<39>0000000000000000<39>')
+        #ELSIF(INSTRING('USER_UPDATE'                    ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>GENERATOR<39>')
+          #SET(%BuildValue, %BuildValue & '<39>GENERATOR<39>')
+        #ELSIF(INSTRING('COMMENT'                        ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>Comment for ' & %NextLine & '<39>')
+          #SET(%BuildValue, %BuildValue & '<39>Comment for ' & %NextLine & '<39>')
+        #ELSIF(INSTRING('DESCRIPTION'                    ,UPPER(%FieldID),1,1))  
+          #SET(%BuildQuery, %BuildQuery & '<39>Description for ' & %NextLine & '<39>')
+          #SET(%BuildValue, %BuildValue & '<39>Description for ' & %NextLine & '<39>')
+        #ELSE
+          #SET(%BuildQuery, %BuildQuery & '<39><39>')
+          #SET(%BuildValue, %BuildValue & '<39><39>')
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDCASE
+#!
+#!  #SET(%BuildQuery, %BuildQuery & '"?"')
+#!  #SET(%BuildValue, %BuildValue & '"?"')
+#!
+  #IF(%IndexFields < %CountFields)
+    #SET(%BuildQuery, %BuildQuery & ', ')
+    #SET(%BuildValue, %BuildValue & ', ')
+  #ENDIF
+#ENDFOR
+#! (value1, ...)
+#SET(%BuildQuery, %BuildQuery & ')')
+#SET(%BuildValue, %BuildValue & ')')
+#MESSAGE('FILE: ' & %File & '', 1)
+#!
+%BuildPart1
+%BuildField
+%BuildPart2
+%BuildValue
+#!
+      #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
+      #OF  ('METABASE')
+      #OROF('MIMER')
+      #OROF('MSSQL')
+      #OROF('SQLANYWHERE')
+      #OROF('POSTGRESQL')
+      #OROF('MYSQL')
+      #OROF('ORACLE')
+      #OROF('DB2')
+      #OROF('TPLUTILITY')
+#CALL(%TerminatorTerminates,%pBaseName)
+      #ELSE
+------ NOT A VALID BACKEND [%pBaseName]
+      #ENDCASE                                                                  #! BACKEND EXCEPTIONS
+#!
+#!%BuildQuery
+#!%BuildPart1%BuildField%BuildPart2%BuildValue
+#!
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

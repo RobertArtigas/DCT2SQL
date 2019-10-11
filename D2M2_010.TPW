@@ -1,0 +1,563 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_010.tpw
+#! Purpose:     METABASE: Options outputed to SQL 
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2019.07.24:  Roberto Artigas
+#!  *   Separated the SQL default options #GROUP to its own source file.
+#! 2017.09.29   Roberto Artigas
+#!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2018.05.01: Check for SQL functions. 
+#GROUP(%IsInitialFunctionSQL,*%pResult,%pFieldInitial)
+  #SET(%pResult,FALSE)
+  #SET(%nLoc1, 0)
+  #SET(%nLoc2, INSTRING(')',%pFieldInitial,-1,LEN(CLIP(%pFieldInitial))))
+  #SET(%nLoc1, %nLoc1 + %nLoc2)
+  #SET(%nLoc2, INSTRING('(',%pFieldInitial,-1,LEN(CLIP(%pFieldInitial))))
+  #SET(%nLoc1, %nLoc1 + %nLoc2)
+  #IF(%nLoc1>0)
+    #SET(%pResult,TRUE)
+  #ENDIF
+#IF(%TraceOption)
+---- #GROUP(%%IsInitialFunctionSQL, %pResult, "%pFieldInitial")
+#ENDIF  
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.07.24: Add ===SQL field type=== (%NFieldOpt2) being passed to this routine.
+#! This might be necessary for some BACKENDs to CAST %NFieldOpt2 to the correct %NFieldOpt3
+#! Example: PostgreSQL: TimeStamp TIMESTAMPTZ DEFAULT current_timestamp::TIMESTAMPTZ
+#! This goes back to GUID tables and DISTRIBUTED data that gets syncronized accross locations.
+#!
+#! RA.2019.07.04: Some reseach into PostgreSQL options for date, time, user, guid [not tested!!!]
+#! RA.2019.07.04: Some reseach into MySQL options for date, time, user, guid [not tested!!!]
+#! RA.2018.06.09: Added the [USER] type backend SQL keyword.
+#! RA.2018.05.07: Experimental ease of use coding. The goal is to provide
+#! some equivalence of the DATE()/TIME() function in clarion in a form that
+#! the backend understands. So creating the record from the backend provides
+#! as much of a same or similar functionalility as the clarion functions do.
+#! RA.2018.05.03: Some replacing based on the backend and field type.
+#GROUP(%IsInitialFunctionReplaceSQL,*%pResult,*%pFunctionReplace,%pBaseName,%pFieldType,%pFieldInitial,%NFieldOpt3,%NFieldOpt2)
+  #SET(%pResult           , FALSE)
+  #SET(%pFunctionReplace  , '')
+#IF(%TraceOption)
+----
+---- #GROUP(%%IsInitialFunctionReplaceSQL,"%pResult","%pFunctionReplace","%pBaseName","%pFieldType","%pFieldInitial","%NFieldOpt3","%NFieldOpt2")
+#ENDIF
+  #!
+  #CASE(UPPER(%NFieldOpt3))
+  #OF  ('[USER]')                                                               #! RA.2018.06.09.SAT: Added
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('METABASE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MIMER')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MSSQL')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'SYSTEM_USER')
+    #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current_user')
+    #OF  ('SQLANYWHERE')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current user')
+    #OF  ('MYSQL')
+      #SET(%pResult         , TRUE)                                             #! RA.2019.07.04: NEEDS TESTING !!!
+      #SET(%pFunctionReplace, '( current_user() )')                             #! RA.2019.07.04: Signals a default function
+    #OF  ('ORACLE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('DB2')
+      #SET(%pFunctionReplace, '')
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #OF  ('[DATE]')
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('METABASE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MIMER')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current_date')
+    #OF  ('MSSQL')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'convert(date,sysdatetime())')                    #! 'convert(date,utcdatetime())'
+    #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current_date')
+    #OF  ('SQLANYWHERE')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current date')                                   #! 'current server date'
+    #OF  ('MYSQL')
+      #SET(%pResult         , TRUE)                                             #! RA.2019.07.04: NEEDS TESTING !!!
+      #SET(%pFunctionReplace, '( current_date() )')                             #! RA.2019.07.04: Signals a default function [CURRENT_DATE]
+    #OF  ('ORACLE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('DB2')
+      #SET(%pFunctionReplace, '')
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #OF  ('[TIME]')
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('METABASE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MIMER')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current_time')
+    #OF  ('MSSQL')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'convert(time,sysdatetime())')                    #! 'convert(time,utcdatetime())'
+    #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current_time')
+    #OF  ('SQLANYWHERE')
+      #SET(%pResult         , TRUE)
+      #SET(%pFunctionReplace, 'current time')                                   #! 'current server time'
+    #OF  ('MYSQL')
+      #SET(%pResult         , TRUE)                                             #! RA.2019.07.04: NEEDS TESTING !!!
+      #SET(%pFunctionReplace, '( current_time() )')                             #! RA.2019.07.04: Signals a default function [CURRENT_TIME]
+    #OF  ('ORACLE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('DB2')
+      #SET(%pFunctionReplace, '')
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #!
+  #OF  ('[STAMP]')
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('METABASE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MIMER')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MSSQL')
+      #SET(%pFunctionReplace, '')
+    #! RA.2019.07.24: PostgreSQL: Casting needed to let the table create (me TIMESTAMPTZ DEFAULT current_timestamp::TIMESTAMPTZ)
+    #!                   OPTIONS: TIMESTAMPTZ, TIMESTAMP (Any numeric is okay: BIGINT DEFAULT current_timestamp)
+    #! The current_timestamp is for any time we update the record, including insert which is why we default and cast.
+    #! For the server, delete time stamps we leave it to null (0), since those will be used when needed.
+    #! FUN: SELECT current_timestamp; SELECT current_timestamp AT TIME ZONE 'UTC'; [See what each returns] 
+    #OF  ('POSTGRESQL')
+      #SET(%pResult         , TRUE)
+      #IF(UPPER(%NFieldOpt2) = 'TIMESTAMPTZ')
+        #SET(%pFunctionReplace, 'current_timestamp::' & %NFieldOpt2)            #! RA.2019.07.24: Added
+      #ELSE
+        #SET(%pFunctionReplace, 'current_timestamp')                            #! RA.2019.07.23: Added
+      #ENDIF
+    #OF  ('SQLANYWHERE')
+#! ALTER FUNCTION "hdata"."sf_GetElapsedTimeUTC"()
+#! returns real
+#! not deterministic
+#! begin
+#!   declare "ans" real;
+#!   set "ans" = (select "DATEDIFF"("millisecond","DATETIME"('1970-01-01 00:00:00.000'),current utc timestamp));
+#!   return "ans"
+#! end      
+      #SET(%pFunctionReplace, '')
+    #OF  ('MYSQL')
+      #SET(%pFunctionReplace, '')
+    #OF  ('ORACLE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('DB2')
+      #SET(%pFunctionReplace, '')
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #!
+  #ENDCASE
+  #!
+  #! RA.2019.07.24: [GUIDPKEY], [GUID]
+  #CASE(SUB(UPPER(%NFieldOpt3),1,5))
+  #OF  ('[GUID')
+    #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+    #OF  ('METABASE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MIMER')
+      #SET(%pFunctionReplace, '')
+    #OF  ('MSSQL')
+      #SET(%pFunctionReplace, '')
+    #! RA.2018.05.06: PostgreSQL has several options. DO WE IMPLEMEMT AT THIS TIME???
+    #OF  ('POSTGRESQL')
+#!
+#! UUID type
+#! Universally Unique Identifies (UUID) is a 128-bit quantity which is generated by an algorithm. 
+#! It is very unlikely that the same identifier will be generated by another person in the world using the same algorithm. 
+#! That's why for the distributed systems, these identifiers are an ideal choice as it offers uniqueness within a single database. 
+#! A UUID is written as a group of UPPER-case hexadecimal digits, with various groups separated by hyphens.
+#!
+#! PostgreSQL has a native UUID data type which consumes 16 bytes of storage.. UUID is an ideal Data type for primary keys.
+#!
+#!
+#! The data type uuid stores Universally Unique Identifiers (UUID) as defined by RFC 4122, ISO/IEC 9834-8:2005, and related standards. 
+#! (Some systems refer to this data type as a globally unique identifier, or GUID, instead.) This identifier is a 128-bit quantity that 
+#! is generated by an algorithm chosen to make it very unlikely that the same identifier will be generated by anyone else in the known 
+#! universe using the same algorithm. Therefore, for distributed systems, these identifiers provide a better uniqueness guarantee than 
+#! sequence generators, which are only unique within a single database.
+#! 
+#! A UUID is written as a sequence of UPPER-case hexadecimal digits, in several groups separated by hyphens, specifically a group of 8 digits 
+#! followed by three groups of 4 digits followed by a group of 12 digits, for a total of 32 digits representing the 128 bits. 
+#! An example of a UUID in this standard form is:
+#! a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
+#!
+#! PostgreSQL also accepts the following alternative forms for input: use of upper-case digits, the standard format surrounded by braces, 
+#! omitting some or all hyphens, adding a hyphen after any group of four digits. Examples are:
+#! 
+#! A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11
+#! {a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11}
+#! a0eebc999c0b4ef8bb6d6bb9bd380a11
+#! a0ee-bc99-9c0b-4ef8-bb6d-6bb9-bd38-0a11
+#! {a0eebc99-9c0b4ef8-bb6d6bb9-bd380a11}
+#!
+#! Output is always in the standard form.
+#! 
+#! PostgreSQL provides storage and comparison functions for UUIDs, but the core database does not include any function for generating UUIDs, 
+#! because no single algorithm is well suited for every application. The uuid-ossp module provides functions that implement several standard algorithms. 
+#! Alternatively, UUIDs could be generated by client applications or other libraries invoked through a server-side function.
+#!
+#! CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+#! Then:
+#! 
+#! SELECT uuid_generate_v4();
+#! Note also that, once you installed the extension, PostgreSQL has an actual binary uuid type, with a length of 16 bytes. 
+#! Working with the binary type is much faster than working with the text equivalent and it takes up less space. 
+#! If you do need the string version, you can simply cast it to text:
+#! 
+#! SELECT uuid_generate_v4()::text;
+    #!
+    #! #OF  ('UUID')
+    #!   #SET(%NFieldTSQL, 'UUID')
+    #!   #SET(%NFieldTDef, 'UUID')                                   #! RA.2008.08.19
+    #! #OF ('UUID1')
+    #!   #SET(%NFieldTSQL, 'UUID DEFAULT uuid_generate_v1()')
+    #!   #SET(%NFieldTDef, 'UUID')                                   #! RA.2008.08.19
+    #! #OF ('UUID2')
+    #!   #SET(%NFieldTSQL, 'UUID DEFAULT uuid_generate_v1mc()')
+    #!   #SET(%NFieldTDef, 'UUID')                                   #! RA.2008.08.19
+    #! #OF ('UUID3')
+    #!   #SET(%NFieldTSQL, 'UUID DEFAULT uuid_generate_v4()')
+    #!   #SET(%NFieldTDef, 'UUID')                                   #! RA.2008.08.19
+    #!
+      #!
+      #! RA.2019.07.20: IF primary key (PKEY), THEN go and generate the function.
+      #! IF NOT primary key, THEN is a link (FKEY) to something else.
+      #!
+#!---- %%optGenerateGUID = %optGenerateGUID ----
+      #SET(%pResult             , TRUE)                                         #! RA.2019.07.04: NEEDS TESTING !!!
+      #CASE(UPPER(%NFieldOpt3))
+      #OF  ('[GUIDPKEY]')
+        #IF(%optGenerateGUID)                                                   #! RA.2019.07.19: Added
+          #SET(%pFunctionReplace, 'uuid_generate_v4()')                         #! RA.2019.07.04: Signals a default function
+        #ELSE
+          #SET(%pFunctionReplace, '<39><39>')                                   #! RA.2019.07.19: If '', TRIGGER generates GUID (StringTheory ???) 
+        #ENDIF
+      #OF  ('[GUID]')
+          #SET(%pFunctionReplace, '<39><39>')                                   #! RA.2019.07.19: If '', SET by relationship 
+      #ENDCASE
+    #OF  ('SQLANYWHERE')
+#! newid
+#! Description
+#! Generates human-readable, globally unique IDs (GUIDs) in two different formats, based on arguments you provide. 
+#! The length of the human-readable format of the GUID value is either 32 bytes (with no dashes) or 36 bytes (with dashes).
+#! 
+#! Syntax
+#! newid([optionflag])
+#! Parameters
+#! option flag
+#! 0, or no value – the GUID generated is human-readable (varchar), but does not include dashes. 
+#!                  This argument, which is the default, is useful for converting values into varbinary.
+#!
+#! -1 – the GUID generated is human-readable (varchar) and includes dashes.
+#!
+#! -0x0 – returns the GUID as a varbinary.
+#! 
+#! Any other value for newid returns NULL.
+#! 
+#! Examples
+#! Example 1
+#! Creates a table with varchar columns 32 bytes long, then uses newid with no arguments with the insert statement:
+#! 
+#! create table t (UUID varchar(32))
+#! go
+#! insert into t values (newid())
+#! insert into t values (newid())
+#! go
+#! select * from t
+#! UUID
+#! --------------------------------
+#! f81d4fae7dec11d0a76500a0c91e6bf6 
+#! 7cd5b7769df75cefe040800208254639
+#! Example 2
+#! Produces a GUID that includes dashes:
+#! 
+#! select newid(1)
+#! ------------------------------------
+#! b59462af-a55b-469d-a79f-1d6c3c1e19e3
+#! Example 3
+#! Creates a default that converts the GUID format without dashes to a varbinary(16) column:
+#! 
+#! create table t (UUID_VC varchar(32), UUID varbinary(16))
+#! go
+#! create default default_guid
+#! as
+#! strtobin(newid())
+#! go
+#! sp_bindefault default_guid, "t.UUID"
+#! go
+#! insert t (UUID_VC) values (newid())
+#! go
+#! Example 4
+#! Returns a new GUID of type varbinary for every row that is returned from the query:
+#! 
+#! select newid(0x0) from sysobjects
+      #SET(%pFunctionReplace, '')
+    #OF  ('MYSQL')
+#!
+#! MySQL UUID vs. Auto-Increment INT as primary key
+#!
+#! Pros
+#! Using UUID for a primary key  brings the following advantages:
+#!
+#! UUID values are unique across tables, databases, and even servers that allow you to merge rows from different databases or distribute databases across servers.
+#! UUID values do not expose the information about your data so they are safer to use in a URL. For example, if a customer with id 10 accesses his account
+#!      via http://www.example.com/customers/10/ URL, it is easy to guess that there is a customer 11, 12, etc., and this could be a target for an attack.
+#! UUID values can be generated anywhere that avoid a round trip to the database server. It also simplifies logic in the application. For example, 
+#!      to insert data into a parent table and child tables, you have to insert into the parent table first, get generated id and then insert data into the child tables.
+#!      By using UUID, you can generate the primary key value of the parent table up front and insert rows into both parent and child tables at the same time within a transaction.
+#!
+#! Cons
+#! Besides the advantages, UUID values also come with some disadvantages:
+#!
+#! Storing UUID values (16-bytes) takes more storage than integers (4-bytes) or even big integers(8-bytes).
+#! Debugging seems to be  more difficult, imagine the expression WHERE id = 'df3b7cb7-6a95-11e7-8846-b05adad3f0ae' instead of WHERE id = 10
+#! Using UUID values may cause performance issues due to their size and not being ordered.
+#!
+#! MySQL UUID solution
+#! In MySQL, you can store UUID values in a compact format (BINARY) and display them in human-readable format (VARCHAR) with help of the following functions:
+#!
+#! UUID_TO_BIN
+#! BIN_TO_UUID
+#! IS_UUID
+#!
+#! Notice that UUID_TO_BIN(), BIN_TO_UUID(), and IS_UUID() functions are only available in MySQL 8.0 or later.
+#! The UUID_TO_BIN() function converts a UUID from a human-readable format (VARCHAR) into a compact format (BINARY) format for storing
+#! and the BIN_TO_UUID() function converts UUID from the compact format (BINARY)to human-readable format (VARCHAR) for displaying.
+#!
+#! The IS_UUID() function returns 1 if the argument is a valid string-format UUID. If the argument is not valid string format UUID, the IS_UUID function returns 0. 
+#! In case the argument is NULL, the IS_UUID() function returns NULL.
+#!
+#! The following are the valid string-format UUID in MySQL:
+#!
+#! 1) aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+#! 2) aaaaaaaabbbbccccddddeeeeeeeeeeee
+#! 3) {aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee}
+#!
+#! MySQL UUID example
+#! Let’s take a look at an example of using UUID as the primary key.
+#! 
+#! The following statement creates a new table named customers:
+#!
+#! CREATE TABLE customers (
+#!     id BINARY(16) PRIMARY KEY,
+#!     name VARCHAR(255)
+#! );
+#! To insert UUID values into the id column, you use UUID() and UUID_TO_BIN() functions as follows:
+#! 
+#! INSERT INTO customers(id, name)
+#! VALUES(UUID_TO_BIN(UUID()),'John Doe'),
+#!       (UUID_TO_BIN(UUID()),'Will Smith'),
+#!       (UUID_TO_BIN(UUID()),'Mary Jane');
+#!
+#! To query data from a UUID column, you use BIN_TO_UUID() function to convert binary format to human-readable format:
+#!
+#! SELECT 
+#!    BIN_TO_UUID(id) id, 
+#!    name
+#! FROM
+#!    customers;   
+#!
+      #SET(%pResult             , TRUE)                                         #! RA.2019.07.04: NEEDS TESTING !!!
+      #CASE(UPPER(%NFieldOpt3))
+      #OF  ('[GUIDPKEY]')
+        #IF(%optGenerateGUID)                                                   #! RA.2019.07.19: Added
+          #SET(%pFunctionReplace, '( UUID_TO_BIN(UUID()) )')                    #! RA.2019.07.04: Signals a default function
+        #ELSE
+          #SET(%pFunctionReplace, '<39><39>')                                   #! RA.2019.07.19: If '', TRIGGER generates GUID (StringTheory ???) 
+        #ENDIF
+      #OF  ('[GUID]')
+          #SET(%pFunctionReplace, '<39><39>')                                   #! RA.2019.07.19: If '', SET by relationship 
+      #ENDCASE
+      #!SET(%pResult         , TRUE)                                            #! RA.2019.07.04: NEEDS TESTING !!!
+      #!SET(%pFunctionReplace, '( UUID_TO_BIN(UUID()) )')                       #! RA.2019.07.04: Signals a default function
+#!
+    #OF  ('ORACLE')
+      #SET(%pFunctionReplace, '')
+    #OF  ('DB2')
+      #SET(%pFunctionReplace, '')
+    #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+  #ENDCASE
+#IF(%TraceOption)
+---- #GROUP(%%IsInitialFunctionReplaceSQL,"%pResult","%pFunctionReplace","%pBaseName","%pFieldType","%pFieldInitial","%NFieldOpt3","%NFieldOpt2")
+----
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! BUILD QUALIFIED FIELDS (Audit GUID consistentancy)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!RA.2019.07.06: Pass %BaseName as a parameter
+#GROUP(%BuildQualifiedFieldsGUID,%pBaseName)                                    #! RA.2019.07.06: Added
+#!
+#!FIX(%File, %NFilesName)
+#FOR(%Field)                                                                    #! VALID FIELD: FOR
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetFieldOptions)                                                     #! RASQL(,,,) for Fields
+  #!--------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a field is processed. !
+  #!--------------------------------------------------------------!
+  #IF(SUB(%NFieldOpt1,1,1)='N')                                                 #! Ignore this field
+    #CYCLE
+  #ENDIF
+  #!------------------------------------------------!
+  #! Begin removal of types that are not processed. !
+  #!------------------------------------------------!
+  #IF(%FieldType='GROUP')
+    #CYCLE
+  #ENDIF
+  #!
+  #IF(%FieldType='END')
+    #CYCLE
+  #ENDIF
+  #!----------------------------!
+  #! We pass FIELD requirements !
+  #!----------------------------!
+  #!-- FieldStatement: %FieldID [%FieldName] %FieldUserOptions
+  #! RA.2019.07.31: Think I will stay consistant and use TS, STS, and DTS accross the field names and externals.
+  #! RA.2019.07.25: Rework this area to catch both ways that this can be matched. (Looked at SYNC template)
+  #! RA.2019.07.06: Make sure field name is there and field option is there.
+  #IF (UPPER(%FieldID) = 'GUID'             AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountGUID   , %NFilesCountGUID + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'TIMESTAMP'        AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountTS     , %NFilesCountTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'SERVERTIMESTAMP'  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountSTS    , %NFilesCountSTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DELETETIMESTAMP'  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+      #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DELETEDTIMESTAMP' AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+      #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'TS'               AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountTS     , %NFilesCountTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'STS'              AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountSTS    , %NFilesCountSTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DTS'              AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+      #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
+  #ENDIF  
+  #! RA.2019.07.25: Count this a bit differently to check (Verify in %FieldUserOptions)
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'GUID'))
+    #SET(%NFilesOptionGUID  , %NFilesOptionGUID + 1)
+  #ENDIF
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'TIMESTAMP'))
+    #SET(%NFilesOptionTS    , %NFilesOptionTS + 1)
+  #ENDIF
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'SERVERTIMESTAMP'))
+    #SET(%NFilesOptionSTS   , %NFilesOptionSTS + 1)
+  #ENDIF
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'DELETETIMESTAMP'))
+    #SET(%NFilesOptionDTS   , %NFilesOptionDTS + 1)
+  #ENDIF
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'DELETEDTIMESTAMP'))
+    #SET(%NFilesOptionDTS   , %NFilesOptionDTS + 1)
+  #ENDIF
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! BUILD QUALIFIED KEYS (Audit GUID consistentancy)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!RA.2019.07.26: Pass %BaseName as a parameter
+#GROUP(%BuildQualifiedKeysGUID,%pBaseName)                                      #! RA.2019.07.26: Added
+#!
+#!FIX(%File, %NFilesName)
+#FOR(%Key)                                                                      #! VALID Key: FOR
+  #!-----------------------!
+  #! Check the OPTIONS now !
+  #!-----------------------!
+  #INSERT(%GetKeyOptions)                                                       #! RASQL(,,,) for Keys
+  #!------------------------------------------------------------!
+  #! The first option RASQL(NO) controls if a key is processed. !
+  #!------------------------------------------------------------!
+  #IF(SUB(%NKeyOpt1,1,1)='N')                                                   #! Ignore this key
+    #CYCLE
+  #ENDIF
+  #!--------------------------!
+  #! We pass KEY requirements !
+  #!--------------------------!
+  #!-- KeyStatement: %KeyID [%KeyName] %KeyUserOptions
+  #IF (INSTRING('_PKEY',UPPER(%KeyID),1,1))
+    #SET(%NFilesKeyGUID           , %NFilesKeyGUID + 1)
+    #IF(%KeyPrimary)
+      #FOR(%KeyField)
+        #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
+        #!-- %[20]KeyFieldID [%KeyField]
+        #IF(UPPER(%KeyFieldID) = 'GUID')
+          #SET(%NFilesFieldGUID   , %NFilesFieldGUID + 1)
+        #ENDIF
+      #ENDFOR
+    #ENDIF
+  #ENDIF
+  #IF (UPPER(%KeyID) = 'TIMESTAMPKEY')
+    #SET(%NFilesKeyTS             , %NFilesKeyTS + 1)
+    #FOR(%KeyField)
+      #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
+      #!-- %[20]KeyFieldID [%KeyField]
+      #IF(UPPER(%KeyFieldID) = 'TIMESTAMP')
+        #SET(%NFilesFieldTS       , %NFilesFieldTS + 1)
+      #ENDIF
+      #! RA.2019.07.31: Think I will stay consistant and use TS, STS, and DTS accross the field names and externals.
+      #IF(UPPER(%KeyFieldID) = 'TS')
+        #SET(%NFilesFieldTS       , %NFilesFieldTS + 1)
+      #ENDIF
+    #ENDFOR
+  #ENDIF
+  #IF (UPPER(%KeyID) = 'SERVERTIMESTAMPKEY')
+    #SET(%NFilesKeySTS            , %NFilesKeySTS + 1)
+    #FOR(%KeyField)
+      #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
+      #!-- %[20]KeyFieldID [%KeyField]
+      #IF(UPPER(%KeyFieldID) = 'SERVERTIMESTAMP')
+        #SET(%NFilesFieldSTS      , %NFilesFieldSTS + 1)
+      #ENDIF
+      #! RA.2019.07.31: Think I will stay consistant and use TS, STS, and DTS accross the field names and externals.
+      #IF(UPPER(%KeyFieldID) = 'STS')
+        #SET(%NFilesFieldSTS      , %NFilesFieldSTS + 1)
+      #ENDIF
+    #ENDFOR
+  #ENDIF
+  #IF (UPPER(%KeyID) = 'DELETETIMESTAMPKEY' OR UPPER(%KeyID) = 'DELETEDTIMESTAMPKEY')
+    #SET(%NFilesKeyDTS            , %NFilesKeyDTS + 1)
+    #FOR(%KeyField)
+      #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
+      #!-- %[20]KeyFieldID [%KeyField]
+      #IF(UPPER(%KeyFieldID) = 'DELETETIMESTAMP' OR UPPER(%KeyFieldID) = 'DELETEDTIMESTAMP')
+        #SET(%NFilesFieldDTS      , %NFilesFieldDTS + 1)
+      #ENDIF
+      #! RA.2019.07.31: Think I will stay consistant and use TS, STS, and DTS accross the field names and externals.
+      #IF(UPPER(%KeyFieldID) = 'DTS')
+        #SET(%NFilesFieldDTS      , %NFilesFieldDTS + 1)
+      #ENDIF
+    #ENDFOR
+  #ENDIF
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------

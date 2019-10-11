@@ -1,0 +1,3620 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!
+#! This template was adapted from a SQL template by G W Bomford
+#! Roberto Artigas Jr's template for Reserved words is used with his requirements
+#! Since I modified it I have used my initials in the declared data so as not to discredit
+#! G W Bomford OR Roberto Artigas Jr for my mistakes
+#!
+#! The person who modified this for Firebird - Jimmy Rogers - may be contacted by email at 7Crystal@bellsouth.net
+#! An article on Clarion Mag explains the template in more detail. 'Migrating your Topseed Application to Firebird'
+#!
+#! No warranty of any kind is expressed, or implied, the template is used at your own risk.
+#!
+#! INSTRUCTIONS
+#! 
+#! 1. a conversion set
+#! step 1 template - old way was to create from a topspeed dictionary and place into an incude file. this should be generic.
+#! step 4 template - create a separate conversion file for each table pair and converts from topseed tables to firebird odbc tables.
+#! 
+#! 2 step 2 template - create the firebird scripts from the topspeed dictionary, using the external name for columns with one
+#! a. I created many different scripts for firebird. triggers, generators, all keys from the dictionary sp's and all 
+#!    had both drop and create in same script. allowing pick your own.
+#!
+#! 3 step 3 template - modify the txd of your dictionary to get it ready for odbc. 
+#! a. this was done mainly because i had existing apps to convert and did not want to import the script created firebird 
+#!    tables into a dictionary and break my app.
+#! b. this adds reserved word columns to the external name, changing from a rule(same as scrip would do) for that column only
+#! c. changes driver to odbc
+#! d. add external names to keys with the table ext
+#! e. changed memo to the firebird string to match what the script created for firebird.
+#! f. adds owner variable
+#! g. adds table name to full path. this is for firebird and can be modified for all odbc requirments.
+#!
+#! all i can think of for now.
+#! 
+#! jimmy rogers
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateStep1, 'Step 1 - Generate topspeed table structures into an include file'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#SHEET
+  #TAB('Page 1 0f 1 To Save Topspeed Table Structures'),FINISH(1)
+#DISPLAY('This Utility will write out all the topspeed table structures into an include file.')
+#DISPLAY('These structures are used for the converson of your tps to ODBC tables.')
+#DISPLAY('The name of the include file is TpsToOdbc.Inc.')
+#DISPLAY('We write out the converson files after the dictionary has been changed to ODBC.')
+#DISPLAY()
+#DISPLAY('Its best to do this on your topspeed dictionary that you will not change and')
+#DISPLAY('is in a different location than the conversion in Step 4.')
+#DISPLAY()
+#DISPLAY('A sub-directory off the App directory named... ''\convert'' is required for the convert files.')
+#DISPLAY('The TpsToOdbc.Inc needs to be in the \Convert folder for Step 4.')
+#DISPLAY('Remember after you run this it will be saved to the directory where your are now.')
+#DISPLAY()
+#DISPLAY('The DLL and Lib file will need to be in your convert folder when compiling the conversion files')
+#DISPLAY('if you use the Data Dll conversion method.')
+#DISPLAY()
+#DISPLAY('Step 2 writes the script files.')
+#DISPLAY('Step 3 changes a txd to ODBC etc.. for import into a new dictionary.')
+#DISPLAY('Step 4 writes the conversion files.')
+#DISPLAY()
+#DISPLAY('REQUIREMENTS')
+#DISPLAY('A. CHANGES TO DICTIONARY')
+#DISPLAY('  1. YOU CANNOT MAKE CHANGES TO THE COLUMN NAMES. ONLY THE EXTERNAL NAME.')
+#DISPLAY('  2. YOU CANNOT ADD COLUMN NAMES UNTIL AFTER THE CONVERSION.')
+#DISPLAY('  3. WE NEED AN EXACT MATCH FOR THE CONVERSION.')
+#DISPLAY()
+#DISPLAY('B. DICTIONARY TO USE FOR THIS TEMPLATE')
+#DISPLAY('  1. MAKE SURE YOU USE YOUR DATADLL APP OR YOUR SINGLE EXE APP.')
+#DISPLAY()
+#DISPLAY('C. SOMETIMES ITS GOOD TO SHOUT')
+#DISPLAY()
+  #ENDTAB
+#ENDSHEET
+#!
+#!
+#DECLARE(%ASCIIFileRecord)
+#DECLARE(%InstancePrefix)
+#DECLARE(%InstanceQueue),MULTI
+#DECLARE(%OutputFile)
+#DECLARE (%CurrentPath)
+#DECLARE (%JKRCounter)
+#DECLARE (%FileStructure)
+#!
+#MESSAGE('Creating Topseed Convertion Files',1)
+#! Set to current path
+#! Set the current path to '\Scripts\'
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%DictionaryFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%DictionaryFile,1,%JKRCounter))
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#SET (%OutputFile, %CurrentPath & 'TpsToOdbc.Inc')
+
+#CREATE(%OutputFile)
+
+File structures for the topspeed files that will imported into the ODBC conversion files
+
+#FOR (%File), WHERE (%FileDriver = 'TOPSPEED' AND %FileType = 'FILE' AND NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 )  )
+[[%File]]
+#IF(%FileOwner)
+FileOwner=1
+  #IF(Sub(%FileOwner,1,1) = '''')
+FileOwnerIsAVariable=0
+  #else  
+FileOwnerIsAVariable=1
+  #Endif
+#ELSE  
+FileOwner=0
+#Endif
+#IF(%FileName)
+FileName=1
+  #IF(Sub(%FileName,1,1) = '''')
+FileNameIsAVariable=0
+  #else  
+FileNameIsAVariable=1
+  #Endif
+#ELSE
+FileName=0
+#Endif
+#!
+#SET(%FileStructure,'  FILE,DRIVER(''TOPSPEED''),PRE(' & %FilePrefix & ')' ) 
+#!
+#IF(%FileOwner)
+  #IF(Sub(%FileOwner,1,1) = '''')
+    #! found ' on FileOwner ist char of %FileOwner
+    #SET(%FileStructure,%FileStructure & ',OWNER(' & %FileOwner & ')' )
+  #else  
+    #! found ! on FileOwner ist char of %FileOwner
+    #SET(%FileStructure,%FileStructure & ',OWNER(FileOwnerPassword)' )
+  #Endif
+#Endif
+#!
+#IF(%FileName)
+  #IF(Sub(%FileName,1,1) = '''')
+    #! found ' on FileName ist char of %FileName
+    #SET(%FileStructure,%FileStructure & ',NAME(' & %FileName & ')' )
+  #else  
+    #! found ! on FileName ist char of %FileName
+    #SET(%FileStructure,%FileStructure & ',NAME(FullPathName)' )
+  #Endif
+#ELSE  
+  #SET(%FileStructure,%FileStructure & ',NAME(FullPathName)' )
+#Endif
+#!
+%[20]File %FileStructure
+    #FOR (%Key)             #! %KeyIndex    Contains KEY, INDEX, or DYNAMIC
+%KeyStruct
+    #ENDFOR
+    #FOR (%Field), WHERE(%FieldType = 'MEMO')
+%FieldStruct
+    #ENDFOR
+    #FOR (%Field), WHERE(%FieldType = 'BLOB')
+%FieldStruct  
+    #ENDFOR
+%FileStructRec,PRE()
+    #FOR (%Field), WHERE(%FieldType <> 'MEMO' AND %FieldType <> 'BLOB')
+%FieldStruct
+    #ENDFOR
+%FileStructRecEnd
+%FileStructEnd
+#ENDFOR
+#CLOSE(%OutputFile)
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateStep2, 'Step 2 - Scripts - Generate Firebird SQL Scripts from Topeed or ODBC tables'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#! This template was adapted from a SQL template by G W Bomford
+#!-----------------------------------------------
+#SHEET
+  #TAB('Page 1 0f 5'),FINISH(0)
+    #BOXED('Generating Firebird SQL Scripts')
+      #DISPLAY()
+      #DISPLAY('MAKE BACKUP COPIES OF YOUR DICTIONARY.')
+      #DISPLAY()
+      #DISPLAY('*** The ''\SCRIPTS\'' Sub-Directory MUST exist! ***')
+      #DISPLAY()
+      #DISPLAY('See next Tab for steps to follow.')
+      #DISPLAY()
+      #DISPLAY('Select the Topspeed or ODBC tables to generate SQL scripts or leave blank to generate for all tables.')
+      #DISPLAY()
+      #DISPLAY('IF YOU CREATE AND OPTION CALLED LocalFile FOR A TABLE NO SCRIPT IS CREATED.')
+      #DISPLAY('The USEROPTIONS are checked for LOCALFILE and this table is skipped if found.')
+      #DISPLAY()
+      #DISPLAY(' Leave Blank to Select ALL Topspeed or ODBC Tables')
+      #PROMPT('Select Tables for SQL Script',FILE),%JKRSelectedFiles,SELECTION('Tables - Leave Blank to Select ALL TPS or ODBC Tables'),INLINE,AT(10)
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 2 0f 5'),FINISH(0)
+    #BOXED('Conditions when creating Firebird scripts')
+      #DISPLAY()
+      #DISPLAY('Name of the SQL file that is created for errors - SqlErrors.Txt:')
+      #DISPLAY()
+      #PROMPT('Check for conditions below and if found cancel writing script files?',CHECK),%JKRCheckForValidFieldNames,DEFAULT(1),AT(10)
+      #DISPLAY()
+      #DISPLAY('Conditions Checked')
+      #DISPLAY('1. Reserved words are not allowed - use EXTERNAL NAME to correct.')
+      #DISPLAY('2. EXTERNAL NAMES are checked for UPPERCASE.')
+      #DISPLAY('3. Field Names > 27 Characters. Maximum in Firebird for object names is 31.')
+      #DISPLAY('4. No primary key in a table in the dictionary is not allowed. It will cause errors at runtime.')
+      #DISPLAY('** Template ASSUMES a string Boolean value has no '' on say the Y N or a T F and adds them.')
+      #DISPLAY('    This is NOT allowed ''Y'' but this is Y. The Initial Value entered value must have '' around it.')
+      #DISPLAY()
+      #DISPLAY('The dictionary changes are described in Step 3.')
+      #DISPLAY('Step 3 makes changes in a txd file for import into a new dictionary.')
+      #DISPLAY('Always use the check box that prints a report of any found problems.')
+      #DISPLAY('Keep using this until you have no more problems in the dictionary.')
+      #DISPLAY()
+      #DISPLAY('Remember that if you want your scripts to allow an existing application to work for testing')
+      #DISPLAY('then you want the column and file names to match with the dictionary.')
+      #DISPLAY('Use the external name attribute on your columns or let this template do it for you.')
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 3 of 5'),FINISH(0)
+    #BOXED('Conversion Settings')
+      #DISPLAY()
+      #DISPLAY('Be consistant with the next 2 column Date and Time types.')
+      #DISPLAY('If you do not change them to a Date and Time type in the Firebird Script')
+      #DISPLAY('then do not change them in Step 3 that changes the TXD.')
+      #DISPLAY()
+      #PROMPT ('Change All LONGs With @D To DATE field type',check),%JKRChangeDateNames,DEFAULT(0),AT(10)
+      #PROMPT ('Change All LONGs With @T To TIME field type',check),%JKRChangeTimeNames,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #DISPLAY('Be consistant with the next column type change.')
+      #DISPLAY('If you do not change them to a BLOB type in the Firebird Script')
+      #DISPLAY('then do not change them in Step 3 that changes the TXD.')
+      #DISPLAY()
+      #PROMPT ('Make STRING CSTRING PSTRING above this size a BLOB for text',check),%JKRChangeStringTypesToBlob,DEFAULT(0),AT(10)
+      #ENABLE(%JKRChangeStringTypesToBlob = 1),CLEAR
+      #DISPLAY('Example: 2000 makes any of these strings that are 2000 or more in size into BLOBS')
+      #DISPLAY('Enter a number or uncheck the box')
+      #PROMPT ('',@N5),%JKRChangeStringTypesToBlobSize,DEFAULT(0),AT(10)
+      #ENDENABLE
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 4 of 5'),FINISH(0)
+    #BOXED('Initial Values And Validity Checks')
+      #DISPLAY()
+      #DISPLAY('Initial Values And Validity Checks in the dictionary can cause problems when creating scripts')
+      #DISPLAY('This could cause problems in your inported scripts if your column Initial Values do not work in Firebird')
+      #DISPLAY('Validity Checks in the dictionary can cause problems when converting your data and also')
+      #DISPLAY('when your program does not assign the value the same.')
+      #DISPLAY('If Cannot Be Zero Or Blank is set it is always written into the scripts ')
+      #DISPLAY()
+      #DISPLAY('Use the Report for Initial Values and Validity Checks to see what you have before')
+      #DISPLAY('creating scripts.')
+      #DISPLAY()
+      #PROMPT ('Do not use Initial Value from dictionary column to create a default for the script column',check),%JKRNoDefaults,DEFAULT(1),AT(10)
+      #ENABLE(%JKRNoDefaults = 0),CLEAR
+      #DISPLAY()
+      #PROMPT ('Do not use Validity Checks from dictionary column to create a check constraint for the script column',check),%JKRFieldValidation,DEFAULT(1),AT(10)
+      #DISPLAY()
+      #DISPLAY('Initial Value=Default')
+      #DISPLAY('Example: Today()=''NOW'' ')
+      #DISPLAY('Example: Cus:No=CUSNO')
+      #DISPLAY('Next example has an empty default so one is not created and = is required')
+      #DISPLAY('Example: MONTH(TODAY())=')
+      #DISPLAY('Enter the dictionary value = and the Firebird value')
+      #DISPLAY('The scripts will get the right side value if the left side value is found.')
+      #DISPLAY('The scripts will get all other entered Initial Values.')
+      #PROMPT ('Initial Values',@S40),%JKRInitialValueList,MULTI('Change this initial value to this'),INLINE
+      #ENDENABLE
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 5 of 5'),FINISH(1)
+    #BOXED('Firebird Conversion Notes')
+      #DISPLAY()
+      #DISPLAY('SCRIPTS ARE ONLY GENERATED FOR TOPSPEED AND ODBC TABLES!')
+      #DISPLAY()
+      #DISPLAY('The following rules are used for creating Firebird scripts.')
+      #DISPLAY('BLOB  -> BLOB SUB_TYPE 0 SEGMENT SIZE 80')
+      #DISPLAY('BYTE -> SMALLINT')
+      #DISPLAY('CSTRING/PSTRING -> VARCHAR')
+      #DISPLAY('DECIMAL/FLOAT -> DECIMAL')
+      #DISPLAY('LONG/ULONG -> INTEGER')
+      #DISPLAY('MEMO  -> BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+      #DISPLAY('SHORT/USHORT/BYTE -> SMALLINT')
+      #DISPLAY('SREAL/BFLOAT4 -> FLOAT')
+      #DISPLAY('REAL/BFLOAT8 -> DOUBLE PRECISION')
+      #DISPLAY('STRING -> CHAR')
+      #DISPLAY()
+      #DISPLAY('STRING/CSTRING/PSTRING size over the template setting')
+      #DISPLAY('-> BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+      #DISPLAY()
+      #DISPLAY('STRING/CSTRING/PSTRING over 32765')
+      #DISPLAY('-> BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+      #DISPLAY()
+      #DISPLAY('''Not Null'' applied to columns marked as NON ZERO and BOOLEAN')
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+#ENDSHEET
+#!
+#DECLARE (%JKRKeyDescription)
+#DECLARE (%FileExternalFlag)
+#DECLARE (%FileThreadedFlag)
+#DECLARE (%SortedFiles), UNIQUE
+#DECLARE (%Groups), MULTI
+#DECLARE (%JKRFileName)
+#DECLARE (%JKRRelation)
+#DECLARE (%JKRKeyName)
+#DECLARE (%JKRFieldName)
+#DECLARE (%JKRFieldType)
+#DECLARE (%JKRShortDataType)
+#DECLARE (%JKRHasPrimary)
+#DECLARE (%JKRKeyField)
+#DECLARE (%JKRCounter)
+#DECLARE(%JKRCounterLoc,LONG)
+#DECLARE (%JKRUniqueKeys)
+#DECLARE (%RelationErrorMessage)
+#DECLARE (%ValueConstruct)
+#DECLARE (%JKRFileKeyField)
+#DECLARE (%JKRFileFieldLink)
+#DECLARE (%CurrentPath)
+#DECLARE (%OutPutFile)
+#DECLARE (%TotalChars)
+#!
+#DECLARE (%JKRPassedExternalName)
+#DECLARE (%JKRFoundReseredWord)
+#DECLARE (%JKRChangedReseredWord)
+#DECLARE(%JKRAddSpaceCounter)
+#DECLARE(%JKRIndexDeclaration)
+#!
+#DECLARE(%IndexForAllKeyColumns),UNIQUE   #! unique so we cannot add one already there
+#!
+#DECLARE(%JKRLeftSideOfStringLocation)
+#DECLARE(%JKRRightSideOfStringLocation)
+#DECLARE(%JKRLeftSideOfString)
+#DECLARE(%JKRRightSideOfString)
+#DECLARE(%JKRFoundLeftSideMatch,LONG)
+#!
+#MESSAGE('Creating Firebird Scripts',1)
+#! Set the current path to '\Scripts\'
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%DictionaryFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%DictionaryFile,1,%JKRCounter) & 'Scripts\')
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#SET (%OutputFile, %CurrentPath & 'SqlErrors.Txt')
+#!
+#IF (%JKRSelectedFiles)
+  #FOR (%JKRSelectedFiles)
+    #FIX (%FILE,%JKRSelectedFiles)
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ELSE
+
+  #FOR (%File), WHERE ((%FileDriver = 'TOPSPEED' OR %FileDriver = 'ODBC') AND %FileType = 'FILE'  AND NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 )  )
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ENDIF
+#!
+#CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+*/
+#! 
+#! added
+#!---------------------------------------------------------------------
+#INSERT(%ClarionReservedWords)
+#INSERT(%SqlReservedWords)
+#FOR(%ClarionWordList)
+  #ADD(%SqlWordList,%ClarionWordList)
+#ENDFOR
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+#! Check for Errors in Files and Fields
+#IF (%JKRCheckForValidFieldNames = 1)
+#INSERT (%JKRCheckNames)
+  #IF (%JKRCounter > 0)
+    #CLOSE (%OutputFile)
+    #ABORT
+  #ENDIF  
+#ENDIF
+#CLOSE (%OutputFile)
+#!
+#! If no errors in files and fields we can continue
+#!
+#SET (%OutputFile, %CurrentPath & 'SqlTablesAndTriggers.Txt')
+#!
+#CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+*/
+#IF (%JKRCounter = 0)
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRSQLFileDetail,1)
+      #! #INSERT (%JKRKeyDefinitions)
+      #INSERT(%JKRGetPrimaryKeyColumn)
+      #IF (%JKRHasPrimary = 1)
+        #INSERT (%JKRTriggers,%File, %JKRKeyField)
+      #ENDIF  
+  #ENDFOR
+  #!
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+#!
+#SET (%OutputFile, %CurrentPath & 'SqlAll.Txt')
+#!
+#CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+    
+    This includes all these together
+    1. TableWithoutDrop
+    2. CreateSingleIndex
+    3. Index
+    4. ForeignKeys
+    5. AutoNoTriggers
+    6. SPReturnNextAutoNo
+*/
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRSQLFileDetail,0)
+      #! #INSERT (%JKRKeyDefinitions)
+      #INSERT(%JKRGetPrimaryKeyColumn)
+      #IF (%JKRHasPrimary = 1)
+        #INSERT (%JKRTriggers,%File, %JKRKeyField)
+      #ENDIF  
+  #ENDFOR
+  #!
+  #!  Create single indexes for all tables
+  #!
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+  #INSERT(%JKRMakeSingleIndexFromKeyDefinitions)
+  #ENDFOR
+  #!
+  #!  Indexes for all tables
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRKeyDefinitions)
+  #ENDFOR
+  #!
+  #!  ForeignKeys for all tables
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #FOR (%Relation)
+      #INSERT (%JKRForeignKeys)
+    #ENDFOR
+  #ENDFOR
+  #!
+  #!  Auto No Triggers for all tables
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT(%JKRGetPrimaryKeyColumn)
+    #IF (%JKRHasPrimary = 1)
+      #INSERT (%JKRTriggers,%File, %JKRKeyField)
+    #ENDIF  
+  #ENDFOR
+  #!
+  #!  Stored procedures that return the next auto no inc on a tables primary key
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT(%JKRGetPrimaryKeyColumn)
+    #IF (%JKRHasPrimary = 1)
+      #INSERT (%JKRGenPrimaryKeySP,%File, %JKRKeyField)
+    #ENDIF  
+  #ENDFOR
+  #!
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'TablesWithDrop.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+  Tables with drop table
+*/
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRSQLFileDetail,1)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'TablesWithoutDrop.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+  Tables without drop table
+*/
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRSQLFileDetail,0)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'Indexs.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Indexes for all tables
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRKeyDefinitions)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #!
+  #SET (%OutputFile, %CurrentPath &  'DropIndexs.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Drop Indexes for all tables
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT (%JKRDropKeyDefinitions)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'ForeignKeys.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Foreign keys
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #FOR (%Relation)
+      #INSERT (%JKRForeignKeys)
+    #ENDFOR
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'AutoNoTriggers.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Auto No Triggers
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT(%JKRGetPrimaryKeyColumn)
+    #IF (%JKRHasPrimary = 1)
+      #INSERT (%JKRTriggers,%File, %JKRKeyField)
+    #ENDIF  
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'AutoNoTriggersWithNullCheck.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Auto No Triggers with null check on the primary column before incrementing
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT(%JKRGetPrimaryKeyColumn)
+    #IF (%JKRHasPrimary = 1)
+      #INSERT (%JKRNullTriggers,%File, %JKRKeyField)
+    #ENDIF  
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #!
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'SPReturnsNextAutoNo.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Stored procedures that return the next auto no inc on a tables primary key
+    
+*/
+  #! 
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #INSERT(%JKRGetPrimaryKeyColumn)
+    #IF (%JKRHasPrimary = 1)
+      #INSERT (%JKRGenPrimaryKeySP,%File, %JKRKeyField)
+    #ENDIF  
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'Constraints.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+   Created from definitions in %DictionaryFile
+
+   Constraints
+    
+*/
+  #!
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #FOR (%Relation)
+      #INSERT (%JKRConstraints)
+    #ENDFOR
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'NotNullColumns.TXT')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+   Created from definitions in %DictionaryFile
+
+   All columns declared with NOT NULL condition
+   Important for conversion purposes
+    
+*/
+  #!
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #FOR (%File)
+      #INSERT (%JKRNotNullColumns)
+    #ENDFOR
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'DropTables.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Drop table for all tables
+    
+*/
+  #!
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+    #SET (%JKRFileName, UPPER(%File))
+  DROP TABLE %JKRFileName;
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'CreateSingleIndex.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Create single indexes for all tables
+    
+*/
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+  #INSERT(%JKRMakeSingleIndexFromKeyDefinitions)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+  #!
+  #! -----------------------------------------------------------------------------------------------
+  #!
+  #SET (%OutputFile, %CurrentPath &  'DropSingleIndex.SQL')
+  #CREATE (%OutputFile)
+/* JKRSQL.Tpl SQL Script Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+    Created from definitions in %DictionaryFile
+
+    Drop single indexes for all tables
+    
+*/
+  #FOR (%SortedFiles)
+    #FIX (%File, %SortedFiles)
+  #INSERT(%JKRMakeDropSingleIndexFromKeyDefinitions)
+  #ENDFOR
+  #CLOSE (%OutputFile)
+#ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRSQLFileDetail,%JKRAddDropTable)
+#!-----------------------------------------------
+#! Print Dictionary 
+#!-----------------------------------------------
+#!
+
+#IF (%FileDescription)
+/*  %[23]SortedFiles %FileDescription  */
+  #IF (%FileLongDesc)
+#!/*  %FileLongDesc  */
+  #ENDIF
+#ELSE
+/*  %SortedFiles*/
+  #IF (%FileLongDesc)
+#!/*  %FileLongDesc  */
+  #ENDIF
+#ENDIF
+
+#SET (%JKRFileName, UPPER(%File))
+  
+#IF(%JKRAddDropTable = 1)  
+/*  Drop the existing table & data if it already exists  */
+  DROP TABLE %JKRFileName;
+#ENDIF  
+  CREATE TABLE %JKRFileName
+  (
+  #SET (%JKRCounter,0)
+ #! #FOR (%Field)
+    #INSERT (%JKRConvertFieldToSQL)
+#!  #ENDFOR
+  #INSERT (%JKRPrimaryKey)
+  );
+#!
+#!-----------------------------------------------
+#GROUP (%JKRConvertFieldToSQL)
+#!-----------------------------------------------
+#! Convert TPS data type to Firebird
+#!-----------------------------------------------
+#!
+#! #CLEAR( %JKRFieldType)       
+#!
+#!  #FOR (%Field)
+#! %[30]%FieldID    %FieldType
+#!  #ENDFOR
+  #FOR (%Field)
+#! #SET (%JKRCounter, %JKRCounter + 1)
+#! #IF (%JKRCounter > 1)                                             #! Insert previous field
+#!       %[30]JKRFieldName    %JKRFieldType,       
+#! #ENDIF
+#! Use external name if specified - might be needed if SQL reserved words have been used
+    #IF (%FieldName)
+        #SET (%JKRFieldName, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRFieldName, UPPER(%FieldID))
+    #ENDIF
+#!
+#! See what type we have
+#!
+#! TargetDatabase = 'Firebird' 
+ #CASE (%FieldType)
+  #OF ('PICTURE') #OROF ('LIKE')  #OROF ('TYPE')
+    #SET (%JKRFieldType,'PICTURE - TYPE - LIKE  -  ARE NOT ALLOWED')
+  #OF ('BLOB')
+    #SET (%JKRFieldType,'BLOB SUB_TYPE 0 SEGMENT SIZE 80')
+  #OF ('BYTE')
+    #SET (%JKRFieldType,'SMALLINT')
+  #OF ('CSTRING') #OROF ('PSTRING')
+    #IF (%FieldMemoSize > 32765)
+      #SET (%JKRFieldType,'BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+    #ELSE
+      #IF(%JKRChangeStringTypesToBlob = 1)
+        #IF (%FieldMemoSize > %JKRChangeStringTypesToBlobSize-1)
+          #SET (%JKRFieldType,'BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+        #ELSE
+          #SET (%JKRFieldType,'VARCHAR' & '(' & %FieldMemoSize & ')')
+        #ENDIF
+      #ELSE
+          #SET (%JKRFieldType,'VARCHAR' & '(' & %FieldMemoSize & ')')
+      #ENDIF
+    #ENDIF
+  #OF ('DATE') 
+    #SET (%JKRFieldType,'DATE')
+  #OF ('TIME') 
+    #SET (%JKRFieldType,'TIME')
+  #OF ('LONG') 
+    #! Convert longs fields to DATE and longs to Time if checked - else make interger
+    #IF (INSTRING('D',UPPER(%FieldPicture),1,1))
+      #IF(%JKRChangeDateNames = 1)
+        #SET (%JKRFieldType,'DATE')
+      #ELSE
+        #SET (%JKRFieldType,'INTEGER')
+      #ENDIF
+    #ELSIF (INSTRING('T',UPPER(%FieldPicture),1,1))
+      #IF(%JKRChangeTimeNames = 1)
+        #SET (%JKRFieldType,'TIME')
+      #ELSE
+        #SET (%JKRFieldType,'INTEGER')
+      #ENDIF
+    #ELSE
+        #SET (%JKRFieldType,'INTEGER')
+    #ENDIF
+  #OF ('ULONG')
+    #SET (%JKRFieldType,'INTEGER')
+  #OF ('SHORT') #OROF ('USHORT')
+    #SET (%JKRFieldType,'SMALLINT')
+  #OF ('STRING')
+    #IF (%FieldMemoSize > 32765)
+      #SET (%JKRFieldType,'BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+    #ELSE
+      #IF(%JKRChangeStringTypesToBlob = 1)
+        #IF (%FieldMemoSize > %JKRChangeStringTypesToBlobSize-1)
+          #SET (%JKRFieldType,'BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+        #ELSE
+          #SET (%JKRFieldType,'CHAR' & '(' & %FieldMemoSize & ')')
+        #ENDIF
+      #ELSE
+          #SET (%JKRFieldType,'CHAR' & '(' & %FieldMemoSize & ')')
+      #ENDIF
+    #ENDIF
+  #OF ('MEMO')
+    #IF(%FieldMemoImage = 1)
+      #SET (%JKRFieldType,'BLOB SUB_TYPE 0 SEGMENT SIZE 80')
+    #ELSE
+      #SET (%JKRFieldType,'BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+    #ENDIF
+  #OF  ('DECIMAL')
+  #OROF('PDECIMAL')
+      #SET(%JKRFieldType, 'DECIMAL(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+  #OF  ('SREAL')
+  #OROF('BFLOAT4')
+      #SET(%JKRFieldType, 'FLOAT')
+  #OF  ('REAL')
+  #OROF('BFLOAT8')
+      #SET(%JKRFieldType, 'DOUBLE PRECISION')
+  #OF  ('GROUP')
+  #OROF('END')
+      #CYCLE
+ #ENDCASE
+ #!
+ #IF(%JKRNoDefaults = 0)
+   #IF(%FieldInitial)
+     #SET(%JKRFoundLeftSideMatch,0)
+     #IF(ITEMS(%JKRInitialValueList))
+       #FOR(%JKRInitialValueList)
+         #IF(INSTRING('=',%JKRInitialValueList,1,1))
+           #SET(%JKRLeftSideOfStringLocation,(INSTRING('=',%JKRInitialValueList,1,1)))
+           #SET(%JKRLeftSideOfString,SUB(%JKRInitialValueList,1,%JKRLeftSideOfStringLocation-1))
+           #SET(%JKRRightSideOfString,SUB(%JKRInitialValueList,%JKRLeftSideOfStringLocation+1,LEN(%JKRInitialValueList)))
+           #IF(UPPER(CLIP(RIGHT(%JKRLeftSideOfString))) = UPPER(CLIP(RIGHT(%FieldInitial))) )
+               #SET(%JKRFoundLeftSideMatch,1)
+             #IF(CLIP(RIGHT(%JKRRightSideOfString))='')
+               #! EMPTY JKRRightSideOfString %JKRRightSideOfString
+               #CYCLE
+             #ELSE  
+               #! NO EMPTY JKRRightSideOfString %JKRRightSideOfString
+               #SET (%JKRFieldType, %JKRFieldType & ' DEFAULT ' & CLIP(RIGHT(%JKRRightSideOfString)))
+               #CYCLE
+             #ENDIF
+           #ENDIF
+         #ELSE
+           #CYCLE
+         #ENDIF
+       #ENDFOR
+     #ENDIF
+     #!
+     #IF(%JKRFoundLeftSideMatch = 0)
+        #IF (INSTRING('D',UPPER(%FieldPicture),1,1))
+            #! do nothing for dates or times
+        #ELSIF (INSTRING('T',UPPER(%FieldPicture),1,1))
+            #! do nothing for dates or times
+        #ELSE
+           #! #SET (%JKRFieldType, %JKRFieldType & ' DEFAULT ')
+           #SET (%JKRFieldType, %JKRFieldType & ' DEFAULT ' & %FieldInitial)
+        #ENDIF
+     #ENDIF
+   #ENDIF
+ #ENDIF
+ #!
+ #! If Cannot Be Zero Or Blank is set it is always written into the scripts
+ #!
+ #CASE(%FieldValidation)   
+ #OF ( 'NONZERO')
+    #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL')
+ #ENDCASE
+#IF(%JKRFieldValidation = 0)
+  #CASE(%FieldValidation)   
+   #OF ( 'BOOLEAN')
+     #IF(%FieldTrueValue AND %FieldFalseValue)
+       #CASE (%FieldType)
+          #OF ('CSTRING') #OROF ('PSTRING') #OROF ('STRING')
+            #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' = ' & '''' & %FieldTrueValue  & '''' & ' OR '  & %JKRFieldName & ' = ' & '''' & %FieldFalseValue & '''' & ')' )
+          #ELSE
+            #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' = ' & %FieldTrueValue  & ' OR '  & %JKRFieldName & ' = ' & %FieldFalseValue & ')' )
+       #ENDCASE
+     #ENDIF
+   #OF ( 'INLIST')
+     #IF (ITEMS(%FieldValues))
+       #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' IN (')
+       #SET (%JKRCounterLoc, 0)
+       #FOR(%FieldValues)
+         #IF (%JKRCounterLoc = 0)
+           #SET (%JKRFieldType, %JKRFieldType & '''' & %FieldValues & '''' )
+           #SET (%JKRCounterLoc, 1)
+         #ELSE
+           #SET (%JKRFieldType, %JKRFieldType & ',' & '''' & %FieldValues & '''' )
+         #ENDIF
+       #ENDFOR
+       #SET (%JKRFieldType, %JKRFieldType & '))')
+     #ENDIF
+   #OF ( 'INRANGE')
+     #IF (%FieldRangeLow AND %FieldRangeHigh)
+        #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' BETWEEN ' & %FieldRangeLow & ' AND ' &  %FieldRangeHigh &')'  )
+     #ELSIF (%FieldRangeLow AND NOT %FieldRangeHigh)
+        #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' >= ' & %FieldRangeLow &')'  )
+     #ELSIF (NOT %FieldRangeLow AND %FieldRangeHigh)
+        #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' <= '  &  %FieldRangeHigh &')'  )
+     #ENDIF
+  #ENDCASE
+#ENDIF
+ %[30]JKRFieldName    %JKRFieldType,       
+   #ENDFOR
+
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRPrimaryKey)
+#!-----------------------------------------------
+#! Define Primary Key for file and Unique Keys
+#!
+#!-----------------------------------------------
+#!
+#SET (%JKRFileName, UPPER(%File))
+#!
+#! See if file has a Primary key field
+#SET (%JKRHasPrimary,0)
+#FOR (%Key)
+  #IF (%KeyPrimary)
+    #SET (%JKRHasPrimary,1)
+    #BREAK
+  #ENDIF
+#ENDFOR
+#IF (%JKRHasPrimary = 1)
+  #IF (%JKRCounter > 0)                                             #! Insert previous field and if only one in file set the if to 0
+         %[30]JKRFieldName    %JKRFieldType,
+  #ENDIF
+  #FOR (%Key)
+    #IF (%KeyPrimary = 1)
+      #SET (%JKRCounter,0)
+      #FOR (%KeyField)
+        #SET (%JKRCounter,%JKRCounter + 1)
+        #FIX (%Field, %KeyField)
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, UPPER(%FieldID))
+    #ENDIF
+        #IF (%JKRCounter > 1)
+          #SET (%JKRFieldName, %JKRFieldName & ', ' & %JKRKeyField)
+        #ELSE
+          #SET (%JKRFieldName, %JKRKeyField)
+        #ENDIF
+      #ENDFOR
+         CONSTRAINT PK_%JKRFileName PRIMARY KEY (%JKRFieldName)
+    #ENDIF
+  #ENDFOR
+#ELSE                                                                 #! No Comma!
+         %[30]JKRFieldName    %JKRFieldType
+#ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRKeyDefinitions)
+#!-----------------------------------------------
+#! Define Other Keys for all Files
+#!
+#!-----------------------------------------------
+#! %JKRFileName
+#! #IF (%FileName)
+#!  #SET (%JKRFileName, UPPER(SUB(%FileName,2,LEN(%FileName)-2)))
+#! #ELSE
+  #SET (%JKRFileName, UPPER(%File))
+#! #ENDIF
+#!
+#FOR (%Key), WHERE (%KeyPrimary = 0)
+  #! %JKRFileName %JKRKeyName
+  #IF (%KeyName)
+     #SET (%JKRKeyName, UPPER(SUB(%KeyName,2,LEN(%KeyName)-2)))
+  #ELSE
+     #! no colons allowed 
+     #SET (%JKRKeyName, UPPER(%FilePrefix) &    UPPER(%KeyId))
+  #ENDIF
+  #!
+  #SET (%JKRCounter,0)
+  #FOR (%KeyField)
+    #SET (%JKRCounter,%JKRCounter + 1)
+    #FIX (%Field, %KeyField)
+    #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, UPPER(%FieldID))
+    #ENDIF
+    #IF (%JKRCounter > 1)
+      #SET (%JKRFieldName, %JKRFieldName & ', ' & %JKRKeyField)
+    #ELSE
+      #SET (%JKRFieldName, %JKRKeyField)
+    #ENDIF
+    #IF (%KeyFieldSequence = 'DESCENDING')
+     #!       #SET (%JKRFieldName, %JKRFieldName & ' DESCENDING')
+      #SET (%JKRFieldName, %JKRFieldName)
+    #ENDIF
+  #ENDFOR
+  #! 
+  #IF (%KeyDuplicate = 0)
+     #SET (%JKRIndexDeclaration, 'CREATE UNIQUE INDEX ' & Upper(%JKRKeyName) & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRFieldName) & ');')
+  %JKRIndexDeclaration
+  #!#SET(%JKRAddSpaceCounter,1)
+  #ELSE
+     #SET (%JKRIndexDeclaration, 'CREATE INDEX ' & Upper(%JKRKeyName) & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRFieldName) & ');')
+  %JKRIndexDeclaration   
+  #ENDIF
+#ENDFOR
+#!
+#SET(%JKRAddSpaceCounter,1)
+#IF(%JKRAddSpaceCounter > 0)
+  #! add a blank space after any found keys for this table
+    
+#ENDIF
+#!    
+#!
+#!-----------------------------------------------
+#GROUP (%JKRDropKeyDefinitions)
+#!-----------------------------------------------
+#! Define Drop For Other Keys for all Files
+#!
+#!-----------------------------------------------
+#! %JKRFileName
+#! #IF (%FileName)
+#!  #SET (%JKRFileName, UPPER(SUB(%FileName,2,LEN(%FileName)-2)))
+#! #ELSE
+  #SET (%JKRFileName, UPPER(%File))
+#! #ENDIF
+#!
+#FOR (%Key), WHERE (%KeyPrimary = 0)
+  #! %JKRFileName %JKRKeyName
+  #IF (%KeyName)
+     #SET (%JKRKeyName, UPPER(SUB(%KeyName,2,LEN(%KeyName)-2)))
+  #ELSE
+     #! no colons allowed 
+     #SET (%JKRKeyName, UPPER(%FilePrefix) &    UPPER(%KeyId))
+  #ENDIF
+  #!
+  #SET (%JKRCounter,0)
+  #FOR (%KeyField)
+    #SET (%JKRCounter,%JKRCounter + 1)
+    #FIX (%Field, %KeyField)
+    #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, UPPER(%FieldID))
+    #ENDIF
+    #IF (%JKRCounter > 1)
+      #SET (%JKRFieldName, %JKRFieldName & ', ' & %JKRKeyField)
+    #ELSE
+      #SET (%JKRFieldName, %JKRKeyField)
+    #ENDIF
+    #IF (%KeyFieldSequence = 'DESCENDING')
+      #SET (%JKRFieldName, %JKRFieldName & ' DESCENDING')
+    #ENDIF
+  #ENDFOR
+  #! 
+  #IF (%KeyDuplicate = 0)
+     #SET (%JKRIndexDeclaration, 'DROP INDEX ' & Upper(%JKRKeyName) & ';' )
+  %JKRIndexDeclaration   
+  #!#SET(%JKRAddSpaceCounter,1)
+  #ELSE
+     #SET (%JKRIndexDeclaration, 'DROP INDEX ' & Upper(%JKRKeyName)  & ';' )
+  %JKRIndexDeclaration   
+  #ENDIF
+#ENDFOR
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRConstraints)
+#!-----------------------------------------------
+#! Create constraints
+#!
+#!-----------------------------------------------
+#!
+#! NONE HERE SO STOP LOOKING
+#!
+#!-----------------------------------------------
+#GROUP (%JKRTriggers, %UpperFileName, %AutoNoColumn)
+#!-----------------------------------------------
+#! Creates a trigger for all numeric primary keys
+#!
+#!-----------------------------------------------
+#!
+#! Return and make no Trigger for string primary keys
+#!
+#FOR (%Key)
+   #IF (%KeyPrimary = 1)
+      #SET (%JKRCounter,0)
+      #FOR (%KeyField)
+        #SET (%JKRCounter,%JKRCounter + 1)
+        #FIX (%Field, %KeyField)
+        #CASE (%FieldType)
+          #OF ('BLOB')
+          #OROF ('CSTRING')
+          #OROF ('STRING')
+          #OROF ('MEMO')
+            #RETURN
+          #OF ('BYTE')
+          #OF ('LONG') #OROF ('ULONG')
+          #OF ('SHORT') #OROF ('USHORT')
+          #ELSE
+            #RETURN
+        #ENDCASE
+      #ENDFOR
+   #ENDIF         #!  (%KeyPrimary = 1)   
+#ENDFOR
+#!
+#DECLARE(%UpperFileNameAutoNoString)
+#!
+#!
+#! #SET(%UpperFileNameAutoNoString,%UpperFileName & 'AUTONO')
+#SET(%UpperFileNameAutoNoString,UPPER(%AutoNoColumn) & 'AUTONO')
+#!
+
+/*  
+    Table %UpperFileName  
+    Trigger and generator names
+    could excede the 31 character max - so be warned
+*/
+
+CREATE GENERATOR %UpperFileNameAutoNoString;
+SET TERM !! ;
+CREATE TRIGGER GET%UpperFileNameAutoNoString FOR %UpperFileName
+ACTIVE BEFORE INSERT POSITION 0
+AS 
+BEGIN
+  NEW.%AutoNoColumn = GEN_ID(%UpperFileNameAutoNoString, 1);
+END  !!
+SET TERM ; !!
+
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRNullTriggers, %UpperFileName, %AutoNoColumn)
+#!-----------------------------------------------
+#! Creates a trigger for all numeric primary keys
+#! Create null only triggers so an insert is given a new primary key no only if it is null
+#! use for those occasions when you have all ready got your
+#! primary key no for your parent and also for the children from a call to a generator for the table
+#!
+#!-----------------------------------------------
+#!
+#! Return and make no Trigger for string primary keys
+#!
+#FOR (%Key)
+   #IF (%KeyPrimary = 1)
+      #SET (%JKRCounter,0)
+      #FOR (%KeyField)
+        #SET (%JKRCounter,%JKRCounter + 1)
+        #FIX (%Field, %KeyField)
+        #CASE (%FieldType)
+          #OF ('BLOB')
+          #OROF ('CSTRING')
+          #OROF ('STRING')
+          #OROF ('MEMO')
+            #RETURN
+          #OF ('BYTE')
+          #OF ('LONG') #OROF ('ULONG')
+          #OF ('SHORT') #OROF ('USHORT')
+          #ELSE
+            #RETURN
+        #ENDCASE
+      #ENDFOR
+   #ENDIF         #!  (%KeyPrimary = 1)   
+#ENDFOR
+#!
+#DECLARE(%UpperFileNameAutoNoString)
+#!
+#!
+#! #SET(%UpperFileNameAutoNoString,%UpperFileName & 'AUTONO')
+#SET(%UpperFileNameAutoNoString,UPPER(%AutoNoColumn) & 'AUTONO')
+#!
+
+/*  Table %UpperFileName  */
+/*  Triggers and generator names using a null condition
+    This generator is for the stored procedure for returning the auto inc on a table. 
+    Use for getting the parent new record id for the children
+    The trigger for the parent must be the one that does not call the generator unless the id is null
+    could excede the 31 max - so be warned
+*/
+
+CREATE GENERATOR %UpperFileNameAutoNoString;
+SET TERM !! ;
+CREATE TRIGGER GET%UpperFileNameAutoNoString FOR %UpperFileName
+ACTIVE BEFORE INSERT POSITION 0
+AS 
+BEGIN
+  IF NEW.%AutoNoColumn IS NULL THEN NEW.%AutoNoColumn = GEN_ID(%UpperFileNameAutoNoString, 1);
+END !!
+SET TERM ; !!
+
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRGenPrimaryKeySP, %UpperFileName, %AutoNoColumn)
+#!-----------------------------------------------
+#! Creates a stored procedure for all numeric primary keys
+#! use to return the primary key no from the generator call in the SP
+#! use for those occasions when you need the primary key no for
+#! your parent record and the child records
+#!
+#!-----------------------------------------------
+#!
+#! Return and make no Trigger for string primary keys
+#!
+#FOR (%Key)
+   #IF (%KeyPrimary = 1)
+      #SET (%JKRCounter,0)
+      #FOR (%KeyField)
+        #SET (%JKRCounter,%JKRCounter + 1)
+        #FIX (%Field, %KeyField)
+        #CASE (%FieldType)
+          #OF ('BLOB')
+          #OROF ('CSTRING')
+          #OROF ('STRING')
+          #OROF ('MEMO')
+            #RETURN
+          #OF ('BYTE')
+          #OF ('LONG') #OROF ('ULONG')
+          #ELSE
+            #RETURN
+        #ENDCASE
+      #ENDFOR
+   #ENDIF         #!  (%KeyPrimary = 1)   
+#ENDFOR
+#!
+#DECLARE(%UpperFileNameAutoNoString)
+#DECLARE(%UpperFileNameAutoNoStringSP)
+#!
+#!
+#! #SET(%UpperFileNameAutoNoString,%UpperFileName & 'AUTONO')
+#SET(%UpperFileNameAutoNoString,UPPER(%AutoNoColumn) & 'AUTONO')
+#SET(%UpperFileNameAutoNoStringSP,UPPER(%AutoNoColumn) & 'AUTONO_SP')
+#!
+
+
+/*  Table %UpperFileName  */
+/*  Stored procedure for returning the auto inc on a table. Use for getting the parent new record id for the children
+     The trigger for the parent must be the one that does not call the generator unless the id is null
+     This is a select procedure in Firebird and it operates a little different than an executable procedure
+     If called by SELECT * FROM SP Name
+     the SUSPEND IS REQUIRED so see below
+     These names could excede the 31 max - so be warned
+     The generator name is the same name given to the generator on the Primary key on the table
+     so the generator needs to be present
+*/
+
+
+SET TERM !! ;
+CREATE PROCEDURE %UpperFileNameAutoNoStringSP
+RETURNS (AUTOINCNO INTEGER) AS
+BEGIN
+AUTOINCNO = GEN_ID(%UpperFileNameAutoNoString, 1); 
+SUSPEND; 
+END !!
+SET TERM ; !!
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRGetPrimaryKeyColumn)
+#!-----------------------------------------------
+#! Get Primary Key column
+#!
+#!-----------------------------------------------
+#!
+#! See if file has a Primary key field
+#SET (%JKRHasPrimary,0)
+#FOR (%Key)
+  #IF (%KeyPrimary)
+    #SET (%JKRHasPrimary,1)
+    #BREAK
+  #ENDIF
+#ENDFOR
+#IF (%JKRHasPrimary = 1)
+  #FOR (%Key)
+    #IF (%KeyPrimary = 1)
+      #SET (%JKRCounter,0)
+      #FOR (%KeyField)
+        #SET (%JKRCounter,%JKRCounter + 1)
+        #FIX (%Field, %KeyField)
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, %FieldID)
+    #ENDIF
+        #IF (%JKRCounter > 1)
+          #SET (%JKRFieldName, %JKRFieldName & ', ' & %JKRKeyField)
+        #ELSE
+          #SET (%JKRFieldName, %JKRKeyField)
+        #ENDIF
+      #ENDFOR
+    #ENDIF
+  #ENDFOR
+#ENDIF
+#!
+#!-----------------------------------------------
+#GROUP (%JKRCheckNames)
+#!-----------------------------------------------
+#! Check the names of files and fields
+#!
+#!-----------------------------------------------
+#!
+#SET (%JKRCounter, 0)
+#FOR (%SortedFiles)
+  #FIX (%File, %SortedFiles)
+    #IF (%FileName)
+      #INSERT (%JKRCheckName,UPPER(SUB(%File,2,LEN(%File)-2)),0)
+    #ELSE
+      #INSERT (%JKRCheckName,%File,0)
+    #ENDIF
+  #FOR (%Field)
+   #CASE (%FieldType)
+     #OF ('PICTURE') #OROF ('LIKE')  #OROF ('TYPE')
+      #SET (%JKRCounter, %JKRCounter + 1)
+        #IF (%JKRCounter = 1)
+          Error File                            FieldName
+        #ENDIF
+        %[4]JKRCounter  %[30]File  %Field is a type PICTURE - LIKE - TYPE - and these are NOT ALLOWED
+    #ENDCASE
+    #!
+    #IF (%FieldName)
+      #INSERT (%JKRCheckName, SUB(%FieldName,2,LEN(%FieldName)-2),1)
+    #ELSE
+      #INSERT (%JKRCheckName, %FieldID,0)
+    #ENDIF
+  #ENDFOR
+  #FOR (%Key)
+  #!
+  #IF (%KeyName)
+      #INSERT (%JKRCheckName, UPPER(SUB(%KeyName,2,LEN(%KeyName)-2)),1)
+  #ELSE
+      #INSERT (%JKRCheckName, %KeyID,0)
+  #ENDIF
+    #! See if file has a Primary key field
+  #ENDFOR
+  #INSERT(%JKRCheckForPrimaryKey)
+#ENDFOR
+#!
+#!-----------------------------------------------
+#GROUP (%JKRCheckName,%JKRFieldNameToCheck,%JKRPassedExternalName)
+#!-----------------------------------------------
+#! Check the names of files and fields
+#!
+#!-----------------------------------------------
+#!
+#FIND(%SqlWordList, UPPER(%JKRFieldNameToCheck))                        #! search of SQL and clarion reserved words
+#IF(%SqlWordList)                                                          
+  #SET (%JKRCounter, %JKRCounter + 1)
+  #IF (%JKRCounter = 1)
+  Error File                            FieldName
+  #ENDIF
+  %[4]JKRCounter  *** %[30]File  %JKRFieldNameToCheck is a reserved word
+#ENDIF                                                  
+#IF (LEN(%JKRFieldNameToCheck) > 27)
+  #SET (%JKRCounter, %JKRCounter + 1)
+  #IF (%JKRCounter = 1)
+  Error File                            FieldName
+  #ENDIF
+   #SET(%TotalChars,LEN(%JKRFieldNameToCheck))
+  %[4]JKRCounter  %[30]File  %JKRFieldNameToCheck is longer than 27 characters - TOTAL %TotalChars
+#ENDIF
+  #! check for uppercase on %Fieldname
+#IF(%JKRPassedExternalName=1)  
+#IF (%JKRFieldNameToCheck <> UPPER(%JKRFieldNameToCheck))
+  #SET (%JKRCounter, %JKRCounter + 1)
+  #IF (%JKRCounter = 1)
+  Error File                            FieldName
+  #ENDIF
+  %[4]JKRCounter  %[30]File  %JKRFieldNameToCheck is an external field name that has lower case characters NOT ALLOWED
+#ENDIF
+#ENDIF
+#RETURN
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRCheckForPrimaryKey)
+#!-----------------------------------------------
+#! Write output file entry if no Primary Key for file 
+#!
+#!-----------------------------------------------
+#!
+#! See if file has a Primary key field
+#SET (%JKRHasPrimary,0)
+#FOR (%Key)
+  #IF (%KeyPrimary)
+    #FOR(%KeyField)
+      #FIX(%Field,%KeyField)
+      #IF(%FieldValidation <> 'NONZERO')
+        #SET (%JKRCounter, %JKRCounter + 1)
+  #IF (%JKRCounter = 1)
+  Error File                            FieldName
+  #ENDIF
+  %[4]JKRCounter  %[30]File  %[30]KeyField Key column not marked as NONZERO
+      #ENDIF
+    #ENDFOR
+    #SET (%JKRHasPrimary,1)
+    #BREAK
+  #ENDIF
+#ENDFOR
+#IF (%JKRHasPrimary = 0)
+  #SET (%JKRCounter, %JKRCounter + 1)
+  #IF (%JKRCounter = 1)
+  Error File                            FieldName
+  #ENDIF
+  %[4]JKRCounter  %[30]File  Has No Primary Key Declared
+#ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRForeignKeys)
+#!-----------------------------------------------
+#!
+#! Define Foreign Keys
+#!
+#!-----------------------------------------------
+#!
+#! CODE NOT COMPLETE
+#!
+#! #RETURN
+#SET (%JKRFileName, UPPER(%File))
+#IF (%FileRelationType = 'MANY:1')
+
+  #SET (%JKRCounter,0)
+  #FOR (%FileKeyField)
+    #IF (%FileKeyFieldLink)
+      #SET (%JKRCounter, %JKRCounter + 1)
+      #FIX(%Field,%FileKeyField)
+      #IF (%JKRCounter > 1)
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+        #IF (%FieldName)
+          #SET (%JKRFileKeyField,%JKRFileKeyField & ', ' & UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+        #ELSE
+          #SET (%JKRFileKeyField,%JKRFileKeyField & ', ' & UPPER(%FieldID))
+        #ENDIF
+      #ELSE
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+        #IF (%FieldName)
+          #SET (%JKRFileKeyField,UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+        #ELSE
+          #SET (%JKRFileKeyField,UPPER(%FieldID))
+        #ENDIF
+      #ENDIF
+      #SET (%JKRFieldName, UPPER(%FileKeyFieldLink))
+      #SET (%JKRRelation, UPPER(%Relation))
+      #FIX (%File, %Relation)
+      #FIX (%Field, %JKRFieldName)
+      #IF (%JKRCounter > 1)
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+        #IF (%FieldName)
+          #SET (%JKRFileFieldLink,%JKRFileFieldLink & ', ' & UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+        #ELSE
+          #SET (%JKRFileFieldLink,%JKRFileFieldLink & ', ' & UPPER(%FieldID))
+        #ENDIF
+      #ELSE
+        #! Use external name if specified - might be needed if SQL reserved words have been used for field names
+        #IF (%FieldName)
+          #SET (%JKRFileFieldLink,UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+        #ELSE
+          #SET (%JKRFileFieldLink,UPPER(%FieldID))
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDFOR
+    #IF (NOT %RelationConstraintDelete AND NOT %RelationConstraintUPDATE)
+        ALTER TABLE %JKRFileName
+        ADD CONSTRAINT FK_%FilePrefix_%JKRRelation FOREIGN KEY(%JKRFileKeyField)
+        REFERENCES %JKRRelation (%JKRFileFieldLink);
+        
+        
+    #ELSE
+      #IF (%RelationConstraintDelete AND NOT %RelationConstraintUPDATE)
+        ALTER TABLE %JKRFileName
+        ADD CONSTRAINT FK_%FilePrefix_%JKRRelation FOREIGN KEY(%JKRFileKeyField)
+        REFERENCES %JKRRelation (%JKRFileFieldLink);
+        /* REFERENCES %JKRRelation (%JKRFileFieldLink)
+           ON DELETE ;   */
+           
+           
+      #ENDIF
+      #IF (%RelationConstraintUpdate AND NOT %RelationConstraintDelete)
+        ALTER TABLE %JKRFileName
+        ADD CONSTRAINT FK_%FilePrefix_%JKRRelation FOREIGN KEY(%JKRFileKeyField)
+        REFERENCES %JKRRelation (%JKRFileFieldLink);
+        /* REFERENCES %JKRRelation (%JKRFileFieldLink)
+           ON UPDATE ;   */
+           
+           
+      #ENDIF
+      #IF (%RelationConstraintUpdate AND %RelationConstraintDelete)
+        ALTER TABLE %JKRFileName
+        ADD CONSTRAINT FK_%FilePrefix_%JKRRelation FOREIGN KEY(%JKRFileKeyField)
+        REFERENCES %JKRRelation (%JKRFileFieldLink);
+        /* REFERENCES %JKRRelation (%JKRFileFieldLink)
+           ON UPDATE    
+           ON DELETE ;   */
+           
+           
+      #ENDIF
+    #ENDIF
+#ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRNotNullColumns)
+#!-----------------------------------------------
+#!
+#! Define all columns that will be NOT NULL in the script file
+#!
+#!-----------------------------------------------
+
+  %FILE     -    NOT NULL DECLARED COLUMNS
+  #FOR(%FIELD)
+    #! #IF (%FieldValidation = 'BOOLEAN' OR %FieldValidation = 'NONZERO')
+    #IF (%FieldValidation = 'NONZERO')
+     %FIELD
+    #ENDIF
+  #ENDFOR
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRMakeSingleIndexFromKeyDefinitions)
+#!-----------------------------------------------
+#! Makes script for both an ascending and descending index for each column of a multi column key and single column key for all Files
+#!-----------------------------------------------
+#!
+#SET (%JKRFileName, UPPER(%File))
+#FOR (%Key), WHERE (%KeyPrimary = 0)
+  #! %JKRFileName %JKRKeyName
+  #IF (%KeyName)
+     #SET (%JKRKeyName, UPPER(SUB(%KeyName,2,LEN(%KeyName)-2)))
+  #ELSE
+     #! no colons allowed 
+     #SET (%JKRKeyName, UPPER(%FilePrefix) &    UPPER(%KeyId))
+  #ENDIF
+  #!
+  #FOR (%KeyField)
+    #FIX (%Field, %KeyField)
+    #! Use external name if specified 
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, UPPER(%FieldID))
+    #ENDIF
+    #!
+    #IF(SUB(%JKRKeyField,1,LEN(%FilePrefix) ) = UPPER(%FilePrefix) )
+      #ADD(%IndexForAllKeyColumns,'CREATE INDEX ' & Upper(%JKRKeyField) & '_ASC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+      #ADD(%IndexForAllKeyColumns,'CREATE DESCENDING INDEX ' & Upper(%JKRKeyField) & '_DESC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+    #ELSE
+      #ADD(%IndexForAllKeyColumns,'CREATE INDEX ' & Upper(%FilePrefix) & %JKRKeyField & '_ASC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+      #ADD(%IndexForAllKeyColumns,'CREATE DESCENDING INDEX ' & Upper(%FilePrefix) & %JKRKeyField & '_DESC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+    #ENDIF
+  #ENDFOR
+  #! 
+#ENDFOR
+#!
+/* 
+
+    Create both an ascending and descending index for each column of a multi column key and single column key for
+    %File
+    
+*/
+#FOR(%IndexForAllKeyColumns)
+%IndexForAllKeyColumns
+#ENDFOR
+#! ADD 1 SPACES AFTER EACH TABLE
+
+#FREE(%IndexForAllKeyColumns)    
+#!    
+#!
+#!-----------------------------------------------
+#GROUP (%JKRMakeDropSingleIndexFromKeyDefinitions)
+#!-----------------------------------------------
+#! Makes script for dropping both an ascending and descending index for each column of a multi column key and single column key for all Files
+#!-----------------------------------------------
+#!
+#SET (%JKRFileName, UPPER(%File))
+#FOR (%Key), WHERE (%KeyPrimary = 0)
+  #! %JKRFileName %JKRKeyName
+  #IF (%KeyName)
+     #SET (%JKRKeyName, UPPER(SUB(%KeyName,2,LEN(%KeyName)-2)))
+  #ELSE
+     #! no colons allowed 
+     #SET (%JKRKeyName, UPPER(%FilePrefix) &    UPPER(%KeyId))
+  #ENDIF
+  #!
+  #FOR (%KeyField)
+    #FIX (%Field, %KeyField)
+    #! Use external name if specified 
+    #IF (%FieldName)
+        #SET (%JKRKeyField, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    #ELSE
+        #SET (%JKRKeyField, UPPER(%FieldID))
+    #ENDIF
+    #!
+    #IF(SUB(%JKRKeyField,1,LEN(%FilePrefix) ) = UPPER(%FilePrefix) )
+      #ADD(%IndexForAllKeyColumns,'CREATE INDEX ' & Upper(%JKRKeyField) & '_ASC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+      #ADD(%IndexForAllKeyColumns,'CREATE DESCENDING INDEX ' & Upper(%JKRKeyField) & '_DESC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+    #ELSE
+      #ADD(%IndexForAllKeyColumns,'DROP INDEX ' & Upper(%FilePrefix) & %JKRKeyField & '_ASC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+      #ADD(%IndexForAllKeyColumns,'DROP DESCENDING INDEX ' & Upper(%FilePrefix) & %JKRKeyField & '_DESC' & ' ON ' & UPPER(%JKRFileName) & '(' & UPPER(%JKRKeyField) & ');' )
+    #ENDIF
+  #ENDFOR
+  #! 
+#ENDFOR
+#!
+/* 
+
+    Create a Drop Indes for  the both an ascending and descending index for each column of a multi column key and single column key for
+    %File
+    
+*/
+#FOR(%IndexForAllKeyColumns)
+%IndexForAllKeyColumns
+#ENDFOR
+#! ADD 1 SPACES AFTER EACH TABLE
+
+#FREE(%IndexForAllKeyColumns)    
+#!
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateStep3, 'Step 3 - Dictionary Change - change column names/ types and driver for SQL Dictionary in a TXD'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#! This template was adapted from a SQL template by G W Bomford
+#!-----------------------------------------------
+#SHEET
+  #TAB('Page 1 0f 3'),FINISH(0)
+    #BOXED('Change driver and column types in a TXD file')
+      #DISPLAY()
+      #DISPLAY('MAKE BACKUP COPIES OF YOUR DICTIONARY.')
+      #DISPLAY()
+      #DISPLAY('This is for changing the driver, column names and types, table owner, NAME attribute ')
+      #DISPLAY(' and removing the Auto Inc in a TOPSPEED Or ODBC table only.')
+      #DISPLAY(' You can overwrite or add the table name to the tables NAME attr.')
+      #DISPLAY()
+      #DISPLAY('IF YOU CREATE AND OPTION CALLED LocalFile FOR A TABLE NO CHANGES ARE MADE.')
+      #DISPLAY('The USEROPTIONS are checked for LOCALFILE and this table is skipped if found.')
+      #DISPLAY()
+      #DISPLAY('Enter or select the TXD file name to read')
+      #PROMPT('',OPENDIALOG('Pick File','Source|*.TXD')),%JKRSelectedTxdFile,REQ,AT(10)
+      #DISPLAY()
+      #DISPLAY('Enter the NEW TXD file name')
+      #PROMPT ('',@s250),%JKRNewTxdFile,REQ,AT(10)
+      #DISPLAY()
+      #PROMPT ('Change Driver From Topspeed To ODBC',check),%JKRChangeDriverNames,DEFAULT(0),AT(10)
+      #PROMPT ('Make table NAME attribute same as the table name',check),%JKRAddTableNames,DEFAULT(0),AT(10)
+      #PROMPT ('Make the table OWNER attribute this variable name',check),%JKRAddTableOwner,DEFAULT(0),AT(10)
+      #ENABLE(%JKRAddTableOwner = 1),CLEAR
+      #DISPLAY('Example: Glo:dbOwner')
+      #PROMPT ('',@S50),%JKRTableOwnerVariable,DEFAULT('Glo:dbOwner'),AT(10)
+      #ENDENABLE
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 2 0f 3'),FINISH(0)
+    #BOXED('')
+      #DISPLAY()
+      #PROMPT ('Add external name to all columns as table prefix column name',check),%AddTablePrefixToAll,DEFAULT(0),AT(10)
+      #PROMPT ('Add external name to a column/key reserved word as table prefix column/key name',check),%SetTablePrefixOnReservedWords,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #PROMPT ('Move all Memo declarations to the file structure as strings',check),%ChangeMemo,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #PROMPT ('Remove Auto Increment from keys',check),%RemoveAutoInc,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #DISPLAY('Be consistant with the next 2 column Date and Time types.')
+      #DISPLAY('If you did not change them to a Date and Time type in the Firebird Script')
+      #DISPLAY('then do not change them in Step 3 that changes the TXD.')
+      #DISPLAY()
+      #PROMPT ('Change All LONGs With @D To DATE field type',check),%JKRChangeDateNames,DEFAULT(0),AT(10)
+      #PROMPT ('Change All LONGs With @T To TIME field type',check),%JKRChangeTimeNames,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #DISPLAY('Be consistant with the next column type and size change for a Firebird TEXT BLOB.')
+      #DISPLAY('If you do not change them to a BLOB type in the Firebird Script then do not change them ')
+      #DISPLAY('here to a string 63990 that changes the TXD. If you do, create the scripts again.')
+      #DISPLAY()
+      #DISPLAY('Check the box to change all STRING CSTRING PSTRING above the entered size below')
+      #PROMPT ('Make all STRING CSTRING PSTRING a STRING 63990 - a BLOB for text in Firebird',check),%JKRChangeStringTypesToBlob,DEFAULT(0),AT(10)
+      #ENABLE(%JKRChangeStringTypesToBlob = 1),CLEAR
+      #DISPLAY('Example: 2000 makes any of these strings that are 2000 or more in size into a STRING 63990')
+      #PROMPT ('Enter a number or uncheck the box',@N5),%JKRChangeStringTypesToBlobSize,DEFAULT(0)
+      #ENDENABLE
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 3 of 3'),FINISH(1)
+    #BOXED('Change these column types in the TXD file')
+      #DISPLAY()
+      #DISPLAY('DRIVER FROM TOPSPEED TO ODBC')
+      #DISPLAY()
+      #DISPLAY('Table Name written in the Tables NAME Attri in Uppercase')
+      #DISPLAY()
+      #DISPLAY('LONG with @D changes to DATE')
+      #DISPLAY('LONG with @T changes to TIME')
+      #DISPLAY()
+      #DISPLAY('MEMO types are changed by this template. They are changed to a string.')
+      #DISPLAY('The STRING size is 63990.This is what they import as. In the scripts they')
+      #DISPLAY('are declared as a BLOB SUB_TYPE TEXT SEGMENT SIZE 80')
+      #DISPLAY()
+      #DISPLAY('The AUTO INC can be removed from a primary key.')
+      #DISPLAY()
+      #DISPLAY('The scripts are created first and checked for the type of errors.')
+      #DISPLAY('This template can correct some errors by changing')
+      #DISPLAY('or adding external names to the columns.')
+      #DISPLAY()
+      #DISPLAY('The create conversion in step 4 can be done at any time if the')
+      #DISPLAY('tables to convert have been changed to ODBC.')
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+#ENDSHEET
+#!
+#DECLARE (%CurrentPath)
+#DECLARE(%ASCIIFileRecord)
+#DECLARE(%AsciiFileRecordCopy)
+#!
+#DECLARE(%NewTxdAsciiRecord),MULTI
+#DECLARE(%NewTxdAsciiRecordHolder)
+#!
+#DECLARE (%JKRFieldName)
+#DECLARE (%JKRFieldType)
+#DECLARE (%JKRCounter)
+#!
+#DECLARE(%JKRLeftSideOfStringLocation)
+#DECLARE(%JKRRightSideOfStringLocation)
+#DECLARE(%JKRLeftSideOfString)
+#DECLARE(%JKRRightSideOfString)
+#DECLARE(%FoundName)
+#DECLARE(%FoundReseredWord,LONG)
+#DECLARE(%JKRFilePrefix)
+#DECLARE(%JKRFoundComment)
+#DECLARE(%JKRFoundSpace,LONG)
+#DECLARE(%JKREndStatementCounter,LONG)
+#!
+#DECLARE(%JKRAddNameAttribute,LONG)
+#DECLARE(%JKRColumnName)
+#DECLARE(%InDeclaredKeys,LONG)
+#DECLARE(%InRecordStructure,LONG)
+#DECLARE(%JKRFoundDateColumn,LONG)
+#DECLARE(%JKRFoundTimeColumn,LONG)
+#DECLARE(%FoundReservedWord,LONG)
+#!
+#DECLARE(%JKRFoundUserOption,LONG)
+#DECLARE(%JKRFoundLocalFile,LONG)
+#!
+#DECLARE(%JKRNotTPSFile,LONG)
+#DECLARE(%JKRBeginOfTableCheck,LONG)
+#!
+#DECLARE(%MemoDeclarations),MULTI
+#DECLARE(%FoundMemo,LONG)
+#DECLARE(%KeyDeclarations),MULTI
+#DECLARE(%KeyTempStorage),MULTI
+#!
+#MESSAGE('Modifying TXD file',1)
+#! setup check for reserved words
+  #INSERT(%ClarionReservedWords)
+  #INSERT(%SqlReservedWords)
+  #FOR(%ClarionWordList)
+    #ADD(%SqlWordList,%ClarionWordList)
+  #ENDFOR
+#!
+  #INSERT(%JKROpenStep5TxdFile)
+#!
+#! ONLY ONE LINE THE CODE IS IN GROUPS
+#!
+#GROUP (%JKROpenStep5TxdFile)
+#!-----------------------------------------------
+#!
+#! opens the txd file and makes the changes
+#!
+#!-----------------------------------------------
+#set(%JKRCounter,0)
+#! 
+#OPEN(%JKRSelectedTxdFile),READ
+#! 
+#! #IF(%ERRORCODE)
+#!   %ERROR(%ERRORCODE)
+#! #RETURN
+#! #ENDIF
+#!
+#! %JKRBeginOfTableCheck is used to set the begin of each table
+#!
+#SET(%JKRBeginOfTableCheck,1)
+#LOOP
+    #READ(%ASCIIFileRecord)
+    #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+    #ENDIF
+    #!
+    #!--------BEGIN OF SKIP NON TOPSPEED FILES----------------------------
+    #!
+    #IF (INSTRING('FILE,DRIVER(',UPPER(%ASCIIFileRecord),1,1))
+      #IF (INSTRING('FILE,DRIVER(''TOPSPEED''',UPPER(%ASCIIFileRecord),1,1) OR INSTRING('FILE,DRIVER(''ODBC''',UPPER(%ASCIIFileRecord),1,1))
+        #SET(%JKRNotTPSFile,0)
+        #SET(%JKRBeginOfTableCheck,0)
+        #SET(%JKRFoundUserOption,0)
+        #INSERT(%JKRGetFilePrefix)
+        #INSERT(%JKRChangeDriverType)
+        #!
+        #! read next line of file ident and write to txd
+        #!
+        #READ(%ASCIIFileRecord)
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #!
+        #SET(%JKREndStatementCounter,2)
+        #SET(%InDeclaredKeys,1) #! set this here so we can get the keys after table checks and before record statement
+        #!
+        #CYCLE
+      #ELSE
+        #SET(%JKRNotTPSFile,1)
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #CYCLE
+      #ENDIF
+    #ENDIF
+    #!
+    #!
+    #! *   END OF SKIP NON TOPSPEED FILES
+    #!
+    #!
+    #! *   BEGIN OF LOCALFILE CHECK - this is always done before the file declaration in the TXD 
+    #!
+    #! we stay in this if until %JKRBeginOfTableCheck gets set to 0 - gets set to 0 by instring(Driver( and in this if statement
+    #! gets reset to a 1 after out of record structure and at start
+    #IF(%JKRBeginOfTableCheck = 1)
+      #! check for a [USEROPTION] so we can then check for LOCALFILE on next pass
+      #IF (SUB(%ASCIIFileRecord,1,12) = '[USEROPTION]')
+        #SET(%JKRFoundUserOption,1)
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #CYCLE
+      #ENDIF  
+      #! check for a local file ON FIRST LINE AFTER [USEROPTION]
+      #IF(%JKRFoundUserOption = 1)
+        #IF (SUB(UPPER(%ASCIIFileRecord),1,10) = '!LOCALFILE')
+          #SET(%JKRFoundLocalFile,1)
+          #SET(%JKRFoundUserOption,0)
+          #SET(%JKRBeginOfTableCheck,0)
+          #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+          #CYCLE
+        #ENDIF  
+      #ENDIF  
+      #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+      #CYCLE
+    #ENDIF  
+    #!
+    #! *      END OF LOCALFILE CHECK
+    #!
+    #! *      TEST FOR END OF A RECORD CONDITIONS 
+    #!
+    #IF (UPPER(SUB(%ASCIIFileRecord,1,6)) = 'RECORD')
+     #!
+     #! * copy keys to txd before Record Structure
+     #!
+      #FOR(%KeyDeclarations)
+        #!
+        #! if bypass this table just write the keys and we also write the memo's for the same condition
+        #!
+        #IF(%JKRFoundLocalFile = 1 OR %JKRNotTPSFile = 1)
+          #ADD(%NewTxdAsciiRecord,%KeyDeclarations)
+          #CYCLE
+        #ENDIF
+        #!
+        #! * check for auto on key
+        #!
+        #IF (SUB(%KeyDeclarations,1,2) = '!!')
+          #IF(%RemoveAutoInc = 1 AND INSTRING(',AUTO',%KeyDeclarations,1,1) )      
+            #SET(%JKRLeftSideOfString,SUB(%KeyDeclarations,1,( INSTRING(',AUTO',%KeyDeclarations,1,1) -1)))
+            #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString)
+            #CYCLE
+          #ENDIF  
+        #ENDIF  
+        #!
+        #! * check for ! or [ add and cycle
+        #!
+        #IF((SUB(%KeyDeclarations,1,1) = '!') OR (SUB(%KeyDeclarations,1,1) = '['))
+          #ADD(%NewTxdAsciiRecord,%KeyDeclarations)
+        #ELSE
+          #!
+          #! * check name on declaration for reserved word- either way do group that adds to queue
+          #!
+          #IF(INSTRING(',NAME(',%KeyDeclarations,1,1) )
+            #INSERT(%JKRCheckKey,0,%KeyDeclarations)
+            #! added to %NewTxdAsciiRecord in group so we just cycle
+            #CYCLE
+          #ELSE  
+            #INSERT(%JKRCheckKey,1,%KeyDeclarations)
+            #! added to %NewTxdAsciiRecord in group so we just cycle
+            #CYCLE
+          #ENDIF
+        #ENDIF
+      #ENDFOR     
+      #!
+      #! * always free temp queues
+      #!
+      #FREE(%KeyDeclarations)
+      #!
+      #! if bypass this table just write the memo's
+      #!
+      #IF(%JKRFoundLocalFile = 1 OR %JKRNotTPSFile = 1 OR %ChangeMemo = 0)
+        #FOR(%MemoDeclarations)
+            #ADD(%NewTxdAsciiRecord,%MemoDeclarations)
+        #ENDFOR
+        #SET(%FoundMemo, 0)
+        #FREE(%MemoDeclarations)
+      #ENDIF
+      #!
+      #! * now add the  'RECORD' ascii line
+      #!
+      #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+      #!
+      #! * set in record structure and out of keys
+      #!
+      #SET(%InRecordStructure,1)
+      #SET(%InDeclaredKeys,0)
+      #CYCLE
+    #ENDIF     #! If (UPPER(SUB(%ASCIIFileRecord,1,6)) = 'RECORD')
+    #!
+    #! * In record structure tests the next if statement sets us back to look for begin of a table structure if true
+    #!
+    #IF(%InRecordStructure)
+      #!
+      #! add indent line and cycle
+      #!
+      #IF (SUB(%ASCIIFileRecord,1,2) = '!!')
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #CYCLE
+      #ENDIF  
+      #!
+      #! add a ! or [ line and cycle
+      #!
+      #IF (SUB(%ASCIIFileRecord,1,1) = '!' OR SUB(%ASCIIFileRecord,1,1) = '[' )
+        #!
+        #! TEST FOR DATE AND TIME CONDITIONS
+        #!
+        #IF(INSTRING('(@D',UPPER(%ASCIIFileRecord),1,1) AND SUB(%ASCIIFileRecord,1,1) = '!' )
+          #SET(%JKRFoundDateColumn,1)
+        #ENDIF
+        #IF(INSTRING('(@T',UPPER(%ASCIIFileRecord),1,1) AND SUB(%ASCIIFileRecord,1,1) = '!' )
+          #SET(%JKRFoundTimeColumn,1)
+        #ENDIF
+        #!
+        #!    END TEST FOR DATE AND TIME CONDITIONS
+        #!
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #CYCLE
+      #ENDIF  
+      #!
+      #IF (SUB(CLIP(LEFT(%ASCIIFileRecord)),1,3) = 'END')
+        #IF(%JKREndStatementCounter > 2) #! in a group so we write and cycle
+          #SET(%JKREndStatementCounter, %JKREndStatementCounter - 1)
+          #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+          #CYCLE
+        #ENDIF
+        #! add any memos to the end of the record structure
+        #IF(%ChangeMemo = 1 AND (%JKRFoundLocalFile = 0 OR %JKRNotTPSFile = 0 ) )
+          #FOR(%MemoDeclarations)
+            #! if we find the declaration check the column conditions
+            #IF(INSTRING(' MEMO(',%MemoDeclarations,1,1)  AND ( (SUB(%MemoDeclarations,1,1) <> '!') OR (SUB(%MemoDeclarations,1,1) <> '[') ) )
+              #IF(INSTRING(',NAME(',%MemoDeclarations,1,1) )
+                #INSERT(%JKRCheckColumn,0,%MemoDeclarations)
+                #! added to %NewTxdAsciiRecord in group so we just cycle
+                #CYCLE
+              #ELSE  
+                #INSERT(%JKRCheckColumn,1,%MemoDeclarations)
+                #! added to %NewTxdAsciiRecord in group so we just cycle
+                #CYCLE
+              #ENDIF
+            #ENDIF
+            #ADD(%NewTxdAsciiRecord,%MemoDeclarations)
+          #ENDFOR
+          #SET(%FoundMemo, 0)
+          #FREE(%MemoDeclarations)
+        #ENDIF
+        #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+        #SET(%InDeclaredKeys,0)
+        #SET(%InRecordStructure,0)
+        #SET(%JKRBeginOfTableCheck,1)
+        #SET(%JKRFoundLocalFile,0)
+        #SET(%JKRNotTPSFile,0)
+        #CYCLE
+      #ENDIF  
+    #ENDIF  #! IF(%InRecordStructure)
+    #!
+    #! check for group
+    #!
+    #IF(%InRecordStructure)
+        #! we add the group back to the txd and then inc the end statement counter to catch the end of the group
+        #IF(INSTRING(' GROUP',%ASCIIFileRecord,1,1) )
+          #SET(%JKREndStatementCounter, %JKREndStatementCounter + 1)
+          #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+          #CYCLE
+        #ENDIF
+        #IF(INSTRING(',NAME(',%ASCIIFileRecord,1,1) )
+          #INSERT(%JKRCheckColumn,0,%AsciiFileRecord)
+          #CYCLE
+        #ELSE  
+          #INSERT(%JKRCheckColumn,1,%AsciiFileRecord)
+          #CYCLE
+        #ENDIF
+    #ENDIF  #! IF(%InRecordStructure)
+    #!
+    #! check keys before record
+    #!
+    #IF(%InDeclaredKeys)
+       #ADD(%KeyTempStorage,%ASCIIFileRecord)
+       #IF (SUB(%ASCIIFileRecord,1,2) = '!!')
+         #IF(%FoundMemo = 1)
+           #FOR(%KeyTempStorage)
+             #ADD(%MemoDeclarations,%KeyTempStorage)
+           #ENDFOR
+           #SET(%FoundMemo,0)
+           #FREE(%KeyTempStorage)
+         #ELSE
+           #FOR(%KeyTempStorage)
+             #ADD(%KeyDeclarations,%KeyTempStorage)
+           #ENDFOR
+           #SET(%FoundMemo,0)
+           #FREE(%KeyTempStorage)
+         #ENDIF
+       #ENDIF
+       #IF(%ChangeMemo=1)
+          #IF(INSTRING(' MEMO(',%ASCIIFileRecord,1,1) )
+            #SET(%FoundMemo,1)
+          #ENDIF
+       #ENDIF
+       #CYCLE
+    #ENDIF
+    #!
+    #! THIS LAST ONE GETS ANYTHING NOT FOUND BY CONDITIONS
+    #!
+    #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+#ENDLOOP
+#CLOSE(%JKRSelectedTxdFile),READ
+#! Remove Extension
+#set(%JKRCounter,0)
+#! #LOOP
+#!   #SET (%JKRCounter, INSTRING('.',%JKRNewTxdFile,1,%JKRCounter+1))
+#!   #IF (%JKRCounter)
+#!     #SET (%JKRNewTxdFile,SUB(%JKRNewTxdFile,1,%JKRCounter-1))
+#!   #ELSE
+#!     #BREAK
+#!   #ENDIF
+#! #ENDLOOP
+#!
+#! #SET(%JKRNewTxdFile, %JKRNewTxdFile)
+#! #SET(%JKRNewTxdFile,%CurrentPath & %JKRNewTxdFile & '.TXD')
+#CREATE(%JKRNewTxdFile)
+#FOR(%NewTxdAsciiRecord)
+%NewTxdAsciiRecord
+#ENDFOR
+#CLOSE(%JKRNewTxdFile)
+#!
+#!----------------------------------------
+#GROUP(%JKRChangeDriverType)
+#!----------------------------------------
+#!
+#!  change driver to ODBC and also check for NAME attri change
+#!
+#IF(%JKRFoundLocalFile = 1 OR %JKRNotTPSFile = 1)
+      #ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+      #RETURN
+#ENDIF
+#!
+#IF(%JKRChangeDriverNames=1)
+     #SET(%JKRLeftSideOfStringLocation,INSTRING('FILE,DRIVER(',%ASCIIFileRecord,1,1) + 12)
+     #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation)-2 )
+     #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+     #SET(%JKRRightSideOfString,SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) )
+     #! just set and check next conditions add to new txa in the end
+     #SET(%ASCIIFileRecord,%JKRLeftSideOfString & 'ODBC' & %JKRRightSideOfString)
+     #IF(%JKRAddTableNames = 1)
+           !#SET(%ASCIIFileRecord,%JKRLeftSideOfString & 'ODBC' & %JKRRightSideOfString)
+       #INSERT(%JKRAddTableName)
+           #!#ELSE
+           #!#ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & 'ODBC' & %JKRRightSideOfString)
+     #ENDIF 
+     #! #RETURN
+     #IF(%JKRAddTableOwner = 1)
+        #INSERT(%JKRAddTableOwnerName)
+     #ENDIF 
+#ELSE      
+     #IF(%JKRAddTableNames = 1)
+       #INSERT(%JKRAddTableName)
+          #!#ELSE
+          #! #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & 'ODBC' & %JKRRightSideOfString)
+     #ENDIF 
+          #! #RETURN
+     #IF(%JKRAddTableOwner = 1)
+        #INSERT(%JKRAddTableOwnerName)
+     #ENDIF 
+#ENDIF
+#ADD(%NewTxdAsciiRecord,%ASCIIFileRecord)
+#!
+#!
+#!----------------------------------------
+#GROUP(%JKRAddTableName)
+#!----------------------------------------
+   #SET(%JKRRightSideOfStringLocation,INSTRING( ' ',%ASCIIFileRecord,1,1))
+   #SET(%FoundName,UPPER(SUB(%ASCIIFileRecord,1,(%JKRRightSideOfStringLocation-1))))
+   #IF(INSTRING(',NAME(',%ASCIIFileRecord,1,1) )
+      #SET(%JKRLeftSideOfStringLocation,INSTRING(',NAME(',%ASCIIFileRecord,1,1) + 5)
+      #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation) - 1)
+      #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+      #SET(%JKRRightSideOfString,SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) )
+      #SET(%ASCIIFileRecord,%JKRLeftSideOfString & '<39>' & %FoundName & '<39>' & %JKRRightSideOfString)
+      #! #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & '<39>' & %FoundName & '<39>' & %JKRRightSideOfString)
+   #ELSE
+     #SET(%JKRLeftSideOfStringLocation,INSTRING('FILE,DRIVER(',%ASCIIFileRecord,1,1) + 13)
+     #SET(%JKRLeftSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+     #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation) )
+     #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+     #SET(%JKRRightSideOfString,SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) )
+      #SET(%ASCIIFileRecord,%JKRLeftSideOfString & ',NAME(''' & %FoundName & ''')' & %JKRRightSideOfString)
+     #! #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & ',NAME(''' & %FoundName & ''')' & %JKRRightSideOfString)
+   #ENDIF
+#!
+#!
+#!----------------------------------------
+#GROUP(%JKRAddTableOwnerName)
+#!----------------------------------------
+#!
+   #IF(INSTRING(',OWNER(',%ASCIIFileRecord,1,1) )
+      #SET(%JKRLeftSideOfStringLocation,INSTRING(',OWNER(',%ASCIIFileRecord,1,1) + 6)
+      #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation) - 1)
+      #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+      #SET(%JKRRightSideOfString,SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) )
+      #SET(%ASCIIFileRecord,%JKRLeftSideOfString & %JKRTableOwnerVariable & %JKRRightSideOfString)
+      #! #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & '<39>' & %FoundName & '<39>' & %JKRRightSideOfString)
+   #ELSE
+
+     #SET(%JKRLeftSideOfStringLocation,INSTRING('FILE,DRIVER(',%ASCIIFileRecord,1,1) + 13)
+     #SET(%JKRLeftSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+     #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation) )
+     #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+     #SET(%JKRRightSideOfString,SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) )
+      #SET(%ASCIIFileRecord,%JKRLeftSideOfString & ',OWNER(' & %JKRTableOwnerVariable & ')' & %JKRRightSideOfString)
+     #! #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & ',NAME(''' & %FoundName & ''')' & %JKRRightSideOfString)
+   #ENDIF
+#!
+#!
+#!----------------------------------------
+#GROUP (%JKRCheckKey,%JKRAddNameAttribute,%AsciiFileRecordCopy)
+#!-----------------------------------------------
+#!
+#! adds name attr to key
+#!
+#!-----------------------------------------------
+#!
+#! check existing Name attribute when passed a 0
+#! add name attribute when passed a 1
+#! FontSize                   BYTE !Font Size
+#IF(%JKRFoundLocalFile = 1 OR %JKRNotTPSFile = 1)
+      #ADD(%NewTxdAsciiRecord,%AsciiFileRecordCopy)
+      #CYCLE
+#ENDIF
+#IF(%JKRAddNameAttribute = 0)
+      #SET(%JKRLeftSideOfStringLocation,INSTRING(',NAME(',%AsciiFileRecordCopy,1,1) + 6)
+      #SET(%JKRRightSideOfStringLocation,INSTRING(')',%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation) - 2)
+      #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation))
+      #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(%JKRRightSideOfStringLocation+1),len(clip(%AsciiFileRecordCopy)) ) )
+      #SET(%FoundName,UPPER(SUB(%AsciiFileRecordCopy,(%JKRLeftSideOfStringLocation+1),%JKRRightSideOfStringLocation-(%JKRLeftSideOfStringLocation))))
+  #!
+  #IF(%SetTablePrefixOnReservedWords = 1 And %AddTablePrefixToAll = 0)
+    #SET(%FoundReservedWord, 0)
+    #FIND(%SqlWordList, UPPER(%FoundName))                        #! search of SQL and clarion reserved words
+    #IF(%SqlWordList)                       
+      #SET(%FoundReservedWord, 1)
+    #ENDIF                                                  
+  #ENDIF
+  #!
+  #IF(%AddTablePrefixToAll = 1 OR %FoundReseredWord = 1)
+    #SET(%FoundName,%JKRFilePrefix & %FoundName)
+  #ENDIF
+  #!
+    #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & UPPER(%FoundName) & %JKRRightSideOfString)
+  #!
+#ElsIF(%JKRAddNameAttribute = 1)
+    #! we add the Name attribute
+    #SET(%JKRLeftSideOfStringLocation,INSTRING('KEY(',%AsciiFileRecordCopy,1,1) + 3)
+    #SET(%JKRLeftSideOfStringLocation,INSTRING(')',%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation) )
+    #SET(%JKRRightSideOfStringLocation,INSTRING(')',%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation))
+    #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation))
+    #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(%JKRRightSideOfStringLocation+1),len(clip(%AsciiFileRecordCopy)) ) )
+
+    #SET(%JKRFoundSpace,INSTRING(' ',%AsciiFileRecordCopy,1,1))
+    #SET(%FoundName,UPPER(SUB(%AsciiFileRecordCopy,1,(%JKRFoundSpace-1))))
+    #!
+    #IF(%SetTablePrefixOnReservedWords = 1 And %AddTablePrefixToAll = 0)
+      #SET(%FoundReseredWord, 0)
+      #FIND(%SqlWordList, UPPER(%FoundName))                        #! search of SQL and clarion reserved words
+      #IF(%SqlWordList)                       
+        #SET(%FoundReseredWord, 1)
+      #ENDIF                                                  
+    #ENDIF
+    #!
+    #IF(%AddTablePrefixToAll = 1 OR %FoundReseredWord = 1)
+      #SET(%FoundName,%JKRFilePrefix & %FoundName)
+      #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & ',NAME(''' & UPPER(%FoundName) & ''') ' & %JKRRightSideOfString)
+    #ELSE  
+      #ADD(%NewTxdAsciiRecord,%AsciiFileRecordCopy)
+    #ENDIF
+    #!
+#ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRCheckColumn,%JKRAddNameAttribute,%AsciiFileRecordCopy)
+#!-----------------------------------------------
+#!
+#! adds name attr to column
+#!
+#!-----------------------------------------------
+#!
+#IF(%JKRFoundLocalFile = 1 OR %JKRNotTPSFile = 1)
+      #ADD(%NewTxdAsciiRecord,%AsciiFileRecordCopy)
+      #CYCLE
+#ENDIF
+#!
+#! check existing Name attribute when passed a 0
+#! add name attribute when passed a 1
+#!
+#!  check all columns for type change first 
+#!  a variable was set before entering this group to check or not
+#!  this group sets %AsciiFileRecordCopy to the new type with everything else the same
+#!
+#INSERT(%JKRCheckColumnType,%AsciiFileRecordCopy)
+#!
+#IF(%JKRAddNameAttribute = 0)
+  #SET(%JKRLeftSideOfStringLocation,INSTRING(',NAME(',%AsciiFileRecordCopy,1,1) + 6)
+  #SET(%JKRRightSideOfStringLocation,INSTRING(')',%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation) - 2)
+  #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,%JKRLeftSideOfStringLocation))
+  #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(%JKRRightSideOfStringLocation+1),len(clip(%AsciiFileRecordCopy)) ) )
+  #SET(%FoundName,UPPER(SUB(%AsciiFileRecordCopy,(%JKRLeftSideOfStringLocation+1),%JKRRightSideOfStringLocation-(%JKRLeftSideOfStringLocation))))
+  #!
+  #IF(%SetTablePrefixOnReservedWords = 1 And %AddTablePrefixToAll = 0)
+    #SET(%FoundReservedWord, 0)
+    #FIND(%SqlWordList, UPPER(%FoundName))                        #! search of SQL and clarion reserved words
+    #IF(%SqlWordList)                       
+      #SET(%FoundReservedWord, 1)
+    #ENDIF                                                  
+  #ENDIF
+  #!
+  #IF(%AddTablePrefixToAll = 1 OR %FoundReseredWord = 1)
+    #SET(%FoundName,%JKRFilePrefix & %FoundName)
+  #ENDIF
+#!
+    #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & UPPER(%FoundName) & %JKRRightSideOfString)
+#!
+#ElsIf(%JKRAddNameAttribute = 1)
+  #! we add the Name attribute
+  #IF (INSTRING('!',%AsciiFileRecordCopy,1,1))
+    #SET(%JKRFoundComment,INSTRING('!',%AsciiFileRecordCopy,1,1))
+    #SET(%JKRFoundSpace,INSTRING(' ',%AsciiFileRecordCopy,1,1))
+    #SET(%FoundName,UPPER(SUB(%AsciiFileRecordCopy,1,(%JKRFoundSpace-1))))
+    #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(%JKRFoundComment-2)))
+    #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,%JKRFoundComment,len(clip(%AsciiFileRecordCopy)) ))
+  #ELSE
+    #SET(%JKRFoundSpace,INSTRING(' ',%AsciiFileRecordCopy,1,1))
+    #SET(%FoundName,UPPER(SUB(%AsciiFileRecordCopy,1,(%JKRFoundSpace-1))))
+    #SET(%JKRLeftSideOfString, Clip(%AsciiFileRecordCopy))
+    #SET(%JKRRightSideOfString,'')
+  #ENDIF
+  #!
+  #IF(%SetTablePrefixOnReservedWords = 1 And %AddTablePrefixToAll = 0)
+    #SET(%FoundReseredWord, 0)
+    #FIND(%SqlWordList, UPPER(%FoundName))                        #! search of SQL and clarion reserved words
+    #IF(%SqlWordList)                       
+      #SET(%FoundReseredWord, 1)
+    #ENDIF                                                  
+  #ENDIF
+  #!
+  #IF(%AddTablePrefixToAll = 1 OR %FoundReseredWord = 1)
+    #SET(%FoundName,%JKRFilePrefix & %FoundName)
+    #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & ',NAME(''' & UPPER(%FoundName) & ''') ' & %JKRRightSideOfString)
+  #ELSE  
+    #ADD(%NewTxdAsciiRecord,%ASCIIFileRecordCopy)
+  #ENDIF
+  #!
+#ENDIF
+  #!
+  #!
+#!----------------------------------------
+#GROUP(%JKRCheckColumnType,* %AsciiFileRecordCopy)
+#!----------------------------------------
+#DECLARE(%StringSizeNo,LONG)
+#DECLARE(%LeftSidePos,LONG)
+#DECLARE(%RightSidePos,LONG)
+#!
+#!  * ck for date and time longs - memo -  string size
+#!
+#IF(%ChangeMemo = 1)
+  #IF (INSTRING(' MEMO(',UPPER(%AsciiFileRecordCopy),1,1))
+     #!
+     #!  * make sure we have a memo
+     #!
+     #SET(%LeftSidePos,(INSTRING(')',UPPER(%AsciiFileRecordCopy),1,1)))
+     #IF(INSTRING('MEMO(',UPPER(%AsciiFileRecordCopy),1,1) < %LeftSidePos  )
+        #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(INSTRING('MEMO(',UPPER(%AsciiFileRecordCopy),1,1)-1)))
+        #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,%LeftSidePos+1,len(%AsciiFileRecordCopy) ) )
+        #SET(%AsciiFileRecordCopy,%JKRLeftSideOfString & 'STRING(63990)' & %JKRRightSideOfString)
+        #RETURN
+    #ENDIF
+  #ENDIF
+#ENDIF
+#!
+#IF(%JKRChangeStringTypesToBlob = 1)
+     #!
+     #!  * make sure we have a string
+     #!  * if we find a string check the size
+     #!
+  #IF (INSTRING(' STRING(',UPPER(%AsciiFileRecordCopy),1,1))
+    #SET(%LeftSidePos,(INSTRING('(',%AsciiFileRecordCopy,1,1) + 1 ) )
+    #IF(INSTRING(' STRING(',UPPER(%AsciiFileRecordCopy),1,1) < %LeftSidePos  )
+      #SET(%RightSidePos,INSTRING(')',%AsciiFileRecordCopy,1,%LeftSidePos)  )
+      #SET(%StringSizeNo,SUB(%AsciiFileRecordCopy,%LeftSidePos,(%RightSidePos-%LeftSidePos)) )
+      #IF(%StringSizeNo > %JKRChangeStringTypesToBlobSize - 1)
+        #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(INSTRING('STRING(',UPPER(%AsciiFileRecordCopy),1,1)-1)))
+        #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(INSTRING(')',UPPER(%AsciiFileRecordCopy),1,%LeftSidePos)+1),len(%AsciiFileRecordCopy)) )
+        #SET(%AsciiFileRecordCopy,%JKRLeftSideOfString & 'STRING(63990)' & %JKRRightSideOfString)
+        #RETURN
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#!
+#IF(%JKRChangeDateNames=1)
+  #IF(%JKRFoundDateColumn = 1)
+    #IF (INSTRING(' LONG',UPPER(%AsciiFileRecordCopy),1,1))
+      #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(INSTRING('LONG',UPPER(%AsciiFileRecordCopy),1,1)-1)))
+      #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(INSTRING('LONG',UPPER(%AsciiFileRecordCopy),1,1)+4),len(clip(%AsciiFileRecordCopy)) ))
+      #SET(%AsciiFileRecordCopy,%JKRLeftSideOfString & 'DATE' & %JKRRightSideOfString)
+      #SET(%JKRFoundDateColumn,0)
+      #RETURN
+    #ENDIF
+  #ENDIF
+#ENDIF
+#IF(%JKRChangeTimeNames=1)
+  #IF(%JKRFoundTimeColumn = 1)
+    #IF (INSTRING(' LONG',UPPER(%AsciiFileRecordCopy),1,1))
+      #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(INSTRING('LONG',UPPER(%AsciiFileRecordCopy),1,1)-1)))
+      #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(INSTRING('LONG',UPPER(%AsciiFileRecordCopy),1,1)+4),len(clip(%AsciiFileRecordCopy)) ))
+      #SET(%AsciiFileRecordCopy,%JKRLeftSideOfString & 'TIME' & %JKRRightSideOfString)
+      #SET(%JKRFoundTimeColumn,0)
+      #RETURN
+    #ENDIF
+  #ENDIF
+#ENDIF
+#!
+#!
+#! now check for byte or memo types
+#!
+#!  #IF (INSTRING('BYTE',UPPER(%AsciiFileRecordCopy),1,1))
+#!    #SET(%JKRLeftSideOfString,SUB(%AsciiFileRecordCopy,1,(INSTRING('BYTE',UPPER(%AsciiFileRecordCopy),1,1)-1)))
+#!    #SET(%JKRRightSideOfString,SUB(%AsciiFileRecordCopy,(INSTRING('BYTE',UPPER(%AsciiFileRecordCopy),1,1)+4),len(clip(%AsciiFileRecordCopy)) ))
+#!    #ADD(%NewTxdAsciiRecord,%JKRLeftSideOfString & 'SHORT' & %JKRRightSideOfString)
+#!    #RETURN
+#!  #ENDIF
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRGetFilePrefix)
+#!-----------------------------------------------
+#!
+#! gets the table prefix
+#!
+#!-----------------------------------------------
+
+
+      #SET(%JKRLeftSideOfStringLocation,INSTRING(',PRE(',%ASCIIFileRecord,1,1) + 5)
+      #SET(%JKRRightSideOfStringLocation,INSTRING(')',%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation) - 1)
+      #SET(%JKRLeftSideOfString,SUB(%ASCIIFileRecord,1,%JKRLeftSideOfStringLocation))
+      #SET(%JKRRightSideOfString,Left(SUB(%ASCIIFileRecord,(%JKRRightSideOfStringLocation+1),len(clip(%ASCIIFileRecord)) ) ))
+      #SET(%JKRFilePrefix,UPPER(SUB(%ASCIIFileRecord,(%JKRLeftSideOfStringLocation),(%JKRRightSideOfStringLocation+1)-(%JKRLeftSideOfStringLocation ))))
+     #!  #SET(%JKRFilePrefix,UPPER(SUB(%ASCIIFileRecord,(%JKRLeftSideOfStringLocation+1),%JKRRightSideOfStringLocation-(%JKRLeftSideOfStringLocation ))))
+#!
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateStep4, 'Step 4 - Convert - TPS to Firebird conversion program'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#! This template was adapted from a SQL template by G W Bomford
+#SHEET
+  #TAB('Page 1 0f 3'),FINISH(0)
+    #BOXED('Select Tables For Conversion')
+      #DISPLAY('This wizard will generate a conversion program for your Topspeed table data to ')
+      #DISPLAY('a Firebird database. ')
+      #DISPLAY('A sub-directory off the App directory named... ''\convert'' is required.')
+      #DISPLAY('This is where the global dll and lib file need to be if you use them.')
+      #DISPLAY()
+      #DISPLAY('YOU MUST HAVE CREATED YOUR TOPSPEED TABLE DECLARATIONS IN STEP 1.')
+      #DISPLAY()
+      #DISPLAY('YOU MUST HAVE YOUR TABLES CHANGED TO ODBC AND THE COLUMNS SET PROPERLY.')
+      #DISPLAY()
+      #DISPLAY('YOU CANNOT HAVE CHANGED THE COLUMN NAMES. ONLY THE EXTERNAL NAME.')
+      #DISPLAY()
+      #DISPLAY('If you have a table declared as a Topspeed driver type - no conversion file is created.')
+      #DISPLAY('If you create a  UserOption LOCALFILEe for a table - no conversion file is created.')
+      #DISPLAY('The USEROPTIONS are checked for LOCALFILE and this table is skipped if found.')
+      #DISPLAY()
+      #DISPLAY('**** The ''<<ApplicationPath>\convert'' sub directory MUST EXIST ***')
+      #DISPLAY()
+      #DISPLAY('Select ODBC Files to convert or none for all')
+      #PROMPT ('',FILE),%JKRFileToConvert,SELECTION('Files - Leave Blank to Select ALL ODBC Files'),INLINE,AT(10)
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 2 0f 3'),FINISH(0)
+    #BOXED('Conversion Methods')
+      #DISPLAY()
+      #DISPLAY('Two Conversion Methods Are available.')
+      #DISPLAY()
+      #DISPLAY('1. Use a data dll with each topspeed table having a table variable for setting the path and name.')
+      #DISPLAY('  a.) A procedure named SetFileNamePath must exist in the dll. This procedure sets the path')
+      #DISPLAY('       passed by address and the file name for each table.')
+      #DISPLAY('       Example: ')
+      #DISPLAY('       SetFileNamePath( *string psPath)')
+      #DISPLAY('       Access:FileName.SetName = clip(psPath) & \Sys1.tps')
+      #DISPLAY('  b.) Each convert file calls this dll using the table imported from the include file created in Step 1')
+      #DISPLAY('       A program is created to compile and run all convert files. Each convert file first deletes any data')
+      #DISPLAY('       in the existing database table(already created with the script files).')
+      #DISPLAY()
+      #DISPLAY('2. Your topspeed tables use the same table name in the dictionary as the ones on the disk or they')
+      #DISPLAY('   use the Name attribute(Full PathName)in the dictionary as the path and name of the')
+      #DISPLAY('   file or files on the disk. You can have these mixed in the dictionary but if you set a path')
+      #DISPLAY('   this would be for all tables with a variable in the Name attribute')
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+  #TAB('Page 3 0f 3'),FINISH(1)
+    #BOXED('Conversion Options')
+      #DISPLAY()
+      #PROMPT ('Use a Data Dll of your Topspeed files you wish to convert',CHECK),%UseGlobalDllForConversion,AT(10),Default(1)
+      #ENABLE(%UseGlobalDllForConversion = 1)
+      #DISPLAY('We need to select the Lib file to compile the convert modules')
+      #DISPLAY('and the data dll needs to be seen when running them.')
+      #DISPLAY('Select the Lib file of the Data Dll to use for your conversion')
+      #PROMPT('',OPENDIALOG('Select the Lib file','Clarion LIB File|*.LIB')),%TopspeedDataDllName,AT(10),REQ
+      #ENDENABLE
+      #DISPLAY()
+      #ENABLE(%UseGlobalDllForConversion = 0),CLEAR
+      #DISPLAY('If you use a variable in the Name attribute or not but you use the table name as the file name')
+      #DISPLAY('you may need to set the path to your topspeeed files')
+      #DISPLAY()
+      #PROMPT ('I need to set the path to my topspeed files',CHECK),%UsePathToTopspeedFiles,AT(10),Default(0)
+      #ENDENABLE
+      #DISPLAY()
+      #ENABLE(%UseGlobalDllForConversion = 1 OR %UsePathToTopspeedFiles = 1),CLEAR
+      #DISPLAY('Select the location of the Topspeed files to convert by selecting one file')
+      #PROMPT('',OPENDIALOG('Select One Topspeed File To Get The Path Only','Topspeed Data Files|*.TPS')),%TopspeedFilePath,AT(10)
+      #ENDENABLE
+      #DISPLAY()
+      #DISPLAY('Enter the SQL Connect String')
+      #DISPLAY('This can be a DSN or a DSN-less string')
+      #DISPLAY('A DSN-less example')
+      #DISPLAY('Firebird/InterBase(r) driver;UID=SYSDBA;PWD=masterkey;DBNAME=Bigdog:D:\TEST.FDB')
+      #PROMPT ('',@S200),%ConnectString,AT(10),REQ
+      #DISPLAY()
+      #DISPLAY('WHEN CONVERTING EACH RECORD.')
+      #DISPLAY('If the index scripts have been loaded into the database and you have invalid data to convert.')
+      #DISPLAY('an Add should not allow any bad data in the database.')
+      #DISPLAY('Not 100% sure about this one.')
+      #DISPLAY()
+      #DISPLAY('I want to ADD a new record to the Firebird database table. It will APPEND if left unchecked.')
+      #PROMPT ('',CHECK),%AddODBCRecord,DEFAULT(0),AT(10)
+      #DISPLAY()
+      #DISPLAY('I want to turn on the error message procedure for each record converting.')
+      #PROMPT ('',CHECK),%AddErrorMessage,DEFAULT(0),AT(10)
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+#ENDSHEET
+#!
+#DECLARE (%JKRKeyDescription)
+#DECLARE (%FileExternalFlag)
+#DECLARE (%FileThreadedFlag)
+#DECLARE (%SortedFiles), UNIQUE
+#DECLARE (%Groups), MULTI
+#DECLARE (%ValueConstruct)
+#DECLARE (%OutputFile)
+#DECLARE (%OldFile)
+#DECLARE (%NewFile)
+#DECLARE (%UpperNewFile)
+#DECLARE (%WhichFile)
+#DECLARE (%JKRFieldName)
+#DECLARE (%JKRFieldType)
+#DECLARE (%JKRKeyField)
+#DECLARE (%CurrentPath)
+#DECLARE (%JKRCounter)
+#DECLARE (%JKRFieldSize)
+#DECLARE (%OneRecordFile)
+#DECLARE (%JKRFileToConvert2)
+#DECLARE (%JKRFileOwner,LONG)
+#DECLARE (%JKRFileOwnerIsAVariable,LONG)
+#DECLARE (%JKRFileName,LONG)
+#DECLARE (%JKRFileNameIsAVariable,LONG)
+#!
+#! for importing tps structure
+#!
+#DECLARE(%ASCIIFileRecord)
+#DECLARE (%FoundTpsFile)
+#DECLARE (%TpsFileDefines)
+#!
+#! Remove selected file
+#SET (%JKRCounter, 0)
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%TopspeedFilePath,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%TopspeedFilePath,1,%JKRCounter))
+    #CYCLE
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#SET (%TopspeedFilePath,%CurrentPath)
+#!
+#! Set the current path to '\Convert\'
+#SET (%JKRCounter,1)
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%DictionaryFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%DictionaryFile,1,%JKRCounter) & 'Convert\')
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#MESSAGE('Creating Convertion Program',1)
+#!
+#!***********************************************************************************************************************************************************************
+#! for now just set these here and not on the template screen
+#!
+#!      #SET(%TopspeedFilePath, 'C:\sc55\data\')
+#!      #SET(%TopspeedDataDllName, 'GLO55D')
+#!      #SET(%ConnectString, 'Star Consignment')
+#!
+#!***********************************************************************************************************************************************************************
+#! convert generation
+#!***********************************************************************************************************************************************************************
+#!
+#IF (%JKRFileToConvert)
+#INSERT(%JKRCreateConversionProgram,0)
+#ELSE
+  #FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' AND NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 )  )
+  #! #FOR (%File), WHERE (%FileDriver = 'TOPSPEED' AND %FileType = 'FILE' AND NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 )  )
+  #! #FOR (%File), WHERE (%FileDriver = 'TOPSPEED' And NOT (INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) OR INSTRING('ONERECORDFILE',UPPER(%FileUserOptions),1,1 ))  )
+#SET (%JKRFileToConvert2,UPPER(%File))
+#INSERT(%JKRCreateConversionProgram,0)
+  #ENDFOR
+  #! #FOR (%File), WHERE (%FileDriver = 'TOPSPEED' And INSTRING('ONERECORDFILE',UPPER(%FileUserOptions),1,1 ) )
+#! #SET (%JKRFileToConvert2,UPPER(%File))
+#! #INSERT(%JKRCreateConversionProgram,1)
+#!  #ENDFOR
+#ENDIF
+#!
+#!
+#INSERT(%JKRCreateMultiConversionProgram)
+#!
+#!*******************************************************************************************************************************************
+#! delete data generation
+#!*******************************************************************************************************************************************
+#INSERT(%JKRCreateMultiDELDataProgram)
+#!
+#IF (%JKRFileToConvert)
+#INSERT(%JKRCreateDeleteDataProgram)
+#ELSE
+   #FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) ) 
+   #SET (%JKRFileToConvert2,UPPER(%File))
+#INSERT(%JKRCreateDeleteDataProgram)
+  #ENDFOR
+#ENDIF
+#!
+#!
+#!
+#!*******************************************************************************************************************************************
+#!
+#!-----------------------------------------------
+#GROUP(%JKRCreateConversionProgram,%OneRecordFile)
+#!-----------------------------------------------
+#! Generate a conversion program for the nominated file(s)
+#!-----------------------------------------------
+#! #MESSAGE('Creating Convertion Program',1)
+#! #MESSAGE('For File: ' & %JKRFileToConvert2,2)
+#! #FIX (%File,%JKRFileToConvert2)
+#SET (%OldFile,'Old' & %JKRFileToConvert2)
+#SET (%NewFile,'New' & %JKRFileToConvert2)
+#!
+#! Create the Project file first
+#SET (%OutputFile, %CurrentPath & 'CNV' & %File & '.Prj')
+#CREATE (%OutputFile)
+#SET (%ValueConstruct,'-- ' & %Outputfile)
+%ValueConstruct
+%#noedit
+%#system win32
+%#model clarion dll
+%#set RELEASE = on
+%#pragma debug(vid=>off)
+#SET (%ValueConstruct,'#compile "' & %CurrentPath & 'CNV' & %File & '.clw"')
+%ValueConstruct
+%#pragma link("C55TPS%%X%%%%L%%.LIB")
+%#pragma link("C55ODB%%X%%%%L%%.LIB")
+#IF(%UseGlobalDllForConversion = 1)
+%#pragma link("%TopspeedDataDllName")
+#ENDIF
+#SET (%ValueConstruct,'#link "' & %CurrentPath & 'CNV' & %File & '.exe"')
+%ValueConstruct
+
+#CLOSE (%OutputFile)
+
+#! Now create the CLW file
+#! The file to create is named FileNameC.Clw
+#SET (%OutputFile, %CurrentPath & 'CNV' & %File & '.CLW')
+#CREATE (%OutputFile)
+#!
+!JKRConvertSQL.Tpl Conversion code generated %@D17@(TODAY()) at %@T7@(CLOCK())
+! This file is named %OutputFile
+! Created from definitions in %DictionaryFile
+! A 32 bit Project file with the same name has also been created
+
+                  PROGRAM
+
+#IF(%UseGlobalDllForConversion = 1)
+#! set this to the name of your global data dll
+#! the SetFileNamePath is the procedure in the dll that sets the path
+#! of where your data files are located
+                  MAP
+                    CheckError(string),LONG
+                    MODULE('DataDll')
+SetFileNamePath        PROCEDURE(*STRING),DLL
+                    END
+                    
+                  END
+#ELSE
+                  MAP
+                    CheckError(string),LONG
+                  END
+#ENDIF
+
+Count             ULONG
+TotalRecords      ULONG
+FullPathName      string(255)
+Glo:dbOwner string(200)
+FileOwnerPassword string(50)
+
+#INSERT(%GetTpsFileDetail)
+#! #SET (%WhichFile,'OLD')
+#! #INSERT (%FileDetail,%WhichFile)
+
+#SET (%WhichFile,'NEW')
+#INSERT (%FileDetail,%WhichFile)
+
+PROGRESS WINDOW('Converting %File'),AT(,,239,67),FONT('MS Sans Serif',8,,),CENTER,SYSTEM,GRAY,DOUBLE
+       STRING('Converting Record No:'),AT(61,22)
+       STRING(@n9),AT(143,22),USE(Count)
+       STRING('Total Records:'),AT(61,36),USE(?String3)
+       STRING(@n9),AT(143,36),USE(TotalRecords)
+     END
+
+  CODE
+   #! path of your data files
+   #IF(%UseGlobalDllForConversion = 1)
+  FullPathName = '%TopspeedFilePath'
+  SetFileNamePath(FullPathName)
+   #ELSE  
+     #IF(%JKRFileNameIsAVariable=0)
+     #! in the the topspeed table declaration FullPathName = %FileName
+     #ELSE
+  FullPathName = '%TopspeedFilePath%File.tps'
+     #ENDIF
+   #ENDIF
+   
+  Glo:dbOwner = '%ConnectString'
+  
+  #IF(%JKRFileOwnerIsAVariable=1)
+  FileOwnerPassword = 
+  #Endif
+   
+  OPEN(%File)
+  #! If Errorcode() = 2 then return. ! file not found
+  IF CheckError('%File') THEN RETURN.
+  TotalRecords = RECORDS(%File)
+  If TotalRecords = 0 Then Return.
+
+  OPEN(Progress)
+
+  OPEN(%NewFile)
+  IF CheckError('%NewFile') THEN RETURN.
+
+  0{PROP:TEXT} = 'Deleting Records In ODBC Table %File'
+  Count = 0
+  SET(%NewFile)
+  LOOP
+    NEXT(%NewFile)
+    IF ErrorCode() = 33 THEN BREAK.
+    DELETE(%NewFile)
+    IF CheckError('%NewFile') THEN CYCLE.
+    Count += 1
+    DISPLAY(?Count)
+  END
+
+  STREAM(%File)
+  !STREAM(%NewFile)
+
+  0{PROP:TEXT} = 'Converting Records For ODBC Table %File'
+  Count = 0
+  SET(%File)
+  LOOP
+    NEXT(%File)
+    IF ErrorCode() = 33 THEN BREAK.
+    DO AssignRecord
+    #IF(%AddODBCRecord = 1)
+    ADD(%NewFile)
+    #ELSE
+    APPEND(%NewFile)
+    #ENDIF
+    #IF(%OneRecordFile=0)
+      #IF(%AddErrorMessage = 0)
+    IF ErrorCode() THEN CYCLE.
+    ! IF CheckError('%NewFile') THEN CYCLE.
+      #ELSE
+    IF CheckError('%NewFile') THEN CYCLE.
+    ! IF ErrorCode() THEN CYCLE.
+      #ENDIF
+    Count += 1
+    DISPLAY(?Count)
+    #ELSE
+    BREAK
+    #ENDIF
+  END
+
+  FLUSH(%File)
+  !FLUSH(%NewFile)
+  BUILD(%NewFile)
+
+  CLOSE(%File)
+  CLOSE(%NewFile)
+  #! MESSAGE(Count & ' records converted','Finished')
+
+AssignRecord      ROUTINE
+
+#FOR (%FIELD)
+    #!
+    #CASE(%FieldType)
+    #OF ('PICTURE') #OROF ('LIKE')  #OROF ('TYPE')
+    ! %FIELD FieldType - PICTURE - TYPE - LIKE  -  ARE NOT ALLOWED
+    #OF ('GROUP') #OROF ('END')
+      #CYCLE
+    #ENDCASE
+    #!
+    #IF (%FieldName)
+    #SET(%JKRFieldName, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+    NEW:%[20]JKRFieldName = %Field
+    #ELSE
+    #SET(%JKRFieldName, UPPER(%FieldID))
+    NEW:%[20]JKRFieldName = %Field
+    #! NEW:%[20]FieldID = %Field
+    #ENDIF
+    #!
+    #CASE(%FieldValidation)   
+     #OF ( 'BOOLEAN')
+       #IF(%FieldTrueValue AND %FieldFalseValue)
+         #CASE (%FieldType)
+            #OF ('CSTRING') #OROF ('PSTRING') #OROF ('STRING')
+      ! IF %Field = ''
+        ! NEW:%JKRFieldName = '%FieldTrueValue'
+        ! NEW:%JKRFieldName = '%FieldFalseValue'
+      ! END
+            #ELSE
+      ! IF %Field = 0
+        ! NEW:%JKRFieldName = %FieldTrueValue
+        ! NEW:%JKRFieldName = %FieldFalseValue
+      ! END
+         #ENDCASE
+       #ENDIF
+     #OF ( 'INLIST')
+       #IF (ITEMS(%FieldValues))
+         #FOR(%FieldValues)
+      ! IF %Field = ''
+      !   NEW:%JKRFieldName = %FieldValues
+      ! END
+         #ENDFOR
+       #ENDIF
+     #OF ( 'INRANGE')
+       #IF (%FieldRangeLow AND %FieldRangeHigh)
+      ! IF %Field = 0
+      !   NEW:%JKRFieldName = %FieldRangeLow
+      !   NEW:%JKRFieldName = %FieldRangeHigh
+      ! END
+       #ELSIF (%FieldRangeLow AND NOT %FieldRangeHigh)
+      ! IF %Field = 0
+      !   NEW:%JKRFieldName = %FieldRangeLow
+      ! END
+       #ELSIF (NOT %FieldRangeLow AND %FieldRangeHigh)
+      ! IF %Field = 0
+      !   NEW:%JKRFieldName = %FieldRangeHigh
+      ! END
+       #ENDIF
+    #ENDCASE
+#ENDFOR
+
+CheckError        FUNCTION(psFileName)
+  CODE
+  IF ERRORCODE() THEN
+    IF ERRORCODE() = 90 THEN
+      STOP('Error On File ' & psFileName & ': ' & FILEERROR())
+    ELSE
+      STOP('Error On File ' & psFileName & ': ' & ERROR())
+    END
+  END
+  RETURN 0
+
+#CLOSE (%OutputFile)
+
+#!-----------------------------------------------
+#GROUP (%GetTpsFileDetail)
+#!-----------------------------------------------
+#! read in tps file structure
+#!-----------------------------------------------
+#!
+#! #IF(%FileOwner)
+#!FileOwner=1
+#!  #IF(Sub(%FileOwner,1,1) = '''')
+#!FileOwnerIsAVariable=0
+#!  #else  
+#!FileOwnerIsAVariable=1
+#!  #Endif
+#!#ELSE  
+#!FileOwner=0
+#!#Endif
+#!#IF(%FileName)
+#!FileName=1
+#!  #IF(Sub(%FileName,1,1) = '''')
+#!FileNameIsAVariable=0
+#!  #else  
+#!FileNameIsAVariable=1
+#!  #Endif
+#!#ELSE
+#!FileName=0
+#!#Endif
+#!
+#SET(%TpsFileDefines,%CurrentPath & 'TpsToOdbc.Inc')
+#OPEN(%TpsFileDefines),READ
+#LOOP
+    #READ(%ASCIIFileRecord)
+    #IF(%ASCIIFileRecord = %EOF)
+        #BREAK
+    #ENDIF
+    #!
+    #If(SUB(%ASCIIFileRecord,1,2) = '[[')
+#!       FOUND [[  -  %ASCIIFileRecord
+      #IF(UPPER(%ASCIIFileRecord) = '[[' & UPPER(%File) & ']]')
+        #Set(%FoundTpsFile,1)
+        #READ(%ASCIIFileRecord)
+        #IF(SUB(%ASCIIFileRecord,1,11) = 'FileOwner=1')
+          #SET(%JKRFileOwner,1)
+          #READ(%ASCIIFileRecord)
+          #IF(SUB(%ASCIIFileRecord,1,22) = 'FileOwnerIsAVariable=1')
+            #SET(%JKRFileOwnerIsAVariable,1)
+            #READ(%ASCIIFileRecord)
+          #ELSE
+            #READ(%ASCIIFileRecord)
+            #SET(%JKRFileOwnerIsAVariable,0)
+          #ENDIF
+        #ELSIF(SUB(%ASCIIFileRecord,1,11) = 'FileOwner=0')
+          #SET(%JKRFileOwner,0)
+          #SET(%JKRFileOwnerIsAVariable,0)
+          #READ(%ASCIIFileRecord)
+        #ENDIF
+        #IF(SUB(%ASCIIFileRecord,1,11) = 'FileName=1')
+          #SET(%JKRFileName,1)
+          #READ(%ASCIIFileRecord)
+          #IF(SUB(%ASCIIFileRecord,1,21) = 'FileNameIsAVariable=1')
+            #SET(%JKRFileNameIsAVariable,1)
+            #READ(%ASCIIFileRecord)
+          #ELSE
+            #READ(%ASCIIFileRecord)
+            #SET(%JKRFileNameIsAVariable,0)
+          #ENDIF
+        #ELSIF(SUB(%ASCIIFileRecord,1,11) = 'FileName=0')
+          #SET(%JKRFileName,0)
+          #SET(%JKRFileNameIsAVariable,0) #! i think this is needed
+          #READ(%ASCIIFileRecord)
+        #ENDIF
+      #ENDIF
+    #ENDIF
+    #!
+    #IF(%FoundTpsFile=1 And SUB(%ASCIIFileRecord,1,2) <> '[[')
+      #IF( SUB(%ASCIIFileRecord,1,LEN(%FILE)) = %FILE AND INSTRING('DRIVER(',%ASCIIFileRecord,1,1) )
+        #IF(%UseGlobalDllForConversion = 1 )
+ 
+%[25]File FILE,DRIVER('TOPSPEED'),PRE(%FilePrefix),EXTERNAL(''),DLL(dll_mode)
+          #cycle
+        #ELSE
+#! extract owner and place in this assignment
+#! %[25]File FILE,DRIVER('TOPSPEED'),PRE(%FilePrefix),NAME(FilePath)
+#! the record was written correctly in step 1
+%ASCIIFileRecord    
+          #cycle
+        #ENDIF
+      #ENDIF
+%ASCIIFileRecord    
+    #EndIf
+    #IF(SUB(%ASCIIFileRecord,1,2) = '[[' AND %FoundTpsFile=1)
+      #break
+    #EndIf
+#ENDLOOP
+#Set(%FoundTpsFile,0)
+#CLOSE(%TpsFileDefines),READ
+#!
+#!-----------------------------------------------
+#GROUP (%FileDetail,%OldOrNew)
+#!-----------------------------------------------
+#! Convert to Firebird
+#!-----------------------------------------------
+#!
+
+!%File  %FileDescription
+
+  #SET (%ValueConstruct, SUB(%FileStruct, INSTRING(' ', %FileStruct, 1, 1), LEN(%FileStruct)))
+  #SET (%FileExternalFlag, %False)
+  #CASE (%OverrideExternal)
+  #OF ('External')
+    #SET (%FileExternalFlag, %True)
+    #IF (%OverrideExternalSource)
+      #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''' & %OverrideExternalSource & '''),DLL(dll_mode)')
+    #ELSE
+      #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''''),DLL(dll_mode)')
+    #ENDIF
+  #OF ('Use Default')
+    #IF (%DefaultExternal = 'All External')
+      #IF (%DefaultExternalAPP)
+        #SET (%FileExternalFlag, %True)
+      #ENDIF
+      #IF (%DefaultExternalSource)
+        #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''' & %DefaultExternalSource & '''),DLL(dll_mode)')
+      #ELSE
+        #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''''),DLL(dll_mode)')
+      #ENDIF
+    #ENDIF
+  #OF ('Not External')
+  #ELSE
+    #IF (%DefaultExternal = 'All External')
+      #IF (%DefaultExternalAPP)
+        #SET (%FileExternalFlag, %True)
+      #ENDIF
+      #IF (%DefaultExternalSource)
+        #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''' & %DefaultExternalSource & '''),DLL(dll_mode)')
+      #ELSE
+        #SET (%ValueConstruct, %ValueConstruct & ',EXTERNAL(''''),DLL(dll_mode)')
+      #ENDIF
+    #ENDIF
+  #ENDCASE
+  #IF (EXTRACT(%ValueConstruct, 'EXTERNAL'))
+    #IF (EXTRACT(%ValueConstruct, 'NAME'))
+      #SET (%ValueConstruct, REPLACE(%ValueConstruct, 'NAME', ''))
+    #ENDIF
+  #ENDIF
+  #!
+  #!
+  #IF (%OldOrNew = 'OLD')
+   #! done in GROUP (%GetTpsFileDetail)
+   #!  %File %ValueConstruct
+  #ELSIF (%OldOrNew = 'NEW')
+    #SET(%UpperNewFile,UPPER(%File))
+New%[20]File  FILE,DRIVER('ODBC'),NAME('%UpperNewFile'),OWNER(Glo:dbOwner),PRE(NEW),BINDABLE,THREAD
+  #ENDIF
+  #!
+  #!
+#IF (%OldOrNew = 'OLD')
+  #FOR (%Key)
+%KeyStruct
+  #ENDFOR
+  #FOR (%Field), WHERE(%FieldType = 'MEMO')
+%FieldStruct
+  #ENDFOR
+  #FOR (%Field), WHERE(%FieldType = 'BLOB')
+%FieldStruct  
+  #ENDFOR
+%FileStructRec,PRE()
+  #FOR (%Field), WHERE(%FieldType <> 'MEMO' AND %FieldType <> 'BLOB')
+%FieldStruct
+  #ENDFOR
+#ELSIF (%OldOrNew = 'NEW')
+  #FOR (%Key),WHERE(%KeyPrimary = 1)
+    #SET (%JKRCounter,0)
+        #FOR (%KeyField)
+          #SET (%JKRCounter,%JKRCounter + 1)
+          #FIX (%Field, %KeyField)
+          #IF (%FieldName)
+             #IF(%JKRCounter > 1)
+               #SET (%JKRKeyField,CLIP(%JKRKeyField) & ',' &  UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+             #ELSE
+               #SET (%JKRKeyField, 'NEW:' & UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+             #ENDIF
+          #ELSE
+             #IF(%JKRCounter > 1)
+               #SET (%JKRKeyField,CLIP(%JKRKeyField) & ',' &  'NEW:' & %FieldID)
+             #ELSE
+             #SET (%JKRKeyField, 'NEW:' & %FieldID)
+             #ENDIF
+          #ENDIF
+        #ENDFOR #! %KEYFIELD
+  #ENDFOR
+PRIMARYKEY               KEY(%JKRKeyField),PRIMARY
+%FileStructRec,PRE()
+ #! these are the odbc defines
+ #!
+  #FOR (%Field)
+    #! Convert Date fields to DATE and TIME to TIME
+    #IF (INSTRING('D',UPPER(%FieldPicture),1,1))
+      #! Convert longs fields to DATE and longs to Time if checked - else make interger
+      #!#IF(%JKRChangeDateNames = 1)
+      #!  #SET (%JKRFieldType,'DATE')
+      #!#ELSE
+     #!   #SET (%JKRFieldType,'LONG')
+     #! #ENDIF
+    #!#ELSIF (INSTRING('T',UPPER(%FieldPicture),1,1))
+    #!  #IF(%JKRChangeTimeNames = 1)
+    #!    #SET (%JKRFieldType,'TIME')
+    #!  #ELSE
+    #!    #SET (%JKRFieldType,'LONG')
+    #!  #ENDIF
+    #ENDIF
+    #CASE(%FieldType)
+    #OF ('PICTURE') #OROF ('LIKE')  #OROF ('TYPE')
+    #SET (%JKRFieldType,'PICTURE - TYPE - LIKE  -  ARE NOT ALLOWED')
+    #OF ('GROUP') #OROF ('END')
+      #CYCLE
+    #OF('MEMO') #OROF ('BLOB')
+      BLOBS AND MEMO'S CANNOT BE DECLARED IN THE ODBC STRUCTURE
+    #OF('ULONG')
+      #SET (%JKRFieldType,'ULONG')
+    #OF('LONG')
+      #SET (%JKRFieldType,'LONG')
+    #OF('DATE')
+      #SET (%JKRFieldType,'DATE')
+    #OF('TIME')
+      #SET (%JKRFieldType,'TIME')
+    #OF('SHORT')
+      #SET (%JKRFieldType,'SHORT')
+    #OF('USHORT')
+      #SET (%JKRFieldType,'USHORT')
+    #OF('BYTE')
+      #! #SET (%JKRFieldType,'SHORT')
+       #SET (%JKRFieldType,'BYTE')
+    #OF('STRING') #OROF ('CSTRING')
+      #SET (%JKRFieldType,SUB(%FieldStatement,1,INSTRING(')',%FieldStatement,1,1) ) ) #! TAKE OUT NAME ATTRIBUTE
+    #OF('PSTRING')
+      #SET (%JKRFieldType,SUB(%FieldStatement,1,INSTRING(')',%FieldStatement,1,1) ) ) #! TAKE OUT NAME ATTRIBUTE
+    #OF('DECIMAL') 
+      #SET(%JKRFieldType, 'DECIMAL(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+    #OF('REAL') 
+      #SET(%JKRFieldType, 'DECIMAL(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+    #OF('PDECIMAL')
+      #SET(%JKRFieldType, 'DECIMAL(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+    #OF('SREAL')
+      #SET(%JKRFieldType, 'FLOAT')
+    #OF('BFLOAT4')
+      #SET(%JKRFieldType, 'FLOAT')
+    #OF('REAL')
+      #SET(%JKRFieldType, 'DOUBLE PRECISION')
+    #OF('BFLOAT8')
+      #SET(%JKRFieldType, 'DOUBLE PRECISION')
+    #ELSE
+      #SET (%JKRFieldType, %FieldStatement)
+    #ENDCASE
+#!
+#! we should have the dictionary set for ODBC at this time so just write out the column name and type from the dictionary
+#!
+#! jkr comment out 03-31-2004
+   #! #SET (%JKRFieldType, %FieldStatement)
+#!
+#! IF NAME SET IN COLUMN    
+#! 
+#!
+   #IF (%FieldName)
+    #SET(%JKRFieldName, UPPER(SUB(%FieldName,2,LEN(%FieldName)-2)))
+%[28]JKRFieldName  %JKRFieldType
+   #ELSE
+    #SET(%JKRFieldName, UPPER(%FieldID))
+%[28]JKRFieldName  %JKRFieldType
+   #ENDIF
+  #ENDFOR
+#ENDIF
+%FileStructRecEnd
+%FileStructEnd
+#!
+#!-----------------------------------------------
+#GROUP(%JKRCreateMultiConversionProgram)
+#!-----------------------------------------------
+#! Generate a conversion program for the nominated file(s)
+#!-----------------------------------------------
+#! Create a source of run commands for all created Projects
+#SET (%OutputFile, %CurrentPath & 'CompileAndRunAllConverts.CLW')
+#CREATE (%OutputFile)
+
+                  PROGRAM
+                  INCLUDE('EQUATES.CLW')                    !Include standard equates
+                  MAP
+                  END
+
+
+  CODE
+
+  ! these are the run statements to convert each file. the projects for each file
+  ! have been placed into this programs project so they will all compile together
+  
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! because you should have already imported your INDEX scripts into the database we use ADD and not append
+  ! this is so no bad data can be converted into your SQL database
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+
+   #FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+               ! run CNV%File.exe
+              #SET(%ValueConstruct,'RUN(' & '<39>' & %CurrentPath & 'CNV' & %File & '.exe' & '<39>' & ',1)' )
+              %ValueConstruct
+
+   #ENDFOR
+  
+              Return
+#CLOSE (%OutputFile)
+
+
+#! #MESSAGE('Creating Conversion Program',1)
+#! #MESSAGE('For File: ' & %JKRFileToConvert2,2)
+#!
+#! Create the Project file first
+#SET (%OutputFile, %CurrentPath & 'CompileAndRunAllConverts' & '.Prj')
+#CREATE (%OutputFile)
+#SET (%ValueConstruct,'-- ' & %Outputfile)
+%ValueConstruct
+%#noedit
+%#system win32
+%#model clarion dll
+%#set RELEASE = on
+%#pragma debug(vid=>off)
+#!
+#FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+#! #include "CNVColors.Prj"
+#SET(%ValueConstruct,'#include "' & %CurrentPath & 'CNV' & %File & '.Prj"')
+%ValueConstruct
+#ENDFOR
+#!
+#SET (%ValueConstruct,'#compile "' & %CurrentPath & 'CompileAndRunAllConverts.clw"')
+%ValueConstruct
+#SET (%ValueConstruct,'#link "' & %CurrentPath & 'CompileAndRunAllConverts.exe"')
+%ValueConstruct
+
+#CLOSE (%OutputFile)
+#!
+#!-----------------------------------------------
+#GROUP(%JKRCreateDeleteDataProgram)
+#!-----------------------------------------------
+#! Generate a delete data program for the nominated file(s)
+#!-----------------------------------------------
+#! #MESSAGE('Creating Convertion Program',1)
+#! #MESSAGE('For File: ' & %JKRFileToConvert2,2)
+#SET (%OldFile,'Old' & %JKRFileToConvert2)
+#SET (%NewFile,'New' & %JKRFileToConvert2)
+#!
+#! Create the Project file first
+#SET (%OutputFile, %CurrentPath & 'DEL' & %File & '.Prj')
+#CREATE (%OutputFile)
+#SET (%ValueConstruct,'-- ' & %Outputfile)
+%ValueConstruct
+%#noedit
+%#system win32
+%#model clarion dll
+%#set RELEASE = on
+%#pragma debug(vid=>off)
+#SET (%ValueConstruct,'#compile "' & %CurrentPath & 'DEL' & %File & '.clw"')
+%ValueConstruct
+%#pragma link("C55TPS%%X%%%%L%%.LIB")
+%#pragma link("C55ODB%%X%%%%L%%.LIB")
+#SET (%ValueConstruct,'#link "' & %CurrentPath & 'DEL' & %File & '.exe"')
+%ValueConstruct
+
+#CLOSE (%OutputFile)
+
+#! Now create the CLW file
+#! The file to create is named FileNameC.Clw
+#SET (%OutputFile, %CurrentPath & 'DEL' & %File & '.CLW')
+#CREATE (%OutputFile)
+#!
+!JKRConvertSQL.Tpl Conversion code generated %@D17@(TODAY()) at %@T7@(CLOCK())
+! This file is named %OutputFile
+! Created from definitions in %DictionaryFile
+! A 32 bit Project file with the same name has also been created
+
+                  PROGRAM
+
+                  MAP
+                    CheckError(string),LONG
+                  END
+
+Count             ULONG
+TotalRecords      ULONG
+FilePath          string(255)
+
+#! #SET (%WhichFile,'OLD')
+#! #INSERT (%FileDetail,%WhichFile)
+
+#SET (%WhichFile,'NEW')
+#INSERT (%FileDetail,%WhichFile)
+
+PROGRESS WINDOW('Converting %File'),AT(,,239,67),FONT('MS Sans Serif',8,,),CENTER,SYSTEM,GRAY,DOUBLE
+       STRING('Converting Record No:'),AT(61,22)
+       STRING(@n9),AT(143,22),USE(Count)
+       STRING('Total Records:'),AT(61,36),USE(?String3)
+       STRING(@n9),AT(143,36),USE(TotalRecords)
+     END
+
+  CODE
+
+  OPEN(Progress)
+
+  OPEN(%NewFile)
+  IF CheckError('%NewFile') THEN RETURN.
+
+  0{PROP:TEXT} = 'Deleting Records In ODBC Table %File'
+  Count = 0
+  SET(%NewFile)
+  LOOP
+    NEXT(%NewFile)
+    IF ErrorCode() = 33 THEN BREAK.
+    DELETE(%NewFile)
+    IF CheckError('%NewFile') THEN CYCLE.
+    Count += 1
+    DISPLAY(?Count)
+  END
+
+  CLOSE(%NewFile)
+
+CheckError        FUNCTION(psFileName)
+  CODE
+  IF ERRORCODE() THEN
+    IF ERRORCODE() = 90 THEN
+      STOP('Error On File ' & psFileName & ': ' & FILEERROR())
+    ELSE
+      STOP('Error On File ' & psFileName & ': ' & ERROR())
+    END
+  END
+  RETURN 0
+
+#CLOSE (%OutputFile)
+
+#!-----------------------------------------------
+#GROUP(%JKRCreateMultiDELDataProgram)
+#!-----------------------------------------------
+#! Generate a conversion program for the nominated file(s)
+#!-----------------------------------------------
+#! Create a source of run commands for all created Projects
+#SET (%OutputFile, %CurrentPath & 'DELMULTI.CLW')
+#CREATE (%OutputFile)
+
+                  PROGRAM
+                  INCLUDE('EQUATES.CLW')                    !Include standard equates
+                  MAP
+                  END
+
+
+  CODE
+
+  ! these are the run statements to convert each file. the projects for each file
+  ! have been placed into this programs project so they will all compile together
+  
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! because you should have already imported your INDEX scripts into the database we use ADD and not append
+  ! this is so no bad data can be converted into your SQL database
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+  ! **********************                                    IMPORTANT                             ****************************
+
+   #FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+               ! run CNV%File.exe
+              #SET(%ValueConstruct,'RUN(' & '<39>' & %CurrentPath & 'DEL' & %File & '.exe' & '<39>' & ',1)' )
+              %ValueConstruct
+
+   #ENDFOR
+  
+              Return
+#CLOSE (%OutputFile)
+
+
+#! #MESSAGE('Creating Convertion Program',1)
+#! #MESSAGE('For File: ' & %JKRFileToConvert2,2)
+#!
+#! Create the Project file first
+#SET (%OutputFile, %CurrentPath & 'DELMULTI' & '.Prj')
+#CREATE (%OutputFile)
+#SET (%ValueConstruct,'-- ' & %Outputfile)
+%ValueConstruct
+%#noedit
+%#system win32
+%#model clarion dll
+%#set RELEASE = on
+%#pragma debug(vid=>off)
+#!
+#FOR (%File), WHERE (%FileDriver = 'ODBC' AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+#SET(%ValueConstruct,'#include "' & %CurrentPath & 'DEL' & %File & '.Prj"')
+%ValueConstruct
+#ENDFOR
+#!
+#SET (%ValueConstruct,'#compile "' & %CurrentPath & 'DELMULTI.clw"')
+%ValueConstruct
+#SET (%ValueConstruct,'#link "' & %CurrentPath & 'DELMULTI.exe"')
+%ValueConstruct
+
+#CLOSE (%OutputFile)
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateReport1, 'Report of Byte,Ushort,Ulong,Type,Sreal,Picture,Pdecimal,Like,Group'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#! This template was adapted from a SQL template by G W Bomford
+#!-----------------------------------------------
+#SHEET
+  #TAB('Page 1 0f 1'),FINISH(1)
+    #BOXED('Documenting the dictionary''s Topspeed files')
+      #DISPLAY()
+      #DISPLAY('Leave this list empty to select all Topspeed files in the current dictionary')
+      #DISPLAY()
+      #PROMPT ('Select Topspeed Files',FILE),%JKRSelectedFiles,SELECTION('Files - Leave Blank to Select ALL TPS Files'),INLINE,AT(10,100)
+      #DISPLAY()
+      #DISPLAY('This wizard generates a printout of all the Topspeed files,')
+      #DISPLAY('or only the selected files, in the current dictionary.')
+      #DISPLAY()
+      #PROMPT('Do you want a printout of Fields for each file?',OPTION),%JKRShowFieldDetails
+      #PROMPT('Yes, show all information for the Files',RADIO),AT(100,,215)
+      #PROMPT('No, just show the File Header and Relationships.',RADIO),AT(100,,224)
+      #DISPLAY()
+      #PROMPT ('Name of Text File to Create:',@S40),%OutPutFile,DEFAULT('Files.Txt'),AT(100)
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+#ENDSHEET
+#!
+#DECLARE (%JKRCounter)
+#DECLARE (%CurrentPath)
+#DECLARE (%JKRKeyDescription)
+#DECLARE (%FileExternalFlag)
+#DECLARE (%FileThreadedFlag)
+#DECLARE (%SortedFiles), UNIQUE
+#DECLARE (%Groups), MULTI
+#DECLARE (%ValueConstruct)
+#DECLARE (%PageBreak)
+#DECLARE (%RelationErrorMessage)
+#!
+#DECLARE (%JKROutputFileLine), MULTI
+#!
+#SET (%PageBreak, CHR(12))
+#! Set the current path to '\Application Path\'
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%DictionaryFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%DictionaryFile,1,%JKRCounter))
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#! Remove Extension
+#LOOP
+  #SET (%JKRCounter, INSTRING('.',%OutputFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%OutputFile,SUB(%OutputFile,1,%JKRCounter-1))
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#IF (ITEMS(%JKRSelectedFiles))
+  #FOR (%JKRSelectedFiles)
+    #FIX (%FILE,%JKRSelectedFiles)
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ELSE
+  #FOR (%File), WHERE ((%FileDriver = 'TOPSPEED' OR %FileDriver = 'ODBC') AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ENDIF
+#!
+#!
+#FOR (%SortedFiles)
+  #FIX (%File, %SortedFiles)
+  #SET(%JKRCounter,1)
+  #INSERT(%JKRFieldDetails)
+#ENDFOR
+#!
+#!
+#SET (%OutputFile, %CurrentPath & %OutputFile & '.TXT')
+#!
+#CREATE (%OutputFile)
+JKRSQL.Tpl Dictionary Report Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+This file is named: %OutputFile
+Topspeed file details for: %[43]DictionaryFile
+
+
+#FOR(%JKROutputFileLine)
+%JKROutputFileLine
+#ENDFOR
+#CLOSE (%OutputFile)
+#!
+#!
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#UTILITY (JKR_FirebirdTemplateReport2, 'Report of Initial Values And Validity Checks For Dictionary Columns'), WIZARD
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#!-----------------------------------------------
+#SHEET
+  #TAB('Page 1 0f 1'),FINISH(1)
+    #BOXED('Initial Values and Valitity Checks''s Topspeed/ODBC Initial Values')
+      #DISPLAY()
+      #DISPLAY('Leave this list empty to select all Topspeed or ODBC tables.')
+      #DISPLAY()
+      #PROMPT ('Select Topspeed/ODBC Tables',FILE),%JKRSelectedFiles,SELECTION('Tables - Leave Blank to Select ALL Topspeed/ODBC Tables'),INLINE,AT(10,100)
+      #DISPLAY()
+      #DISPLAY('This wizard generates a printout of all the Topspeed/ODBC TABLES,')
+      #DISPLAY('or only the selected files, in the current dictionary.')
+      #DISPLAY()
+    #ENDBOXED
+  #ENDTAB
+#ENDSHEET
+#!
+#DECLARE (%JKRCounter)
+#DECLARE(%JKRCounterLoc,LONG)
+#DECLARE (%JKRFieldName)
+#DECLARE (%JKRFieldType)
+#DECLARE (%CurrentPath)
+#DECLARE (%JKRKeyDescription)
+#DECLARE (%FileExternalFlag)
+#DECLARE (%FileThreadedFlag)
+#DECLARE (%SortedFiles), UNIQUE
+#DECLARE (%Groups), MULTI
+#DECLARE (%ValueConstruct)
+#DECLARE (%PageBreak)
+#DECLARE (%RelationErrorMessage)
+#DECLARE (%OutPutFile)
+#!
+#DECLARE (%JKROutputFileLine), MULTI
+#!
+#SET (%PageBreak, CHR(12))
+#! Set the current path to '\Application Path\'
+#LOOP
+  #SET (%JKRCounter, INSTRING('\',%DictionaryFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%CurrentPath,SUB(%DictionaryFile,1,%JKRCounter))
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#! Remove Extension
+#LOOP
+  #SET (%JKRCounter, INSTRING('.',%OutputFile,1,%JKRCounter+1))
+  #IF (%JKRCounter)
+    #SET (%OutputFile,SUB(%OutputFile,1,%JKRCounter-1))
+  #ELSE
+    #BREAK
+  #ENDIF
+#ENDLOOP
+#!
+#IF (ITEMS(%JKRSelectedFiles))
+  #FOR (%JKRSelectedFiles)
+    #FIX (%FILE,%JKRSelectedFiles)
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ELSE
+  #FOR (%File), WHERE ((%FileDriver = 'TOPSPEED' OR %FileDriver = 'ODBC') AND %FileType = 'FILE' And NOT INSTRING('LOCALFILE',UPPER(%FileUserOptions),1,1 ) )
+    #ADD (%SortedFiles, %File)
+  #ENDFOR
+#ENDIF
+#!
+#!
+#FOR (%SortedFiles)
+  #FIX (%File, %SortedFiles)
+  #SET(%JKRCounter,1)
+  #INSERT(%JKRFieldItialValues)
+#ENDFOR
+#FOR (%SortedFiles)
+  #FIX (%File, %SortedFiles)
+  #SET(%JKRCounter,1)
+  #INSERT(%JKRFieldValidityChecks)
+#ENDFOR
+#!
+#!
+#SET (%OutputFile, %CurrentPath & 'InitialValues' & '.TXT')
+#!
+#CREATE (%OutputFile)
+Dictionary Report Generated %@D17@(TODAY()) at %@T7@(CLOCK())
+This file is named: %OutputFile
+Topspeed file details for: %[43]DictionaryFile
+
+Initial Values and Validity checks from the dictionary
+
+
+#FOR(%JKROutputFileLine)
+%JKROutputFileLine
+#ENDFOR
+#CLOSE (%OutputFile)
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRFieldItialValues)
+#!-----------------------------------------------
+#! Print Dictionary Group
+#!-----------------------------------------------
+#!
+  #FOR (%Field)
+     #IF (%JKRCounter = 1)
+       #ADD(%JKROutputFileLine,'')
+       #ADD(%JKROutputFileLine,'')
+       #ADD(%JKROutputFileLine, %FILE & '  FILE TYPE = ' & %FILEDRIVER)
+       #ADD(%JKROutputFileLine, 'Inital Values')
+       #SET(%JKRCounter,0)
+     #ENDIF
+     #IF(%FieldInitial)
+       #ADD(%JKROutputFileLine, '    '  & %FIELDID & '    ' & %FIELDTYPE & '    ' & %FieldInitial)
+     #ENDIF
+  #ENDFOR
+#!
+#!
+#!-----------------------------------------------
+#GROUP (%JKRFieldValidityChecks)
+#!-----------------------------------------------
+#! Print Dictionary Group
+#!-----------------------------------------------
+#!
+  #ADD(%JKROutputFileLine,'')
+  #ADD(%JKROutputFileLine,'')
+  #FOR (%Field),WHERE(%FieldValidation = 'NONZERO' OR %FieldValidation = 'BOOLEAN' OR %FieldValidation = 'INLIST' OR %FieldValidation = 'INRANGE')
+     #IF (%JKRCounter = 1)
+       #ADD(%JKROutputFileLine, %FILE & '  FILE TYPE = ' & %FILEDRIVER)
+       #ADD(%JKROutputFileLine, 'Validity Checks In Script Form')
+       #SET(%JKRCounter,0)
+     #ENDIF
+     #!
+     #SET (%JKRFieldName, %FieldID)
+     #SET (%JKRFieldType, %FieldType)
+     #!
+     #CASE(%FieldValidation)   
+      #OF ( 'NONZERO')
+         #SET (%JKRFieldType, %JKRFieldType & '    ' & '  NOT NULL')
+      #OF ( 'BOOLEAN')
+        #IF(%FieldTrueValue AND %FieldFalseValue)
+          #CASE (%FieldType)
+             #OF ('CSTRING') #OROF ('PSTRING') #OROF ('STRING')
+               #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' = ' & '''' & %FieldTrueValue  & '''' & ' OR '  & %JKRFieldName & ' = ' & '''' & %FieldFalseValue & '''' & ')' )
+             #ELSE
+               #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' = ' & %FieldTrueValue  & ' OR '  & %JKRFieldName & ' = ' & %FieldFalseValue & ')' )
+          #ENDCASE
+        #ENDIF
+      #OF ( 'INLIST')
+        #IF (ITEMS(%FieldValues))
+          #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' IN (')
+          #SET (%JKRCounterLoc, 0)
+          #FOR(%FieldValues)
+            #IF (%JKRCounterLoc = 0)
+              #SET (%JKRFieldType, %JKRFieldType & '''' & %FieldValues & '''' )
+              #SET (%JKRCounterLoc, 1)
+            #ELSE
+              #SET (%JKRFieldType, %JKRFieldType & ',' & '''' & %FieldValues & '''' )
+            #ENDIF
+          #ENDFOR
+          #SET (%JKRFieldType, %JKRFieldType & '))')
+        #ENDIF
+      #OF ( 'INRANGE')
+        #IF (%FieldRangeLow AND %FieldRangeHigh)
+           #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' BETWEEN ' & %FieldRangeLow & ' AND ' &  %FieldRangeHigh &')'  )
+        #ELSIF (%FieldRangeLow AND NOT %FieldRangeHigh)
+           #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' >= ' & %FieldRangeLow &')'  )
+        #ELSIF (NOT %FieldRangeLow AND %FieldRangeHigh)
+           #SET (%JKRFieldType, %JKRFieldType & '  NOT NULL CHECK(' & %JKRFieldName & ' <= '  &  %FieldRangeHigh &')'  )
+        #ENDIF
+      #ENDCASE
+      #ADD(%JKROutputFileLine, '    '  & %JKRFieldName & '    ' & %JKRFieldType )
+      #! %[30]JKRFieldName    %JKRFieldType,       
+  #ENDFOR
+#!
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
