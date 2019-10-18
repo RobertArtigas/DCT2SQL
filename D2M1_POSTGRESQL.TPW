@@ -29,7 +29,7 @@
 #! This will make the code easier to maintain accross all the backends.
 #PREPARE
 #DECLARE(%BaseName)                                                             #! Define the BACKEND here
-#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL: SPECIFIC
+#SET(%BaseName, 'POSTGRESQL')                                                   #! SPECIFIC
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #INSERT(%VariablesCommon)                                                       #! Need a few simple variables
@@ -61,7 +61,7 @@
 #!#SET(%DebugSet,1)
 #!#DEBUG(%DebugSet)
 #!
-#CALL(%CombinedGenerate,%BaseName)                                              #! DDL scripts for POSTGRESQL
+#CALL(%CombinedGenerate,%BaseName)                                              #! DDL scripts for backend
 #!
 #!#SET(%DebugSet,0)
 #!#DEBUG(%DebugSet)
