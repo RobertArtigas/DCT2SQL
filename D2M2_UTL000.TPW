@@ -51,16 +51,25 @@
 #CALL(%BuildQualifiedFiles)
 #IF(%TRUE)
 #SET(%AuditLines, 0)
--- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
+-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[7]NULL PREFIX %[5]NULL FULLPATH %[42]NULL FILE-OPTIONS
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
     #!INSERT(%MetabaseSqlField,%BaseName)
     #SET(%NFilesKeyCount    , ITEMS(%Key))
     #SET(%NFilesFieldCount  , ITEMS(%Field))
+    #!
+    #SET(%NFilesFullPath    ,%FileName)                                         #! Table Full Path Name - RA.2019.10.20
+    #IF(LEN(%NFilesFullPath)>0)
+      #IF(INSTRING('''',%NFilesFullPath,1,1)<1)                                 #! Make it obvious it is a variable
+        #SET(%NFilesFullPath,'!' & %FileName)
+      #ENDIF
+    #ENDIF
+    #!CALL(%ReplaceSubString ,%NFilesFullPath ,'''','')
+    #!
     #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
--- PROCESSED: %@N04@(%NFilesCount) %[50]NFilesName %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL [%[10]FilePrefix] %NFilesFullPath
+-- PROCESSED: %@N04@(%NFilesCount) %[50]NFilesName %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL [%[10]FilePrefix] %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
 #INSERT(%AuditFieldsAndKeys000)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)

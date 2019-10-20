@@ -4,7 +4,7 @@
 #!---------------------------------------------------------------------
 #! File Name:   D2M2_010.tpw
 #! Purpose:     METABASE: Options outputed to SQL 
-#! Author:      Copyright Â© 1999-2999 by Roberto Artigas Jr
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
 #! 2019.07.24:  Roberto Artigas
@@ -260,12 +260,12 @@
 #! newid([optionflag])
 #! Parameters
 #! option flag
-#! 0, or no value â€“ the GUID generated is human-readable (varchar), but does not include dashes. 
+#! 0, or no value – the GUID generated is human-readable (varchar), but does not include dashes. 
 #!                  This argument, which is the default, is useful for converting values into varbinary.
 #!
-#! -1 â€“ the GUID generated is human-readable (varchar) and includes dashes.
+#! -1 – the GUID generated is human-readable (varchar) and includes dashes.
 #!
-#! -0x0 â€“ returns the GUID as a varbinary.
+#! -0x0 – returns the GUID as a varbinary.
 #! 
 #! Any other value for newid returns NULL.
 #! 
@@ -349,7 +349,7 @@
 #! 3) {aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee}
 #!
 #! MySQL UUID example
-#! Letâ€™s take a look at an example of using UUID as the primary key.
+#! Let’s take a look at an example of using UUID as the primary key.
 #! 
 #! The following statement creates a new table named customers:
 #!
@@ -485,6 +485,12 @@
 #!---------------------------------------------------------------------
 #!RA.2019.07.26: Pass %BaseName as a parameter
 #GROUP(%BuildQualifiedKeysGUID,%pBaseName)                                      #! RA.2019.07.26: Added
+#IF(NOT VAREXISTS(%NKeyFieldSize))
+  #DECLARE(%NKeyFieldSize)
+#ENDIF
+#IF(NOT VAREXISTS(%NKeyFieldEQ))
+  #DECLARE(%NKeyFieldEQ)
+#ENDIF
 #!
 #!FIX(%File, %NFilesName)
 #FOR(%Key)                                                                      #! VALID Key: FOR
@@ -507,10 +513,14 @@
     #IF(%KeyPrimary)
       #FOR(%KeyField)
         #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
-        #!-- %[20]KeyFieldID [%KeyField]
+      #SET(%KeyFieldID,UPPER(%KeyFieldID))
+      #SET(%NKeyFieldSize, LEN(%KeyFieldID))
+      #SET(%NKeyFieldEQ, (UPPER(%KeyFieldID) = 'GUID'))
+#!          --0 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldGUID
         #IF(UPPER(%KeyFieldID) = 'GUID')
           #SET(%NFilesFieldGUID   , %NFilesFieldGUID + 1)
         #ENDIF
+#!          --1 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldGUID
       #ENDFOR
     #ENDIF
   #ENDIF
@@ -518,7 +528,10 @@
     #SET(%NFilesKeyTS             , %NFilesKeyTS + 1)
     #FOR(%KeyField)
       #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
-      #!-- %[20]KeyFieldID [%KeyField]
+      #SET(%KeyFieldID,UPPER(%KeyFieldID))
+      #SET(%NKeyFieldSize, LEN(%KeyFieldID))
+      #SET(%NKeyFieldEQ, (UPPER(%KeyFieldID) = 'TIMESTAMP'))
+#!          --0 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldTS
       #IF(UPPER(%KeyFieldID) = 'TIMESTAMP')
         #SET(%NFilesFieldTS       , %NFilesFieldTS + 1)
       #ENDIF
@@ -526,13 +539,17 @@
       #IF(UPPER(%KeyFieldID) = 'TS')
         #SET(%NFilesFieldTS       , %NFilesFieldTS + 1)
       #ENDIF
+#!          --1 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldTS
     #ENDFOR
   #ENDIF
   #IF (UPPER(%KeyID) = 'SERVERTIMESTAMPKEY')
     #SET(%NFilesKeySTS            , %NFilesKeySTS + 1)
     #FOR(%KeyField)
       #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
-      #!-- %[20]KeyFieldID [%KeyField]
+      #SET(%KeyFieldID,UPPER(%KeyFieldID))
+      #SET(%NKeyFieldSize, LEN(%KeyFieldID))
+      #SET(%NKeyFieldEQ, (UPPER(%KeyFieldID) = 'SERVERTIMESTAMP'))
+#!          --0 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldSTS
       #IF(UPPER(%KeyFieldID) = 'SERVERTIMESTAMP')
         #SET(%NFilesFieldSTS      , %NFilesFieldSTS + 1)
       #ENDIF
@@ -540,13 +557,17 @@
       #IF(UPPER(%KeyFieldID) = 'STS')
         #SET(%NFilesFieldSTS      , %NFilesFieldSTS + 1)
       #ENDIF
+#!          --1 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldSTS
     #ENDFOR
   #ENDIF
   #IF (UPPER(%KeyID) = 'DELETETIMESTAMPKEY' OR UPPER(%KeyID) = 'DELETEDTIMESTAMPKEY')
     #SET(%NFilesKeyDTS            , %NFilesKeyDTS + 1)
     #FOR(%KeyField)
       #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
-      #!-- %[20]KeyFieldID [%KeyField]
+      #SET(%KeyFieldID,UPPER(%KeyFieldID))
+      #SET(%NKeyFieldSize, LEN(%KeyFieldID))
+      #SET(%NKeyFieldEQ, (UPPER(%KeyFieldID) = 'DELETETIMESTAMP' OR UPPER(%KeyFieldID) = 'DELETEDTIMESTAMP'))
+#!          --0 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldDTS
       #IF(UPPER(%KeyFieldID) = 'DELETETIMESTAMP' OR UPPER(%KeyFieldID) = 'DELETEDTIMESTAMP')
         #SET(%NFilesFieldDTS      , %NFilesFieldDTS + 1)
       #ENDIF
@@ -554,6 +575,7 @@
       #IF(UPPER(%KeyFieldID) = 'DTS')
         #SET(%NFilesFieldDTS      , %NFilesFieldDTS + 1)
       #ENDIF
+#!          --1 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldDTS
     #ENDFOR
   #ENDIF
 #ENDFOR
