@@ -3,7 +3,7 @@ Clarion dictionary to SQL DDL back end templates.
 
 This will take a clarion dictionary (DCT) and create SQL DDL for several back ends.
 
-The current SQL back ends that can be template generated are: 
+The current SQL back ends can have DDL template generated code are: 
 POSTGRESQL, MYSQL, MSSQL, SQLANYWHERE, MIMER
 
 The dictionaries should be SQL ready to be generated correctly and there are a number of audit templates to help you check and correct your dictionary.
