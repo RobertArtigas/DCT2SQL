@@ -52,14 +52,20 @@
 #IF(%TRUE)
 #SET(%AuditLines, 0)
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[7]NULL PREFIX %[5]NULL FULLPATH %[42]NULL FILE-OPTIONS
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
   #IF(%opt000AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
@@ -78,11 +84,16 @@
     #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- PROCESSED: %@N04@(%NFilesCount) %[50]NFilesName %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL [%[10]FilePrefix] %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
 =======
 #!-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[50]NFilesName %[0]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL %[10]FilePrefix %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
 -- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[0]NULL %[30]NFilesName %[0]NULL %[8]FilePrefix %[0]NULL %[40]NFilesFullPath %[0]NULL %FileUserOptions
 >>>>>>> Updates and new utility
+=======
+#!-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[50]NFilesName %[0]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL %[10]FilePrefix %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
+-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[0]NULL %[30]NFilesName %[0]NULL %[8]FilePrefix %[0]NULL %[40]NFilesFullPath %[0]NULL %FileUserOptions
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #INSERT(%AuditFieldsAndKeys000)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)

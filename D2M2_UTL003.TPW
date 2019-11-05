@@ -3,10 +3,14 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
 #! File Name:   D2M2_UTL000.tpw
 =======
 #! File Name:   D2M2_UTL003.tpw
 >>>>>>> Updates and new utility
+=======
+#! File Name:   D2M2_UTL003.tpw
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #! Purpose:     UTILITY: Check GUID related areas
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
@@ -15,10 +19,14 @@
 #!  *   Template utility creation.
 #!
 <<<<<<< HEAD
+<<<<<<< HEAD
 #UTILITY(D2M2_UTIL_FILE, '2019.10.19: [UTIL] Verify FILE information')
 =======
 #UTILITY(D2M2_UTIL_FILE, '2019.11.04: [UTIL] Verify FILE information')
 >>>>>>> Updates and new utility
+=======
+#UTILITY(D2M2_UTIL_FILE, '2019.11.04: [UTIL] Verify FILE information')
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #!-----------------------------------------------------------------------------
 #! RA.2017.12.17 - The %BaseName determines what backend you are processing.
 #! All the specific items related to a backend can be coded with a case statement.
@@ -40,10 +48,14 @@
 #!---------------------------------------------------------------------
 #SHEET,HSCROLL,AT(,,464)
 <<<<<<< HEAD
+<<<<<<< HEAD
   #INSERT(%MITLicenseD2M2UTL004)
 =======
   #INSERT(%MITLicenseD2M2UTL003)
 >>>>>>> Updates and new utility
+=======
+  #INSERT(%MITLicenseD2M2UTL003)
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
   #INSERT(%ShowExplainUtilFILE)
   #INSERT(%ShowExplainUtilFILE2)
   #INSERT(%MetabaseTabSelection)
@@ -62,6 +74,7 @@
 #CALL(%UtilityPrefix                      , %BaseName)
 #CALL(%BuildQualifiedFiles)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 #IF(%TRUE)
 #SET(%AuditLines, 0)
@@ -69,13 +82,18 @@
   #IF(%opt003AuditGUID)
 -- %[16]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #IF(%TRUE)
 #SET(%AuditLines, 0)
 #!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
   #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
   #ENDIF
 --
   #FOR(%NFiles)
@@ -83,6 +101,7 @@
     #!INSERT(%MetabaseSqlField,%BaseName)
     #SET(%NFilesKeyCount    , ITEMS(%Key))
     #SET(%NFilesFieldCount  , ITEMS(%Field))
+<<<<<<< HEAD
 <<<<<<< HEAD
     #!
     #SET(%NFilesFullPath    ,%FileName)                                         #! Table Full Path Name - RA.2018.04.12
@@ -101,18 +120,26 @@
 -- %[16]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[1]NULL 
   #ENDIF 
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
     #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
 #!-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[50]NFilesName %[0]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL %[10]FilePrefix %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
 -- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[0]NULL %[30]NFilesName %[0]NULL %[8]FilePrefix %[0]NULL %[40]NFilesFullPath %[0]NULL %FileUserOptions
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #INSERT(%AuditFieldsAndKeys003)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- %[5]NULL KC-PK-FLD %[0]NULL FILENAME %[7]NULL PREFIX %[2]NULL FULLPATH %[22]NULL FILE-OPTIONS
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
   #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
@@ -120,19 +147,28 @@
   #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 --
     #ENDIF
   #ENDFOR
 --
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- %[5]NULL KC-PK-FLD %[0]NULL FILENAME %[7]NULL PREFIX %[2]NULL FULLPATH %[22]NULL FILE-OPTIONS
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
   #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #ENDIF
 #CALL(%UtilitySuffix                      , %BaseName)
 #!
@@ -146,6 +182,7 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 <<<<<<< HEAD
+<<<<<<< HEAD
 #GROUP(%MITLicenseD2M2UTL004)
 #TAB('UTIL_FILE'),PROP(PROP:FontStyle,700)
   #INSERT(%MITLicense)
@@ -155,6 +192,8 @@
     #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.', CHECK), %opt003AuditFields, AT(10)
     #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.', CHECK), %opt003AuditKeys, AT(10)
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
 #GROUP(%MITLicenseD2M2UTL003)
 #TAB('UTIL_FILE'),PROP(PROP:FontStyle,700)
   #INSERT(%MITLicense)
@@ -163,7 +202,10 @@
     #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'     , CHECK), %opt003AuditGUID, AT(10)
     #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.' , CHECK), %opt003AuditFields, AT(10)
     #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'     , CHECK), %opt003AuditKeys, AT(10)
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -275,6 +317,7 @@
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%AuditFieldsAndKeys003)
 <<<<<<< HEAD
+<<<<<<< HEAD
     #IF(ITEMS(%Field) AND %opt003AuditFields)
 -- %[10]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[27]NULL FIELD-OPTIONS  
 -- %[10]NULL ========== %[40]NULL ============= %[37]NULL ============= %[27]NULL =============  
@@ -283,6 +326,8 @@
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
 -- %[10]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[40]FieldInitial %[0]NULL %FieldUserOptions  
 =======
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
     #IF(%opt003AuditGUID)
 #!-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS
@@ -294,11 +339,15 @@
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
 -- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
+<<<<<<< HEAD
 >>>>>>> Updates and new utility
+=======
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
       #ENDFOR
     #ENDIF
     #!
     #IF(ITEMS(%Key) AND %opt003AuditKeys)               
+<<<<<<< HEAD
 <<<<<<< HEAD
 -- %[10]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[66]NULL KEY-OPTIONS  
 -- %[10]NULL ======== %[22]NULL ============= %[17]NULL ============== %[66]NULL ===========  
@@ -306,6 +355,10 @@
 -- %[05]NULL KEY-NAME %[17]NULL EXTERNAL-NAME %[12]NULL KEY-FIELD-LIST %[46]NULL KEY-OPTIONS  
 -- %[05]NULL ======== %[17]NULL ============= %[12]NULL ============== %[46]NULL ===========  
 >>>>>>> Updates and new utility
+=======
+-- %[05]NULL KEY-NAME %[17]NULL EXTERNAL-NAME %[12]NULL KEY-FIELD-LIST %[46]NULL KEY-OPTIONS  
+-- %[05]NULL ======== %[17]NULL ============= %[12]NULL ============== %[46]NULL ===========  
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
       #FOR(%Key)
         #SET(%NextLine, EXTRACT(%KeyStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
@@ -319,10 +372,14 @@
           #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
         #ENDIF
 <<<<<<< HEAD
+<<<<<<< HEAD
 -- %[10]NULL %[30]KeyID %[0]NULL %[30]NextLine %[0]NULL %[80]KeyFieldList %[0]NULL %KeyUserOptions  
 =======
 -- %[05]NULL %[25]KeyID %[0]NULL %[25]NextLine %[0]NULL %[60]KeyFieldList %[0]NULL %KeyUserOptions  
 >>>>>>> Updates and new utility
+=======
+-- %[05]NULL %[25]KeyID %[0]NULL %[25]NextLine %[0]NULL %[60]KeyFieldList %[0]NULL %KeyUserOptions  
+>>>>>>> ab2407d8cbb4b6223d1593b388ad32cefd6ef7f1
       #ENDFOR
     #ENDIF
 #!---------------------------------------------------------------------
