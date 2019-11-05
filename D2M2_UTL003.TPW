@@ -2,7 +2,7 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#! File Name:   D2M2_UTL000.tpw
+#! File Name:   D2M2_UTL003.tpw
 #! Purpose:     UTILITY: Check GUID related areas
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
@@ -10,7 +10,7 @@
 #! 2018.07.04   Roberto Artigas
 #!  *   Template utility creation.
 #!
-#UTILITY(D2M2_UTIL_GUID, '2019.07.04: [UTIL] Verify GUID information')
+#UTILITY(D2M2_UTIL_FILE, '2019.11.04: [UTIL] Verify FILE information')
 #!-----------------------------------------------------------------------------
 #! RA.2017.12.17 - The %BaseName determines what backend you are processing.
 #! All the specific items related to a backend can be coded with a case statement.
@@ -28,12 +28,12 @@
 #INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
 #INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
 #INSERT(%PreambleUtility)                                                       #! Basic copyright message
-#INSERT(%VariablesUtility000)                                                   #! RA.2019.07.25.THU: Added 
+#INSERT(%VariablesUtility003)                                                   #! RA.2019.07.25.THU: Added 
 #!---------------------------------------------------------------------
 #SHEET,HSCROLL,AT(,,464)
-  #INSERT(%MITLicenseD2M2UTL000)
-  #INSERT(%ShowExplainUtilGUID)
-  #INSERT(%ShowExplainUtilGUID2)
+  #INSERT(%MITLicenseD2M2UTL003)
+  #INSERT(%ShowExplainUtilFILE)
+  #INSERT(%ShowExplainUtilFILE2)
   #INSERT(%MetabaseTabSelection)
 #ENDSHEET
 #!---------------------------------------------------------------------
@@ -44,7 +44,7 @@
 #!#DEBUG(%DebugSet)
 #!
 #SET(%UtilityChekTable                    , %TRUE)
-#SET(%UtilityNameTable                    , %DictName & '_' & %BaseName & '_GUID_VERIFY.TXT')
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseName & '_FILE_VERIFY.TXT')
 #SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
 #!
 #CALL(%UtilityPrefix                      , %BaseName)
@@ -53,7 +53,7 @@
 #SET(%AuditLines, 0)
 #!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
-  #IF(%opt000AuditGUID)
+  #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
 --
@@ -66,22 +66,22 @@
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
 #!-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[50]NFilesName %[0]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL %[10]FilePrefix %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
 -- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[0]NULL %[30]NFilesName %[0]NULL %[8]FilePrefix %[0]NULL %[40]NFilesFullPath %[0]NULL %FileUserOptions
-#INSERT(%AuditFieldsAndKeys000)
+#INSERT(%AuditFieldsAndKeys003)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
-  #IF(%opt000AuditGUID)
+  #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
-  #IF(%opt000AuditGUID)
+  #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
 --
     #ENDIF
   #ENDFOR
 --
-  #IF(%opt000AuditGUID)
+  #IF(%opt003AuditGUID)
 -- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
   #ENDIF
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
@@ -97,129 +97,129 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%MITLicenseD2M2UTL000)
-#TAB('UTIL_GUID'),PROP(PROP:FontStyle,700)
+#GROUP(%MITLicenseD2M2UTL003)
+#TAB('UTIL_FILE'),PROP(PROP:FontStyle,700)
   #INSERT(%MITLicense)
   #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
    #DISPLAY(''),AT(,,,1)
-    #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'     , CHECK), %opt000AuditGUID, AT(10)
-    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.' , CHECK), %opt000AuditFields, AT(10)
-    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'     , CHECK), %opt000AuditKeys, AT(10)
+    #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'     , CHECK), %opt003AuditGUID, AT(10)
+    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.' , CHECK), %opt003AuditFields, AT(10)
+    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'     , CHECK), %opt003AuditKeys, AT(10)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%ExplainUtilGUID)
+#GROUP(%ExplainUtilFILE)
 #PREPARE
-  #IF(NOT VAREXISTS(%ExplainTextGUID))
-    #DECLARE(%ExplainTextGUID)
+  #IF(NOT VAREXISTS(%ExplainTextFILE))
+    #DECLARE(%ExplainTextFILE)
   #ENDIF
-  #SET(%ExplainTextGUID, '')
-  #!SET(%ExplainTextGUID, %ExplainTextGUID & 'This is one of the METABASE templates.')
-  #!SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & 'This generic utility will verify your database has the basic GUID and TIME STAMP components in place')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & ' so you can have scalable and distributed databases as large as you desire.')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & 'It will provide an audit listing that contains the following header components:')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>KC-PK-FLD<9>GUID<9>TS<9>STS<9>DTS')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>4 -1 -21<9><9>1 -1<9>1 -1<9>1 -1<9>1 -1<13,10>')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>KC<9>= Key count for this table.')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>PK<9>= Primary key for this table exists.<9>(yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>KC<9>= Field count for this table.')
-  #!SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>GUID<9>= How many GUID items have been detected.')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & 'Under the GUID, TS, STS, and DTS what is important is the 1 - 1 to be there.')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & ' This tells you that field name and field options for the time stamps have been added. (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>For the Field NAMES:')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>GUID<9>= GUID<9><9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>TS<9>= TimeStamp<9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>STS<9>= ServerTimeStamp<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>DTS<9>= DeletedTimeStamp<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>For the Field OPTIONS:')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>GUID<9>= GUID(1):Integer<9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>TS<9>= TimeStamp(1):Integer<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>STS<9>= ServerTimeStamp(1):Integer<9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><9>DTS<9>= DeletedTimeStamp(1):Integer<9>Has been detected? (yes=1, no=0)')
-  #!SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
-  #!SET(%ExplainTextGUID, %ExplainTextGUID & 'This template has been tested with the ABC template chains.')
-  #SET(%ExplainTextGUID, %ExplainTextGUID & '')
+  #SET(%ExplainTextFILE, '')
+  #!SET(%ExplainTextFILE, %ExplainTextFILE & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'This generic utility will verify your database has the basic GUID and TIME STAMP components in place')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & ' so you can have scalable and distributed databases as large as you desire.')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'It will provide an audit listing that contains the following header components:')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>KC-PK-FLD<9>GUID<9>TS<9>STS<9>DTS')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>4 -1 -21<9><9>1 -1<9>1 -1<9>1 -1<9>1 -1<13,10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>KC<9>= Key count for this table.')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>PK<9>= Primary key for this table exists.<9>(yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>KC<9>= Field count for this table.')
+  #!SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>GUID<9>= How many GUID items have been detected.')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'Under the GUID, TS, STS, and DTS what is important is the 1 - 1 to be there.')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & ' This tells you that field name and field options for the time stamps have been added. (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>For the Field NAMES:')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>GUID<9>= GUID<9><9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>TS<9>= TimeStamp<9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>STS<9>= ServerTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>DTS<9>= DeletedTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>For the Field OPTIONS:')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>GUID<9>= GUID(1):Integer<9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>TS<9>= TimeStamp(1):Integer<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>STS<9>= ServerTimeStamp(1):Integer<9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><9>DTS<9>= DeletedTimeStamp(1):Integer<9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
+  #!SET(%ExplainTextFILE, %ExplainTextFILE & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '')
 #ENDPREPARE
 #!
-#GROUP(%ShowExplainUtilGUID)
-#INSERT(%ExplainUtilGUID)
+#GROUP(%ShowExplainUtilFILE)
+#INSERT(%ExplainUtilFILE)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
   #BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextGUID),AT(,,436,204)
+    #DISPLAY(%ExplainTextFILE),AT(,,436,204)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%ExplainUtilGUID2)
+#GROUP(%ExplainUtilFILE2)
 #PREPARE
-  #IF(NOT VAREXISTS(%ExplainTextGUID2))
-    #DECLARE(%ExplainTextGUID2)
+  #IF(NOT VAREXISTS(%ExplainTextFILE2))
+    #DECLARE(%ExplainTextFILE2)
   #ENDIF
-  #SET(%ExplainTextGUID2, '')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'After the original audit template was written a few more items were discovered that seem')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & ' to need checking for accuracy.')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'The following header components were added to the audit:')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KGUID<9>KTS<9>KSTS<9>KDTS')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>1 -1<9>1 -1<9>1 -1<9>1 -1')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'Under the KGUID, KTS, KSTS, and KDTS what is important is the 1 - 1 to be there.')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & ' This tells you that key names for the time stamps have been created, and field name for the time stamps')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & ' have been added in the correct keys. (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>For the KEY NAMES:')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KGUID<9>= _PKEY<9><9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KTS<9>= TimeStampKey<9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KSTS<9>= ServerTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KDTS<9>= DeletedTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>For the Field NAMES inside the KEY NAMES:')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KGUID<9>= GUID<9><9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KTS<9>= TimeStamp<9><9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KSTS<9>= ServerTimeStamp<9><9>Has been detected? (yes=1, no=0)')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><9>KDTS<9>= DeletedTimeStamp<9><9>Has been detected? (yes=1, no=0)')
-  #!SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>')
-  #!SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'This template has been tested with the ABC template chains.')
-  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '')
+  #SET(%ExplainTextFILE2, '')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'After the original audit template was written a few more items were discovered that seem')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & ' to need checking for accuracy.')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'The following header components were added to the audit:')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KGUID<9>KTS<9>KSTS<9>KDTS')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>1 -1<9>1 -1<9>1 -1<9>1 -1')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'Under the KGUID, KTS, KSTS, and KDTS what is important is the 1 - 1 to be there.')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & ' This tells you that key names for the time stamps have been created, and field name for the time stamps')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & ' have been added in the correct keys. (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>For the KEY NAMES:')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KGUID<9>= _PKEY<9><9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KTS<9>= TimeStampKey<9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KSTS<9>= ServerTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KDTS<9>= DeletedTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>For the Field NAMES inside the KEY NAMES:')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KGUID<9>= GUID<9><9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KTS<9>= TimeStamp<9><9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KSTS<9>= ServerTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><9>KDTS<9>= DeletedTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>')
+  #!SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '')
 #ENDPREPARE
 #!
-#GROUP(%ShowExplainUtilGUID2)
-#INSERT(%ExplainUtilGUID2)
+#GROUP(%ShowExplainUtilFILE2)
+#INSERT(%ExplainUtilFILE2)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
   #BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextGUID2),AT(,,436,204)
+    #DISPLAY(%ExplainTextFILE2),AT(,,436,204)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
-#GROUP(%VariablesUtility000)
+#GROUP(%VariablesUtility003)
 #PREPARE
 #DECLARE(%NextLine)
 #DECLARE(%KeyFieldList)
 #DECLARE(%KeyFieldID)
 #DECLARE(%AuditLines)
 #!
-#DECLARE(%opt000AuditGUID                 ,LONG)
-#SET(%opt000AuditGUID                     ,FALSE)
-#DECLARE(%opt000AuditFields               ,LONG)
-#SET(%opt000AuditFields                   ,FALSE)
-#DECLARE(%opt000AuditKeys                 ,LONG)
-#SET(%opt000AuditKeys                     ,FALSE)
+#DECLARE(%opt003AuditGUID                 ,LONG)
+#SET(%opt003AuditGUID                     ,FALSE)
+#DECLARE(%opt003AuditFields               ,LONG)
+#SET(%opt003AuditFields                   ,FALSE)
+#DECLARE(%opt003AuditKeys                 ,LONG)
+#SET(%opt003AuditKeys                     ,FALSE)
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
-#GROUP(%AuditFieldsAndKeys000)
-    #IF(%opt000AuditGUID)
+#GROUP(%AuditFieldsAndKeys003)
+    #IF(%opt003AuditGUID)
 #!-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS
     #ENDIF
-    #IF(ITEMS(%Field) AND %opt000AuditFields)
+    #IF(ITEMS(%Field) AND %opt003AuditFields)
 -- %[05]NULL FIELD-NAME %[20]NULL EXTERNAL-NAME %[17]NULL INITIAL-VALUE %[16]NULL FIELD-OPTIONS  
 -- %[05]NULL ========== %[20]NULL ============= %[17]NULL ============= %[16]NULL =============  
       #FOR(%Field)
@@ -229,7 +229,7 @@
       #ENDFOR
     #ENDIF
     #!
-    #IF(ITEMS(%Key) AND %opt000AuditKeys)               
+    #IF(ITEMS(%Key) AND %opt003AuditKeys)               
 -- %[05]NULL KEY-NAME %[17]NULL EXTERNAL-NAME %[12]NULL KEY-FIELD-LIST %[46]NULL KEY-OPTIONS  
 -- %[05]NULL ======== %[17]NULL ============= %[12]NULL ============== %[46]NULL ===========  
       #FOR(%Key)
