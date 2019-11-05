@@ -51,11 +51,7 @@
 #CALL(%BuildQualifiedFiles)
 #IF(%TRUE)
 #SET(%AuditLines, 0)
-#!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
--- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
-  #IF(%opt000AuditGUID)
--- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
-  #ENDIF
+-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
@@ -64,24 +60,17 @@
     #SET(%NFilesFieldCount  , ITEMS(%Field))
     #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
-#!-- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[50]NFilesName %[0]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL %[10]FilePrefix %[0]NULL %[50]NFilesFullPath %[0]NULL %FileUserOptions
--- %@N04@(%NFilesCount) %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[0]NULL %[30]NFilesName %[0]NULL %[8]FilePrefix %[0]NULL %[40]NFilesFullPath %[0]NULL %FileUserOptions
+-- PROCESSED: %@N04@(%NFilesCount) %[50]NFilesName %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL [%[10]FilePrefix] %[50]NFilesFullPath %[0]NULL %FileUserOptions
 #INSERT(%AuditFieldsAndKeys000)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
--- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
-  #IF(%opt000AuditGUID)
--- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
-  #ENDIF
+-- %[66]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 --
     #ENDIF
   #ENDFOR
 --
-  #IF(%opt000AuditGUID)
--- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
-  #ENDIF
--- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
+-- Processed Files -- ENDED %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 #ENDIF
 #CALL(%UtilitySuffix                      , %BaseName)
 #!
@@ -98,10 +87,9 @@
 #TAB('UTIL_GUID'),PROP(PROP:FontStyle,700)
   #INSERT(%MITLicense)
   #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-   #DISPLAY(''),AT(,,,1)
-    #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'     , CHECK), %opt000AuditGUID, AT(10)
-    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.' , CHECK), %opt000AuditFields, AT(10)
-    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'     , CHECK), %opt000AuditKeys, AT(10)
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.', CHECK), %opt000AuditFields, AT(10)
+    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.', CHECK), %opt000AuditKeys, AT(10)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -202,8 +190,6 @@
 #DECLARE(%KeyFieldID)
 #DECLARE(%AuditLines)
 #!
-#DECLARE(%opt000AuditGUID                 ,LONG)
-#SET(%opt000AuditGUID                     ,FALSE)
 #DECLARE(%opt000AuditFields               ,LONG)
 #SET(%opt000AuditFields                   ,FALSE)
 #DECLARE(%opt000AuditKeys                 ,LONG)
@@ -212,23 +198,19 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%AuditFieldsAndKeys000)
-    #IF(%opt000AuditGUID)
-#!-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
--- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS
-    #ENDIF
     #IF(ITEMS(%Field) AND %opt000AuditFields)
--- %[05]NULL FIELD-NAME %[20]NULL EXTERNAL-NAME %[17]NULL INITIAL-VALUE %[16]NULL FIELD-OPTIONS  
--- %[05]NULL ========== %[20]NULL ============= %[17]NULL ============= %[16]NULL =============  
+-- %[10]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[27]NULL FIELD-OPTIONS  
+-- %[10]NULL ========== %[40]NULL ============= %[37]NULL ============= %[27]NULL =============  
       #FOR(%Field)
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
--- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
+-- %[10]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[40]FieldInitial %[0]NULL %FieldUserOptions  
       #ENDFOR
     #ENDIF
     #!
     #IF(ITEMS(%Key) AND %opt000AuditKeys)               
--- %[05]NULL KEY-NAME %[17]NULL EXTERNAL-NAME %[12]NULL KEY-FIELD-LIST %[46]NULL KEY-OPTIONS  
--- %[05]NULL ======== %[17]NULL ============= %[12]NULL ============== %[46]NULL ===========  
+-- %[10]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[66]NULL KEY-OPTIONS  
+-- %[10]NULL ======== %[22]NULL ============= %[17]NULL ============== %[66]NULL ===========  
       #FOR(%Key)
         #SET(%NextLine, EXTRACT(%KeyStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
@@ -241,7 +223,7 @@
         #IF(LEN(%KeyFieldList) > 80)
           #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
         #ENDIF
--- %[05]NULL %[25]KeyID %[0]NULL %[25]NextLine %[0]NULL %[60]KeyFieldList %[0]NULL %KeyUserOptions  
+-- %[10]NULL %[30]KeyID %[0]NULL %[30]NextLine %[0]NULL %[80]KeyFieldList %[0]NULL %KeyUserOptions  
       #ENDFOR
     #ENDIF
 #!---------------------------------------------------------------------
