@@ -55,9 +55,11 @@
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
-    #SET(%NFilesFullPath    , %FileName)
-    #IF (INSTRING('''',%NFilesFullPath,1,1) < 0)
-      #SET(%NFilesFullPath  , '!' & %NFilesFullPath)
+    #SET(%NFilesFullPath      , %FileName)
+    #IF(LEN(%NFilesFullPath) > 0)
+      #IF (INSTRING('''',%NFilesFullPath,1,1) < 1)
+        #SET(%NFilesFullPath  , '!' & %NFilesFullPath)
+      #ENDIF
     #ENDIF
     #!INSERT(%MetabaseSqlField,%BaseName)
     #SET(%NFilesKeyCount    , ITEMS(%Key))
