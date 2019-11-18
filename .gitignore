@@ -1,4 +1,25 @@
 *.sublime-workspace
-*.MAP
+
+############
+## Clarion
+############
 *.FileList.xml
-CwUnit/Testit.bat
+*.MAP
+*.exe
+**/Cla*.dll
+*.ini
+*.cache
+obj/**
+*/obj/**
+*.obj
+*.rsc
+*.RSC
+*.bpp
+*.ap~
+PWEE*.txt
+
+############
+## Windows
+############
+# Windows image file caches
+Thumbs.db
