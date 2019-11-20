@@ -34,6 +34,7 @@
   #INSERT(%MITLicenseD2M2UTL000)
   #INSERT(%ShowExplainUtilGUID)
   #INSERT(%ShowExplainUtilGUID2)
+  #INSERT(%ShowExplainUtilGUID3)                                                #! RA.2019.11.20.WED: Added
   #INSERT(%MetabaseTabSelection)
 #ENDSHEET
 #!---------------------------------------------------------------------
@@ -185,6 +186,47 @@
   #BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
     #DISPLAY(%ExplainTextGUID2),AT(,,436,204)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilGUID3)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextGUID3))
+    #DECLARE(%ExplainTextGUID3)
+  #ENDIF
+  #SET(%ExplainTextGUID3, '')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'Additional checks have been added for the security features.')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'The following header components were added to the audit:')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>NCRPT')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>1')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'The NCRPT is a check to see if the <39>EncryptionVersion<39> field is in the table.')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>For the KEY NAMES:')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KGUID<9>= _PKEY<9><9><9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KTS<9>= TimeStampKey<9><9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KSTS<9>= ServerTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KDTS<9>= DeletedTimeStampKey<9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>For the Field NAMES inside the KEY NAMES:')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KGUID<9>= GUID<9><9><9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KTS<9>= TimeStamp<9><9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KSTS<9>= ServerTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><9>KDTS<9>= DeletedTimeStamp<9><9>Has been detected? (yes=1, no=0)')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>')
+  #!SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilGUID3)
+#INSERT(%ExplainUtilGUID3)
+#!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+#TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Documentation (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextGUID3),AT(,,436,204)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
