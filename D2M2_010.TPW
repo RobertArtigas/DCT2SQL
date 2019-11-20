@@ -4,12 +4,14 @@
 #!---------------------------------------------------------------------
 #! File Name:   D2M2_010.tpw
 #! Purpose:     METABASE: Options outputed to SQL 
-#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#! Author:      Copyright ? 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
-#! 2019.07.24:  Roberto Artigas
+#! 2019.11.20.WED:      Roberto Artigas
+#!  *   Added logic to handle EncryptionVersion for MyTable, JFiles, Cryptonite
+#! 2019.07.24:          Roberto Artigas
 #!  *   Separated the SQL default options #GROUP to its own source file.
-#! 2017.09.29   Roberto Artigas
+#! 2017.09.29           Roberto Artigas
 #!  *   Creation of this generic structured template
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -260,12 +262,12 @@
 #! newid([optionflag])
 #! Parameters
 #! option flag
-#! 0, or no value – the GUID generated is human-readable (varchar), but does not include dashes. 
+#! 0, or no value ? the GUID generated is human-readable (varchar), but does not include dashes. 
 #!                  This argument, which is the default, is useful for converting values into varbinary.
 #!
-#! -1 – the GUID generated is human-readable (varchar) and includes dashes.
+#! -1 ? the GUID generated is human-readable (varchar) and includes dashes.
 #!
-#! -0x0 – returns the GUID as a varbinary.
+#! -0x0 ? returns the GUID as a varbinary.
 #! 
 #! Any other value for newid returns NULL.
 #! 
@@ -349,7 +351,7 @@
 #! 3) {aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee}
 #!
 #! MySQL UUID example
-#! Let’s take a look at an example of using UUID as the primary key.
+#! Let?s take a look at an example of using UUID as the primary key.
 #! 
 #! The following statement creates a new table named customers:
 #!
@@ -432,48 +434,56 @@
   #! We pass FIELD requirements !
   #!----------------------------!
   #!-- FieldStatement: %FieldID [%FieldName] %FieldUserOptions
+  #! RA.2019.11.20: Table Count EncryptionVersion (MyTable, JFiles, CryptoNite)
   #! RA.2019.07.31: Think I will stay consistant and use TS, STS, and DTS accross the field names and externals.
   #! RA.2019.07.25: Rework this area to catch both ways that this can be matched. (Looked at SYNC template)
   #! RA.2019.07.06: Make sure field name is there and field option is there.
-  #IF (UPPER(%FieldID) = 'GUID'             AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-    #SET(%NFilesCountGUID   , %NFilesCountGUID + 1)
+  #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION'      AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountEncrypt      , %NFilesCountEncrypt + 1)
   #ENDIF
-  #IF (UPPER(%FieldID) = 'TIMESTAMP'        AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-    #SET(%NFilesCountTS     , %NFilesCountTS + 1)
+  #IF (UPPER(%FieldID) = 'GUID'                   AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountGUID         , %NFilesCountGUID + 1)
   #ENDIF
-  #IF (UPPER(%FieldID) = 'SERVERTIMESTAMP'  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-    #SET(%NFilesCountSTS    , %NFilesCountSTS + 1)
+  #IF (UPPER(%FieldID) = 'TIMESTAMP'              AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountTS           , %NFilesCountTS + 1)
   #ENDIF
-  #IF (UPPER(%FieldID) = 'DELETETIMESTAMP'  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+  #IF (UPPER(%FieldID) = 'SERVERTIMESTAMP'        AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountSTS          , %NFilesCountSTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DELETETIMESTAMP'      AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+      #SET(%NFilesCountDTS        , %NFilesCountDTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DELETEDTIMESTAMP'     AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+      #SET(%NFilesCountDTS        , %NFilesCountDTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'TS'                   AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountTS           , %NFilesCountTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'STS'                  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
+    #SET(%NFilesCountSTS          , %NFilesCountSTS + 1)
+  #ENDIF
+  #IF (UPPER(%FieldID) = 'DTS'                  AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
       #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
   #ENDIF
-  #IF (UPPER(%FieldID) = 'DELETEDTIMESTAMP' AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-      #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
-  #ENDIF
-  #IF (UPPER(%FieldID) = 'TS'               AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-    #SET(%NFilesCountTS     , %NFilesCountTS + 1)
-  #ENDIF
-  #IF (UPPER(%FieldID) = 'STS'              AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-    #SET(%NFilesCountSTS    , %NFilesCountSTS + 1)
-  #ENDIF
-  #IF (UPPER(%FieldID) = 'DTS'              AND INSTRING('READONLY',UPPER(%FieldName),1,1) = 0)
-      #SET(%NFilesCountDTS  , %NFilesCountDTS + 1)
-  #ENDIF  
+  #! RA.2019.11.20: Table Option EncryptionVersion (MyTable, JFiles, CryptoNite) [Not used]  
   #! RA.2019.07.25: Count this a bit differently to check (Verify in %FieldUserOptions)
+  #IF(EXTRACT(UPPER(%FieldUserOptions),'ENCRYPTIONVERSION'))
+    #SET(%NFilesOptionEncrypt     , %NFilesOptionEncrypt + 1)
+  #ENDIF
   #IF(EXTRACT(UPPER(%FieldUserOptions),'GUID'))
-    #SET(%NFilesOptionGUID  , %NFilesOptionGUID + 1)
+    #SET(%NFilesOptionGUID        , %NFilesOptionGUID + 1)
   #ENDIF
   #IF(EXTRACT(UPPER(%FieldUserOptions),'TIMESTAMP'))
-    #SET(%NFilesOptionTS    , %NFilesOptionTS + 1)
+    #SET(%NFilesOptionTS          , %NFilesOptionTS + 1)
   #ENDIF
   #IF(EXTRACT(UPPER(%FieldUserOptions),'SERVERTIMESTAMP'))
-    #SET(%NFilesOptionSTS   , %NFilesOptionSTS + 1)
+    #SET(%NFilesOptionSTS         , %NFilesOptionSTS + 1)
   #ENDIF
   #IF(EXTRACT(UPPER(%FieldUserOptions),'DELETETIMESTAMP'))
-    #SET(%NFilesOptionDTS   , %NFilesOptionDTS + 1)
+    #SET(%NFilesOptionDTS         , %NFilesOptionDTS + 1)
   #ENDIF
   #IF(EXTRACT(UPPER(%FieldUserOptions),'DELETEDTIMESTAMP'))
-    #SET(%NFilesOptionDTS   , %NFilesOptionDTS + 1)
+    #SET(%NFilesOptionDTS         , %NFilesOptionDTS + 1)
   #ENDIF
 #ENDFOR
 #!---------------------------------------------------------------------

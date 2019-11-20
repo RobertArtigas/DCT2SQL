@@ -51,7 +51,7 @@
 #CALL(%BuildQualifiedFiles)
 #IF(%TRUE)
 #SET(%AuditLines, 0)
--- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[7]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
+-- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[1]NULL NCRPT %[3]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
@@ -66,17 +66,17 @@
     #SET(%NFilesFieldCount  , ITEMS(%Field))
     #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
     #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
--- %@N04@(%NFilesCount) %[0]NULL %[50]NFilesName %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[5]NULL [%[12]FilePrefix] %[50]NFilesFullPath %[0]NULL %FileUserOptions
+-- %@N04@(%NFilesCount) %[0]NULL %[50]NFilesName %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[0]NULL %[2]NFilesCountEncrypt %[5]NULL [%[12]FilePrefix] %[50]NFilesFullPath %[0]NULL %FileUserOptions
 #INSERT(%AuditFieldsAndKeys000)
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
--- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[7]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
+-- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[1]NULL NCRPT %[3]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
 --
     #ENDIF
   #ENDFOR
 --
--- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[7]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
+-- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[1]NULL NCRPT %[3]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
 #ENDIF
 #CALL(%UtilitySuffix                      , %BaseName)
 #!

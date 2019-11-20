@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2019.11.20         Roberto Artigas
+#!  *   Added the EncryptionVersion logic to the template.
 #! 2019.08.15:        Roberto Artigas
 #!  *   Made changes for the field externals. Commented out the replaced code for now.
 #! 2019.08.14:        Roberto Artigas [short quotes from conversation with Dennis E Evans]
@@ -138,6 +140,12 @@ IF    (TG_WHEN = 'BEFORE') THEN
         #SET(%NextLine, 'NEW.' & %FieldNameExt)
     %[29]NextLine = 0;   
       #ENDIF
+      #! RA.2019.11.20: Added the EncryptionVersion logic to the template.
+      #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION')
+        #!SET(%NextLine, 'NEW.' & %FieldID)
+        #SET(%NextLine, 'NEW.' & %FieldNameExt)
+    %[29]NextLine = 0;   
+      #ENDIF
       #IF (UPPER(%FieldID) = 'GUID')
         #!SET(%NextLine, 'NEW.' & %FieldID)
         #SET(%NextLine, 'NEW.' & %FieldNameExt)
@@ -221,6 +229,9 @@ IF    (TG_WHEN = 'BEFORE') THEN
         #SET(%DeletedTimeStamp  , 'NEW.' & %FieldNameExt)
         #SET(%Nextline          , 'NEW.' & %FieldNameExt)
       #ENDIF
+      #! RA.2019.11.20: Added the EncryptionVersion logic to the template.
+      #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION')
+      #ENDIF
       #IF (UPPER(%FieldID) = 'GUID')
       #ENDIF
       #! RA.2019.08.01: IF deleting something that is needed, THEN put it back.
@@ -299,6 +310,9 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #IF (UPPER(%FieldID) = 'STS' OR UPPER(%FieldID) = 'SERVERTIMESTAMP')
       #ENDIF
       #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
+      #ENDIF
+      #! RA.2019.11.20: Added the EncryptionVersion logic to the template.
+      #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION')
       #ENDIF
       #IF (UPPER(%FieldID) = 'GUID')
       #ENDIF

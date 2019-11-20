@@ -632,238 +632,241 @@
 #GROUP(%DefineFileOptions)
 #!DECLARE(%NFilesSort),MULTI,UNIQUE                                             #! RA.2019.07.04: Define a bit earlier
 #DECLARE(%CountNFiles)
-#DECLARE(%NFiles),MULTI                 #!,UNIQUE
-#DECLARE(%NFilesCount       ,%NFiles)   #! ID: Table Count
-#DECLARE(%NFilesName        ,%NFiles)   #! Table Name
-#DECLARE(%NFilesSeqName     ,%NFiles)   #! Table Sequence Name
-#DECLARE(%NFilesSeqField    ,%NFiles)   #! Table Sequence Field
-#DECLARE(%NFilesPKeyName    ,%NFiles)   #! Table Primary Key Name
-#DECLARE(%NFilesPKeyField   ,%NFiles)   #! Table Primary Field Name
-#DECLARE(%NFilesFullPath    ,%NFiles)   #! Table Full Path Name
+#DECLARE(%NFiles),MULTI                       #!,UNIQUE
+#DECLARE(%NFilesCount             ,%NFiles)   #! ID: Table Count
+#DECLARE(%NFilesName              ,%NFiles)   #! Table Name
+#DECLARE(%NFilesSeqName           ,%NFiles)   #! Table Sequence Name
+#DECLARE(%NFilesSeqField          ,%NFiles)   #! Table Sequence Field
+#DECLARE(%NFilesPKeyName          ,%NFiles)   #! Table Primary Key Name
+#DECLARE(%NFilesPKeyField         ,%NFiles)   #! Table Primary Field Name
+#DECLARE(%NFilesFullPath          ,%NFiles)   #! Table Full Path Name
 #! RA.2019.07.06: Additional GUID items to verify per file
-#DECLARE(%NFilesKeyCount    ,%NFiles)   #! Table Count Keys
-#DECLARE(%NFilesKeyPrimary  ,%NFiles)   #! Table Count Primary Keys
-#DECLARE(%NFilesFieldCount  ,%NFiles)   #! Table Count Fields
-#DECLARE(%NFilesCountGUID   ,%NFiles)   #! Table Count GUID
-#DECLARE(%NFilesCountTS     ,%NFiles)   #! Table Count TS
-#DECLARE(%NFilesCountSTS    ,%NFiles)   #! Table Count STS
-#DECLARE(%NFilesCountDTS    ,%NFiles)   #! Table Count DTS
-#DECLARE(%NFilesOptionGUID  ,%NFiles)   #! Table Option GUID
-#DECLARE(%NFilesOptionTS    ,%NFiles)   #! Table Option TS
-#DECLARE(%NFilesOptionSTS   ,%NFiles)   #! Table Option STS
-#DECLARE(%NFilesOptionDTS   ,%NFiles)   #! Table Option DTS
+#DECLARE(%NFilesKeyCount          ,%NFiles)   #! Table Count Keys
+#DECLARE(%NFilesKeyPrimary        ,%NFiles)   #! Table Count Primary Keys
+#DECLARE(%NFilesFieldCount        ,%NFiles)   #! Table Count Fields
+#DECLARE(%NFilesCountGUID         ,%NFiles)   #! Table Count GUID
+#DECLARE(%NFilesCountTS           ,%NFiles)   #! Table Count TS
+#DECLARE(%NFilesCountSTS          ,%NFiles)   #! Table Count STS
+#DECLARE(%NFilesCountDTS          ,%NFiles)   #! Table Count DTS
+#DECLARE(%NFilesOptionGUID        ,%NFiles)   #! Table Option GUID
+#DECLARE(%NFilesOptionTS          ,%NFiles)   #! Table Option TS
+#DECLARE(%NFilesOptionSTS         ,%NFiles)   #! Table Option STS
+#DECLARE(%NFilesOptionDTS         ,%NFiles)   #! Table Option DTS
 #! RA.2019.07.26: Verify more GUID items per file
-#DECLARE(%NFilesKeyGUID     ,%NFiles)   #! Key for GUID
-#DECLARE(%NFilesKeyTS       ,%NFiles)   #! Key for TS
-#DECLARE(%NFilesKeySTS      ,%NFiles)   #! Key for STS
-#DECLARE(%NFilesKeyDTS      ,%NFiles)   #! Key for DTS
-#DECLARE(%NFilesFieldGUID   ,%NFiles)   #! Key-Field for GUID
-#DECLARE(%NFilesFieldTS     ,%NFiles)   #! Key-Field for TS
-#DECLARE(%NFilesFieldSTS    ,%NFiles)   #! Key-Field for STS
-#DECLARE(%NFilesFieldDTS    ,%NFiles)   #! Key-Field for DTS
+#DECLARE(%NFilesKeyGUID           ,%NFiles)   #! Key for GUID
+#DECLARE(%NFilesKeyTS             ,%NFiles)   #! Key for TS
+#DECLARE(%NFilesKeySTS            ,%NFiles)   #! Key for STS
+#DECLARE(%NFilesKeyDTS            ,%NFiles)   #! Key for DTS
+#DECLARE(%NFilesFieldGUID         ,%NFiles)   #! Key-Field for GUID
+#DECLARE(%NFilesFieldTS           ,%NFiles)   #! Key-Field for TS
+#DECLARE(%NFilesFieldSTS          ,%NFiles)   #! Key-Field for STS
+#DECLARE(%NFilesFieldDTS          ,%NFiles)   #! Key-Field for DTS
+#! RA.2019.11.20: Added the EncryptionVersion logic to the template.
+#DECLARE(%NFilesCountEncrypt      ,%NFiles)   #! Table Count EncryptionVersion
+#DECLARE(%NFilesOptionEncrypt     ,%NFiles)   #! Table Option EncryptionVersion (Not used)
 #!
 #INSERT(%VarOptFile)                                                            #! RA.2019.07.28: Options: File
 #!
-#DECLARE(%TheTable)                     #! Reserved word change
-#DECLARE(%TheTable2)                    #! Reserved word change (related tables) - RA.2018.06.03.SUN: Added
+#DECLARE(%TheTable)                           #! Reserved word change
+#DECLARE(%TheTable2)                          #! Reserved word change (related tables) - RA.2018.06.03.SUN: Added
 #!---------------------------------------------------------------------
 #GROUP(%DefineFieldOptions)
 #DECLARE(%CountNFields)
-#DECLARE(%NFields),MULTI                #!,UNIQUE
-#DECLARE(%NFieldsCount      ,%NFields)  #! ID: Field Count
-#DECLARE(%NFieldsKey        ,%NFields)  #! Clarion: Prefix:FieldName
-#DECLARE(%NFieldsName       ,%NFields)  #! Clarion: Field Name
-#DECLARE(%NFieldsType       ,%NFields)  #! Clarion: Field Type
-#DECLARE(%NFieldsFormat     ,%NFields)  #! Clarion: Display Format
-#DECLARE(%NFieldsDatLen     ,%NFields)  #! Clarion: Data Length             - RA.2018.04.15: Added
-#DECLARE(%NFieldsDatDec     ,%NFields)  #! Clarion: Data Decimals           - RA.2018.04.15: Added
-#DECLARE(%NFieldsDspLen     ,%NFields)  #! Clarion: Display Length          - RA.2018.04.15: Added
-#DECLARE(%NFieldsDspDec     ,%NFields)  #! Clarion: Display Decimals        - RA.2018.04.15: Added
-#DECLARE(%NFieldsOpts       ,%NFields)  #! Clarion: %FieldUserOptions       - RA.2019.04.30: Added
-#DECLARE(%NFieldsNSql       ,%NFields)  #! SQL: Name
-#DECLARE(%NFieldsTSql       ,%NFields)  #! SQL: Type
-#DECLARE(%NFieldsDef        ,%NFields)  #! SQL: Default
-#DECLARE(%NFieldsAuto       ,%NFields)  #! SQL: AUTO_INCREMENT
-#DECLARE(%NFieldsNN         ,%NFields)  #! SQL: NOT NULL
+#DECLARE(%NFields),MULTI                      #!,UNIQUE
+#DECLARE(%NFieldsCount            ,%NFields)  #! ID: Field Count
+#DECLARE(%NFieldsKey              ,%NFields)  #! Clarion: Prefix:FieldName
+#DECLARE(%NFieldsName             ,%NFields)  #! Clarion: Field Name
+#DECLARE(%NFieldsType             ,%NFields)  #! Clarion: Field Type
+#DECLARE(%NFieldsFormat           ,%NFields)  #! Clarion: Display Format
+#DECLARE(%NFieldsDatLen           ,%NFields)  #! Clarion: Data Length             - RA.2018.04.15: Added
+#DECLARE(%NFieldsDatDec           ,%NFields)  #! Clarion: Data Decimals           - RA.2018.04.15: Added
+#DECLARE(%NFieldsDspLen           ,%NFields)  #! Clarion: Display Length          - RA.2018.04.15: Added
+#DECLARE(%NFieldsDspDec           ,%NFields)  #! Clarion: Display Decimals        - RA.2018.04.15: Added
+#DECLARE(%NFieldsOpts             ,%NFields)  #! Clarion: %FieldUserOptions       - RA.2019.04.30: Added
+#DECLARE(%NFieldsNSql             ,%NFields)  #! SQL: Name
+#DECLARE(%NFieldsTSql             ,%NFields)  #! SQL: Type
+#DECLARE(%NFieldsDef              ,%NFields)  #! SQL: Default
+#DECLARE(%NFieldsAuto             ,%NFields)  #! SQL: AUTO_INCREMENT
+#DECLARE(%NFieldsNN               ,%NFields)  #! SQL: NOT NULL
 #!
 #DECLARE(%CountAFields)
-#DECLARE(%AFields),MULTI                #!,UNIQUE
-#DECLARE(%AFieldsCount      ,%AFields)  #! ID: Field Count
-#DECLARE(%AFieldsKey        ,%AFields)  #! Clarion: Prefix:FieldName
-#DECLARE(%AFieldsName       ,%AFields)  #! Clarion: Field Name
-#DECLARE(%AFieldsType       ,%AFields)  #! Clarion: Field Type
-#DECLARE(%AFieldsFormat     ,%AFields)  #! Clarion: Display Format
-#DECLARE(%AFieldsDatLen     ,%AFields)  #! Clarion: Data Length             - RA.2018.04.15: Added
-#DECLARE(%AFieldsDatDec     ,%AFields)  #! Clarion: Data Decimals           - RA.2018.04.15: Added
-#DECLARE(%AFieldsDspLen     ,%AFields)  #! Clarion: Display Length          - RA.2018.04.15: Added
-#DECLARE(%AFieldsDspDec     ,%AFields)  #! Clarion: Display Decimals        - RA.2018.04.15: Added
-#DECLARE(%AFieldsOpts       ,%AFields)  #! Clarion: %FieldUserOptions       - RA.2019.04.30: Added
-#DECLARE(%AFieldsNSql       ,%AFields)  #! SQL: Name
-#DECLARE(%AFieldsTSql       ,%AFields)  #! SQL: Type
-#DECLARE(%AFieldsDef        ,%AFields)  #! SQL: Default
-#DECLARE(%AFieldsAuto       ,%AFields)  #! SQL: AUTO_INCREMENT
-#DECLARE(%AFieldsNN         ,%AFields)  #! SQL: NOT NULL
+#DECLARE(%AFields),MULTI                      #!,UNIQUE
+#DECLARE(%AFieldsCount            ,%AFields)  #! ID: Field Count
+#DECLARE(%AFieldsKey              ,%AFields)  #! Clarion: Prefix:FieldName
+#DECLARE(%AFieldsName             ,%AFields)  #! Clarion: Field Name
+#DECLARE(%AFieldsType             ,%AFields)  #! Clarion: Field Type
+#DECLARE(%AFieldsFormat           ,%AFields)  #! Clarion: Display Format
+#DECLARE(%AFieldsDatLen           ,%AFields)  #! Clarion: Data Length             - RA.2018.04.15: Added
+#DECLARE(%AFieldsDatDec           ,%AFields)  #! Clarion: Data Decimals           - RA.2018.04.15: Added
+#DECLARE(%AFieldsDspLen           ,%AFields)  #! Clarion: Display Length          - RA.2018.04.15: Added
+#DECLARE(%AFieldsDspDec           ,%AFields)  #! Clarion: Display Decimals        - RA.2018.04.15: Added
+#DECLARE(%AFieldsOpts             ,%AFields)  #! Clarion: %FieldUserOptions       - RA.2019.04.30: Added
+#DECLARE(%AFieldsNSql             ,%AFields)  #! SQL: Name
+#DECLARE(%AFieldsTSql             ,%AFields)  #! SQL: Type
+#DECLARE(%AFieldsDef              ,%AFields)  #! SQL: Default
+#DECLARE(%AFieldsAuto             ,%AFields)  #! SQL: AUTO_INCREMENT
+#DECLARE(%AFieldsNN               ,%AFields)  #! SQL: NOT NULL
 #!
-#DECLARE(%NFieldsNOTNULL),MULTI,UNIQUE  #! Fields: KEY, INDEX
+#DECLARE(%NFieldsNOTNULL),MULTI,UNIQUE        #! Fields: KEY, INDEX
 #DECLARE(%IFieldInKey)
 #!
 #! RA.2018.04.23: Track the auto increment fields for specific backends.
-#DECLARE(%NFieldsAUTOINC),MULTI,UNIQUE  #! Fields: Auto-Increment
+#DECLARE(%NFieldsAUTOINC),MULTI,UNIQUE        #! Fields: Auto-Increment
 #DECLARE(%IFieldAutoInc)
 #!
 #! RA.2018.04.23: Track the primary keys to NOT-NULL them at create
-#DECLARE(%NFieldsPRIMARY),MULTI,UNIQUE  #! Fields: Primary
+#DECLARE(%NFieldsPRIMARY),MULTI,UNIQUE        #! Fields: Primary
 #DECLARE(%IFieldPrimary)
 #!
 #INSERT(%VarOptField)                                                           #! RA.2019.07.28: Options: Field
 #!
-#DECLARE(%TheField)                     #! Reserved word change
-#DECLARE(%CStringLen)                   #! Length of types shortened by one
-#DECLARE(%LastField)                    #! Last field processed
-#DECLARE(%InnerGroup)                   #! Inner group level processed
-#DECLARE(%FieldComma)                   #! Number of fields - 1
+#DECLARE(%TheField)                           #! Reserved word change
+#DECLARE(%CStringLen)                         #! Length of types shortened by one
+#DECLARE(%LastField)                          #! Last field processed
+#DECLARE(%InnerGroup)                         #! Inner group level processed
+#DECLARE(%FieldComma)                         #! Number of fields - 1
 #!
 #DECLARE(%TestLenDec)
 #DECLARE(%MoreLenDec)
 #!
-#DECLARE(%NFieldPKey)                   #! Field is Primary Key?
-#DECLARE(%NFieldName)                   #! Field Name
-#DECLARE(%NFieldType)                   #! Field Type
-#DECLARE(%NFieldNSql)                   #! Field SQL Name
-#DECLARE(%NFieldTSql)                   #! Field SQL Type
-#DECLARE(%NFieldAuto)                   #! Field AUTO_INCREMENT
-#DECLARE(%NFieldNN)                     #! Field NOT NULL
-#DECLARE(%NFieldDef)                    #! Field default
-#DECLARE(%NFieldLineCount)              #! Count DDL line fields
-#DECLARE(%NFieldLine)                   #! Output DDL line
-#DECLARE(%NFieldLine1)                  #! Line piece
-#DECLARE(%NFieldSize  ,LONG)            #! Field decimal size
-#DECLARE(%NFieldDec   ,LONG)            #! Field decimal places
-#DECLARE(%NLeadZero   ,LONG)            #! Have a leading zero
-#DECLARE(%NFNameAuto)                   #! Field Name Auto Increment
+#DECLARE(%NFieldPKey)                         #! Field is Primary Key?
+#DECLARE(%NFieldName)                         #! Field Name
+#DECLARE(%NFieldType)                         #! Field Type
+#DECLARE(%NFieldNSql)                         #! Field SQL Name
+#DECLARE(%NFieldTSql)                         #! Field SQL Type
+#DECLARE(%NFieldAuto)                         #! Field AUTO_INCREMENT
+#DECLARE(%NFieldNN)                           #! Field NOT NULL
+#DECLARE(%NFieldDef)                          #! Field default
+#DECLARE(%NFieldLineCount)                    #! Count DDL line fields
+#DECLARE(%NFieldLine)                         #! Output DDL line
+#DECLARE(%NFieldLine1)                        #! Line piece
+#DECLARE(%NFieldSize      ,LONG)              #! Field decimal size
+#DECLARE(%NFieldDec       ,LONG)              #! Field decimal places
+#DECLARE(%NLeadZero       ,LONG)              #! Have a leading zero
+#DECLARE(%NFNameAuto)                         #! Field Name Auto Increment
 #!
-#DECLARE (%DimCount   ,LONG)            #! Number of dimensions
-#DECLARE (%FldArray   ,STRING)          #! Created field name from array
-#DECLARE (%FD1S       ,STRING)          #! Number for dimension 1
-#DECLARE (%FD2S       ,STRING)          #! Number for dimension 2
-#DECLARE (%FD3S       ,STRING)          #! Number for dimension 3
-#DECLARE (%FD4S       ,STRING)          #! Number for dimension 4
-#DECLARE (%FD1I       ,LONG)            #! Looping in Dimension 1
-#DECLARE (%FD2I       ,LONG)            #! Looping in Dimension 2
-#DECLARE (%FD3I       ,LONG)            #! Looping in Dimension 3
-#DECLARE (%FD4I       ,LONG)            #! Looping in Dimension 4
-#DECLARE (%FD1L       ,LONG)            #! Set to %FieldDimension1
-#DECLARE (%FD2L       ,LONG)            #! Set to %FieldDimension2
-#DECLARE (%FD3L       ,LONG)            #! Set to %FieldDimension3
-#DECLARE (%FD4L       ,LONG)            #! Set to %fieldDimension4
+#DECLARE (%DimCount       ,LONG)              #! Number of dimensions
+#DECLARE (%FldArray       ,STRING)            #! Created field name from array
+#DECLARE (%FD1S           ,STRING)            #! Number for dimension 1
+#DECLARE (%FD2S           ,STRING)            #! Number for dimension 2
+#DECLARE (%FD3S           ,STRING)            #! Number for dimension 3
+#DECLARE (%FD4S           ,STRING)            #! Number for dimension 4
+#DECLARE (%FD1I           ,LONG)              #! Looping in Dimension 1
+#DECLARE (%FD2I           ,LONG)              #! Looping in Dimension 2
+#DECLARE (%FD3I           ,LONG)              #! Looping in Dimension 3
+#DECLARE (%FD4I           ,LONG)              #! Looping in Dimension 4
+#DECLARE (%FD1L           ,LONG)              #! Set to %FieldDimension1
+#DECLARE (%FD2L           ,LONG)              #! Set to %FieldDimension2
+#DECLARE (%FD3L           ,LONG)              #! Set to %FieldDimension3
+#DECLARE (%FD4L           ,LONG)              #! Set to %fieldDimension4
 #!---------------------------------------------------------------------
 #GROUP(%DefineKeyOptions)
 #DECLARE(%CountNKeys)
-#DECLARE(%NKeys),MULTI                  #!,UNIQUE
-#DECLARE(%NKeysCount          ,%NKeys)  #! ID: Key Count
-#DECLARE(%NKeysKey            ,%NKeys)  #! Prefix:KeyName
-#DECLARE(%NKeysName           ,%NKeys)  #! Key Name
-#DECLARE(%NKeysType           ,%NKeys)  #! Key Type
-#DECLARE(%NKeysFlagPri        ,%NKeys)  #! Key is: Primary
-#DECLARE(%NKeysFlagSeq        ,%NKeys)  #! Key is: Sequence
-#DECLARE(%NKeysFlagUni        ,%NKeys)  #! Key is: Unique
-#DECLARE(%NkeysAutoField      ,%NKeys)  #! Auto-Inc Field Name
-#DECLARE(%NKeysFieldCount     ,%NKeys)  #! Number of Fields
-#DECLARE(%NKeysField01        ,%NKeys)  #! Field 01
-#DECLARE(%NKeysField02        ,%NKeys)  #! Field 02
-#DECLARE(%NKeysField03        ,%NKeys)  #! Field 03
-#DECLARE(%NKeysField04        ,%NKeys)  #! Field 04
-#DECLARE(%NKeysField05        ,%NKeys)  #! Field 05
-#DECLARE(%NKeysField06        ,%NKeys)  #! Field 06
-#DECLARE(%NKeysField07        ,%NKeys)  #! Field 07
-#DECLARE(%NKeysField08        ,%NKeys)  #! Field 08
-#DECLARE(%NKeysField09        ,%NKeys)  #! Field 09
-#DECLARE(%NKeysSort01         ,%NKeys)  #! Sort Order 01
-#DECLARE(%NKeysSort02         ,%NKeys)  #! Sort Order 02
-#DECLARE(%NKeysSort03         ,%NKeys)  #! Sort Order 03
-#DECLARE(%NKeysSort04         ,%NKeys)  #! Sort Order 04
-#DECLARE(%NKeysSort05         ,%NKeys)  #! Sort Order 05
-#DECLARE(%NKeysSort06         ,%NKeys)  #! Sort Order 06
-#DECLARE(%NKeysSort07         ,%NKeys)  #! Sort Order 07
-#DECLARE(%NKeysSort08         ,%NKeys)  #! Sort Order 08
-#DECLARE(%NKeysSort09         ,%NKeys)  #! Sort Order 09
+#DECLARE(%NKeys),MULTI                        #!,UNIQUE
+#DECLARE(%NKeysCount              ,%NKeys)    #! ID: Key Count
+#DECLARE(%NKeysKey                ,%NKeys)    #! Prefix:KeyName
+#DECLARE(%NKeysName               ,%NKeys)    #! Key Name
+#DECLARE(%NKeysType               ,%NKeys)    #! Key Type
+#DECLARE(%NKeysFlagPri            ,%NKeys)    #! Key is: Primary
+#DECLARE(%NKeysFlagSeq            ,%NKeys)    #! Key is: Sequence
+#DECLARE(%NKeysFlagUni            ,%NKeys)    #! Key is: Unique
+#DECLARE(%NkeysAutoField          ,%NKeys)    #! Auto-Inc Field Name
+#DECLARE(%NKeysFieldCount         ,%NKeys)    #! Number of Fields
+#DECLARE(%NKeysField01            ,%NKeys)    #! Field 01
+#DECLARE(%NKeysField02            ,%NKeys)    #! Field 02
+#DECLARE(%NKeysField03            ,%NKeys)    #! Field 03
+#DECLARE(%NKeysField04            ,%NKeys)    #! Field 04
+#DECLARE(%NKeysField05            ,%NKeys)    #! Field 05
+#DECLARE(%NKeysField06            ,%NKeys)    #! Field 06
+#DECLARE(%NKeysField07            ,%NKeys)    #! Field 07
+#DECLARE(%NKeysField08            ,%NKeys)    #! Field 08
+#DECLARE(%NKeysField09            ,%NKeys)    #! Field 09
+#DECLARE(%NKeysSort01             ,%NKeys)    #! Sort Order 01
+#DECLARE(%NKeysSort02             ,%NKeys)    #! Sort Order 02
+#DECLARE(%NKeysSort03             ,%NKeys)    #! Sort Order 03
+#DECLARE(%NKeysSort04             ,%NKeys)    #! Sort Order 04
+#DECLARE(%NKeysSort05             ,%NKeys)    #! Sort Order 05
+#DECLARE(%NKeysSort06             ,%NKeys)    #! Sort Order 06
+#DECLARE(%NKeysSort07             ,%NKeys)    #! Sort Order 07
+#DECLARE(%NKeysSort08             ,%NKeys)    #! Sort Order 08
+#DECLARE(%NKeysSort09             ,%NKeys)    #! Sort Order 09
 #!
 #INSERT(%VarOptKey)                                                             #! RA.2019.07.28: Options: Key
 #!
-#DECLARE(%TheKey)                       #! Reserved word change
-#DECLARE(%NKeyCount)                    #! File key counts
-#DECLARE(%NKeyPrimary)                  #! File primary key counts
-#DECLARE(%NKeyPrimaryValidSeq)          #! Valid sequence is a number
-#DECLARE(%NKeyFieldIndex)               #! Set field array into table
-#DECLARE(%NKeyDidIndex)                 #! Have created an Index
-#DECLARE(%NKeyComma)                    #! How many commas do I need?
-#DECLARE(%NKeyFieldAD)                  #! Key Field A/D line
-#DECLARE(%NKeyFieldID)                  #! Key Field ID Name
-#DECLARE(%NKeySortOrder)                #! Key Field ASC/DESC sort order
+#DECLARE(%TheKey)                             #! Reserved word change
+#DECLARE(%NKeyCount)                          #! File key counts
+#DECLARE(%NKeyPrimary)                        #! File primary key counts
+#DECLARE(%NKeyPrimaryValidSeq)                #! Valid sequence is a number
+#DECLARE(%NKeyFieldIndex)                     #! Set field array into table
+#DECLARE(%NKeyDidIndex)                       #! Have created an Index
+#DECLARE(%NKeyComma)                          #! How many commas do I need?
+#DECLARE(%NKeyFieldAD)                        #! Key Field A/D line
+#DECLARE(%NKeyFieldID)                        #! Key Field ID Name
+#DECLARE(%NKeySortOrder)                      #! Key Field ASC/DESC sort order
 #!---------------------------------------------------------------------
 #GROUP(%DefineRelationOptions)
 #DECLARE(%CountNRelations)
-#DECLARE(%NRelas),MULTI                 #!,UNIQUE
-#DECLARE(%NRelasCount        ,%NRelas)  #! ID: Relation Count
-#DECLARE(%NRelasFileFromKey  ,%NRelas)  #! File From: Prefix:Name
-#DECLARE(%NRelasFileLinkKey  ,%NRelas)  #! File Link: Prefix:Name
-#DECLARE(%NRelasKeyFromKey   ,%NRelas)  #!  Key From: Prefix:Name
-#DECLARE(%NRelasKeyLinkKey   ,%NRelas)  #!  Key Link: Prefix:Name
-#DECLARE(%NRelasType         ,%NRelas)  #! Relation Type
-#DECLARE(%NRelasFileFrom     ,%NRelas)  #! Relation File: Main from
-#DECLARE(%NRelasFileLink     ,%NRelas)  #! Relation File: Relate to
-#DECLARE(%NRelasKeyFrom      ,%NRelas)  #! Relation Key: Main from
-#DECLARE(%NRelasKeyLink      ,%NRelas)  #! Relation Key: Relate to
-#DECLARE(%NRelasOnUpdate     ,%NRelas)  #! ON UPDATE: What to do?
-#DECLARE(%NRelasOnDelete     ,%NRelas)  #! ON DELETE: What to do?
-#DECLARE(%NRelasKeyFromCount ,%NRelas)  #! Key From: Field Count
-#DECLARE(%NRelasKFfield01    ,%NRelas)  #! Key From: Field 01
-#DECLARE(%NRelasKFfield02    ,%NRelas)  #! Key From: Field 02
-#DECLARE(%NRelasKFfield03    ,%NRelas)  #! Key From: Field 03
-#DECLARE(%NRelasKFfield04    ,%NRelas)  #! Key From: Field 04
-#DECLARE(%NRelasKFfield05    ,%NRelas)  #! Key From: Field 05
-#DECLARE(%NRelasKFfield06    ,%NRelas)  #! Key From: Field 06
-#DECLARE(%NRelasKFfield07    ,%NRelas)  #! Key From: Field 07
-#DECLARE(%NRelasKFfield08    ,%NRelas)  #! Key From: Field 08
-#DECLARE(%NRelasKFfield09    ,%NRelas)  #! Key From: Field 09
-#DECLARE(%NRelasKFlabel01    ,%NRelas)  #! Key From: Label 01
-#DECLARE(%NRelasKFlabel02    ,%NRelas)  #! Key From: Label 02
-#DECLARE(%NRelasKFlabel03    ,%NRelas)  #! Key From: Label 03
-#DECLARE(%NRelasKFlabel04    ,%NRelas)  #! Key From: Label 04
-#DECLARE(%NRelasKFlabel05    ,%NRelas)  #! Key From: Label 05
-#DECLARE(%NRelasKFlabel06    ,%NRelas)  #! Key From: Label 06
-#DECLARE(%NRelasKFlabel07    ,%NRelas)  #! Key From: Label 07
-#DECLARE(%NRelasKFlabel08    ,%NRelas)  #! Key From: Label 08
-#DECLARE(%NRelasKFlabel09    ,%NRelas)  #! Key From: Label 09
-#DECLARE(%NRelasKeyLinkCount ,%NRelas)  #! Key Link: Field Count
-#DECLARE(%NRelasKLfield01    ,%NRelas)  #! Key Link: Field 01
-#DECLARE(%NRelasKLfield02    ,%NRelas)  #! Key Link: Field 02
-#DECLARE(%NRelasKLfield03    ,%NRelas)  #! Key Link: Field 03
-#DECLARE(%NRelasKLfield04    ,%NRelas)  #! Key Link: Field 04
-#DECLARE(%NRelasKLfield05    ,%NRelas)  #! Key Link: Field 05
-#DECLARE(%NRelasKLfield06    ,%NRelas)  #! Key Link: Field 06
-#DECLARE(%NRelasKLfield07    ,%NRelas)  #! Key Link: Field 07
-#DECLARE(%NRelasKLfield08    ,%NRelas)  #! Key Link: Field 08
-#DECLARE(%NRelasKLfield09    ,%NRelas)  #! Key Link: Field 09
-#DECLARE(%NRelasKLlabel01    ,%NRelas)  #! Key Link: Label 01
-#DECLARE(%NRelasKLlabel02    ,%NRelas)  #! Key Link: Label 02
-#DECLARE(%NRelasKLlabel03    ,%NRelas)  #! Key Link: Label 03
-#DECLARE(%NRelasKLlabel04    ,%NRelas)  #! Key Link: Label 04
-#DECLARE(%NRelasKLlabel05    ,%NRelas)  #! Key Link: Label 05
-#DECLARE(%NRelasKLlabel06    ,%NRelas)  #! Key Link: Label 06
-#DECLARE(%NRelasKLlabel07    ,%NRelas)  #! Key Link: Label 07
-#DECLARE(%NRelasKLlabel08    ,%NRelas)  #! Key Link: Label 08
-#DECLARE(%NRelasKLlabel09    ,%NRelas)  #! Key Link: Label 09
+#DECLARE(%NRelas),MULTI                       #!,UNIQUE
+#DECLARE(%NRelasCount             ,%NRelas)   #! ID: Relation Count
+#DECLARE(%NRelasFileFromKey       ,%NRelas)   #! File From: Prefix:Name
+#DECLARE(%NRelasFileLinkKey       ,%NRelas)   #! File Link: Prefix:Name
+#DECLARE(%NRelasKeyFromKey        ,%NRelas)   #!  Key From: Prefix:Name
+#DECLARE(%NRelasKeyLinkKey        ,%NRelas)   #!  Key Link: Prefix:Name
+#DECLARE(%NRelasType              ,%NRelas)   #! Relation Type
+#DECLARE(%NRelasFileFrom          ,%NRelas)   #! Relation File: Main from
+#DECLARE(%NRelasFileLink          ,%NRelas)   #! Relation File: Relate to
+#DECLARE(%NRelasKeyFrom           ,%NRelas)   #! Relation Key: Main from
+#DECLARE(%NRelasKeyLink           ,%NRelas)   #! Relation Key: Relate to
+#DECLARE(%NRelasOnUpdate          ,%NRelas)   #! ON UPDATE: What to do?
+#DECLARE(%NRelasOnDelete          ,%NRelas)   #! ON DELETE: What to do?
+#DECLARE(%NRelasKeyFromCount      ,%NRelas)   #! Key From: Field Count
+#DECLARE(%NRelasKFfield01         ,%NRelas)   #! Key From: Field 01
+#DECLARE(%NRelasKFfield02         ,%NRelas)   #! Key From: Field 02
+#DECLARE(%NRelasKFfield03         ,%NRelas)   #! Key From: Field 03
+#DECLARE(%NRelasKFfield04         ,%NRelas)   #! Key From: Field 04
+#DECLARE(%NRelasKFfield05         ,%NRelas)   #! Key From: Field 05
+#DECLARE(%NRelasKFfield06         ,%NRelas)   #! Key From: Field 06
+#DECLARE(%NRelasKFfield07         ,%NRelas)   #! Key From: Field 07
+#DECLARE(%NRelasKFfield08         ,%NRelas)   #! Key From: Field 08
+#DECLARE(%NRelasKFfield09         ,%NRelas)   #! Key From: Field 09
+#DECLARE(%NRelasKFlabel01         ,%NRelas)   #! Key From: Label 01
+#DECLARE(%NRelasKFlabel02         ,%NRelas)   #! Key From: Label 02
+#DECLARE(%NRelasKFlabel03         ,%NRelas)   #! Key From: Label 03
+#DECLARE(%NRelasKFlabel04         ,%NRelas)   #! Key From: Label 04
+#DECLARE(%NRelasKFlabel05         ,%NRelas)   #! Key From: Label 05
+#DECLARE(%NRelasKFlabel06         ,%NRelas)   #! Key From: Label 06
+#DECLARE(%NRelasKFlabel07         ,%NRelas)   #! Key From: Label 07
+#DECLARE(%NRelasKFlabel08         ,%NRelas)   #! Key From: Label 08
+#DECLARE(%NRelasKFlabel09         ,%NRelas)   #! Key From: Label 09
+#DECLARE(%NRelasKeyLinkCount      ,%NRelas)   #! Key Link: Field Count
+#DECLARE(%NRelasKLfield01         ,%NRelas)   #! Key Link: Field 01
+#DECLARE(%NRelasKLfield02         ,%NRelas)   #! Key Link: Field 02
+#DECLARE(%NRelasKLfield03         ,%NRelas)   #! Key Link: Field 03
+#DECLARE(%NRelasKLfield04         ,%NRelas)   #! Key Link: Field 04
+#DECLARE(%NRelasKLfield05         ,%NRelas)   #! Key Link: Field 05
+#DECLARE(%NRelasKLfield06         ,%NRelas)   #! Key Link: Field 06
+#DECLARE(%NRelasKLfield07         ,%NRelas)   #! Key Link: Field 07
+#DECLARE(%NRelasKLfield08         ,%NRelas)   #! Key Link: Field 08
+#DECLARE(%NRelasKLfield09         ,%NRelas)   #! Key Link: Field 09
+#DECLARE(%NRelasKLlabel01         ,%NRelas)   #! Key Link: Label 01
+#DECLARE(%NRelasKLlabel02         ,%NRelas)   #! Key Link: Label 02
+#DECLARE(%NRelasKLlabel03         ,%NRelas)   #! Key Link: Label 03
+#DECLARE(%NRelasKLlabel04         ,%NRelas)   #! Key Link: Label 04
+#DECLARE(%NRelasKLlabel05         ,%NRelas)   #! Key Link: Label 05
+#DECLARE(%NRelasKLlabel06         ,%NRelas)   #! Key Link: Label 06
+#DECLARE(%NRelasKLlabel07         ,%NRelas)   #! Key Link: Label 07
+#DECLARE(%NRelasKLlabel08         ,%NRelas)   #! Key Link: Label 08
+#DECLARE(%NRelasKLlabel09         ,%NRelas)   #! Key Link: Label 09
 #!
 #INSERT(%VarOptRelation)                                                        #! RA.2019.07.28: Options: Relation
 #!
-#DECLARE(%TheRelation)                  #! Reserved word change
-#DECLARE(%NRelaFound)                   #! Found a relation to process
-#DECLARE(%NRelaFieldIndex)              #! Set field array into table
-#DECLARE(%NRelaDidRelation)             #! Have created an Index
-#DECLARE(%NRelaFieldsParent)            #! Relation field list for Parent table
-#DECLARE(%NRelaFieldsChild)             #! Relation field list for Child table
-#DECLARE(%NRelaRestrict)                #! Change RESTRICT_SERVER to RESTRICT
+#DECLARE(%TheRelation)                        #! Reserved word change
+#DECLARE(%NRelaFound)                         #! Found a relation to process
+#DECLARE(%NRelaFieldIndex)                    #! Set field array into table
+#DECLARE(%NRelaDidRelation)                   #! Have created an Index
+#DECLARE(%NRelaFieldsParent)                  #! Relation field list for Parent table
+#DECLARE(%NRelaFieldsChild)                   #! Relation field list for Child table
+#DECLARE(%NRelaRestrict)                      #! Change RESTRICT_SERVER to RESTRICT
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! RA.2017.12.05 - Show the files to make sure the get presented correctly
@@ -1042,6 +1045,8 @@
 #SET(%NFilesFieldTS       ,0)                                                   #! RA.2019.07.26: Key-Field for TS
 #SET(%NFilesFieldSTS      ,0)                                                   #! RA.2019.07.26: Key-Field for STS
 #SET(%NFilesFieldDTS      ,0)                                                   #! RA.2019.07.26: Key-Field for DTS
+#SET(%NFilesCountEncrypt  ,0)                                                   #! RA.2019.11.20: Table Count EncryptionVersion
+#SET(%NFilesOptionEncrypt ,0)                                                   #! RA.2019.11.20: Table Option EncryptionVersion (Not used)
 #!
 #ENDFOR                                                                         #! VALID FILE: #ENDFOR
 #IF(%TraceDetail)
