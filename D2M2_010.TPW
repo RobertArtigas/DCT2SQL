@@ -404,10 +404,16 @@
 #!---------------------------------------------------------------------
 #! RA.2019.11.21: This has to be inside a field loop for all fields to get something.
 #! This will give you an alternative if there is nothing added to the external name attributes.
-#! It can be also used to replace the name external attributes in the dictionary.
+#! Results can be also used to replace the name external attributes in the dictionary.
 #GROUP(%BuildAttributesFieldNAME,*%pTheName)                                    #! RA.2019.11.21: Added
 #IF(NOT VAREXISTS(%TheName))
   #DECLARE(%TheName)
+#ENDIF
+#IF(NOT VAREXISTS(%TheFieldType))
+  #DECLARE(%TheFieldType)
+#ENDIF
+#IF(NOT VAREXISTS(%TheFieldName))
+  #DECLARE(%TheFieldName)
 #ENDIF
 #!
   #SET(%TheName   , '')
@@ -423,14 +429,42 @@
   #ELSE
     #SET(%TheName , %TheName & %FieldID)
   #ENDCASE
-  #SET(%TheName   , %TheName & ' | ' & %FieldType)
+#!
+  #CASE(UPPER(%FieldType))
+  #OF  ('DECIMAL')
+  #OROF('PDECIMAL')
+  #!OROF('REAL')
+  #!OROF('SREAL')
+    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+  #OF  ('STRING')
+  #OROF('MEMO')
+  #OROF('BLOB')
+    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
+  #OF  ('CSTRING')
+  #OROF('PSTRING')
+    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
+  #ELSE
+    #SET(%TheFieldType , %FieldType)
+  #ENDCASE
+  #SET(%TheName   , %TheName & ' | ' & %TheFieldType)
+#!
   #SET(%TheName   , %TheName & ' | ' & %FieldDisplayPicture)
+#!
   #CASE(UPPER(%FieldID))
   #OF  ('GUID')
     #SET(%TheName , %TheName & ' | Salt')
   #ENDCASE
+#!
+#! RA.2019.11.21: This contains the original name external attributes in the dictionary.
+#! There might be a need to parse what currently exists there in the old and add what 
+#! does not exist to the new. Not needed at this time. But food for future thought.
+#! 
+  #SET(%TheFieldName, %FieldName)
+#!
   #SET(%TheName   , LOWER(%TheName) & '<39>)')
-#! [???] Add name debugging
+#! [???] Add name string display for debugging
+! ---- %TheFieldName
+! ---- %TheName
 #SET(%pTheName    , %TheName)
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
