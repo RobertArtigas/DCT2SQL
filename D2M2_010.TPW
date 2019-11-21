@@ -402,6 +402,38 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2019.11.21: This has to be inside a field loop for all fields to get something.
+#! This will give you an alternative if there is nothing added to the external name attributes.
+#! It can be also used to replace the name external attributes in the dictionary.
+#GROUP(%BuildAttributesFieldNAME,*%pTheName)                                    #! RA.2019.11.21: Added
+#IF(NOT VAREXISTS(%TheName))
+  #DECLARE(%TheName)
+#ENDIF
+#!
+  #SET(%TheName   , '')
+  #SET(%TheName   , %TheName & ',NAME(<39>')
+  #CASE(UPPER(%FieldID))
+  #OF  ('TIMESTAMP')
+    #SET(%TheName , %TheName & 'ts')
+  #OF  ('SERVERTIMESTAMP')
+    #SET(%TheName , %TheName & 'sts')
+  #OF  ('DELETETIMESTAMP')
+  #OROF('DELETEDTIMESTAMP')
+    #SET(%TheName , %TheName & 'dts')
+  #ELSE
+    #SET(%TheName , %TheName & %FieldID)
+  #ENDCASE
+  #SET(%TheName   , %TheName & ' | ' & %FieldType)
+  #SET(%TheName   , %TheName & ' | ' & %FieldDisplayPicture)
+  #CASE(UPPER(%FieldID))
+  #OF  ('GUID')
+    #SET(%TheName , %TheName & ' | Salt')
+  #ENDCASE
+  #SET(%TheName   , LOWER(%TheName) & '<39>)')
+#! [???] Add name debugging
+#SET(%pTheName    , %TheName)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #! BUILD QUALIFIED FIELDS (Audit GUID consistentancy)
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
