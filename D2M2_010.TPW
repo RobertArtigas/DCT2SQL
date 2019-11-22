@@ -405,6 +405,7 @@
 #! RA.2019.11.21: This has to be inside a field loop for all fields to get something.
 #! This will give you an alternative if there is nothing added to the external name attributes.
 #! Results can be also used to replace the name external attributes in the dictionary.
+#! Used as comments in a few places where I generate structures from the dictionary. 
 #GROUP(%BuildAttributesFieldNAME,*%pTheName)                                    #! RA.2019.11.21: Added
 #IF(NOT VAREXISTS(%TheName))
   #DECLARE(%TheName)
@@ -433,14 +434,11 @@
   #CASE(UPPER(%FieldType))
   #OF  ('DECIMAL')
   #OROF('PDECIMAL')
-  #!OROF('REAL')
-  #!OROF('SREAL')
     #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
   #OF  ('STRING')
   #OROF('MEMO')
   #OROF('BLOB')
-    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
-  #OF  ('CSTRING')
+  #OROF('CSTRING')
   #OROF('PSTRING')
     #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
   #ELSE
@@ -456,8 +454,8 @@
   #ENDCASE
 #!
 #! RA.2019.11.21: This contains the original name external attributes in the dictionary.
-#! There might be a need to parse what currently exists there in the old and add what 
-#! does not exist to the new. Not needed at this time. But food for future thought.
+#! There might be a need to parse what currently exists there in the old external name attributes  
+#! and add what does not exist into the new. Not needed at this time. But food for future thought.
 #! 
   #SET(%TheFieldName, %FieldName)
 #!
