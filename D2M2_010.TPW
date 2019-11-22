@@ -463,8 +463,8 @@
 #!
   #SET(%TheName   , LOWER(%TheName) & '<39>)')
 #! [???] Add name string display for debugging
-! ---- %TheFieldName
-! ---- %TheName
+#! ---- %TheFieldName
+#! ---- %TheName
 #SET(%pTheName    , %TheName)
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
