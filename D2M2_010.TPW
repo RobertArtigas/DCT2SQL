@@ -440,6 +440,7 @@
   #OROF('BLOB')
   #OROF('CSTRING')
   #OROF('PSTRING')
+  #OROF('USTRING')
     #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
   #ELSE
     #SET(%TheFieldType , %FieldType)
