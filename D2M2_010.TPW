@@ -406,6 +406,27 @@
 #! This will give you an alternative if there is nothing added to the external name attributes.
 #! Results can be also used to replace the name external attributes in the dictionary.
 #! Used as comments in a few places where I generate structures from the dictionary. 
+#GROUP(%BuildFieldType,*%pTheField)                                             #! RA.2019.11.29: Added
+#IF(NOT VAREXISTS(%TheFieldType))
+  #DECLARE(%TheFieldType)
+#ENDIF
+#!
+#CASE(UPPER(%FieldType))
+#OF  ('DECIMAL')
+#OROF('PDECIMAL')
+  #SET(%pTheField , %FieldType & '(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+#OF  ('STRING')
+#OROF('MEMO')
+#OROF('BLOB')
+#OROF('CSTRING')
+#OROF('PSTRING')
+#OROF('USTRING')
+  #SET(%pTheField , %FieldType & '(' & %FieldMemoSize & ')')
+#ELSE
+  #SET(%pTheField , %FieldType)
+#ENDCASE
+#SET(%pTheField, UPPER(%pTheField))
+#!---------------------------------------------------------------------
 #GROUP(%BuildAttributesFieldNAME,*%pTheName)                                    #! RA.2019.11.21: Added
 #IF(NOT VAREXISTS(%TheName))
   #DECLARE(%TheName)
@@ -431,20 +452,21 @@
     #SET(%TheName , %TheName & %FieldID)
   #ENDCASE
 #!
-  #CASE(UPPER(%FieldType))
-  #OF  ('DECIMAL')
-  #OROF('PDECIMAL')
-    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
-  #OF  ('STRING')
-  #OROF('MEMO')
-  #OROF('BLOB')
-  #OROF('CSTRING')
-  #OROF('PSTRING')
-  #OROF('USTRING')
-    #SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
-  #ELSE
-    #SET(%TheFieldType , %FieldType)
-  #ENDCASE
+  #!CASE(UPPER(%FieldType))
+  #!OF  ('DECIMAL')
+  #!OROF('PDECIMAL')
+    #!SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ',' & %FieldPlaces & ')')
+  #!OF  ('STRING')
+  #!OROF('MEMO')
+  #!OROF('BLOB')
+  #!OROF('CSTRING')
+  #!OROF('PSTRING')
+  #!OROF('USTRING')
+    #!SET(%TheFieldType , %FieldType & '(' & %FieldMemoSize & ')')
+  #!ELSE
+    #!SET(%TheFieldType , %FieldType)
+  #!ENDCASE
+  #CALL(%BuildFieldType,%TheFieldType)
   #SET(%TheName   , %TheName & ' | ' & %TheFieldType)
 #!
   #SET(%TheName   , %TheName & ' | ' & %FieldDisplayPicture)

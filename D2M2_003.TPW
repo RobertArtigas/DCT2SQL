@@ -7,10 +7,12 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
-#! 2019.07.28:  Roberto Artigas
+#! 2019.11.30.SAT:  Roberto Artigas Jr
+#!  *   Added %tplVer and %tplRel used for temmplate generation.
+#! 2019.07.28:      Roberto Artigas
 #!  *   Separated variable related #GROUPs to their own source file.
 #!      Set up the TRIGGER named variables and options.
-#! 2017.09.29   Roberto Artigas
+#! 2017.09.29       Roberto Artigas
 #!  *   Creation of this generic structured template
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -20,6 +22,15 @@
 #PREPARE
 #DECLARE(%TheDate                         ,STRING)                              #! Display current date
 #DECLARE(%TheTime                         ,STRING)                              #! Display current time
+#!
+#DECLARE(%tplVer                          ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplRel                          ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerNumber                    ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerName                      ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerCopyrights                ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerReserveAll                ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerCollection                ,STRING)                              #! RA.2019.11.30: Template generation
+#DECLARE(%tplVerContact                   ,STRING)                              #! RA.2019.11.30: Template generation
 #!---------------------------------------------------------------------
 #DECLARE(%DictPath                        ,STRING)
 #DECLARE(%DictName                        ,STRING)
@@ -130,8 +141,17 @@
 #!---------------------------------------------------------------------
 #GROUP(%VariablesSetup)                                                         #! Setup output file names
 #PREPARE
-#SET(%TheDate                             ,FORMAT(TODAY(),@D010))               #! Set current date
-#SET(%TheTime                             ,FORMAT(CLOCK(),@T06))                #! Set current time
+#SET(%TheDate          ,FORMAT(TODAY(),@D010))                                  #! Set current date
+#SET(%TheTime          ,FORMAT(CLOCK(),@T06))                                   #! Set current time
+#!
+#SET(%tplVer           ,'1.00')                                                 #! RA.2019.11.30: Template generation
+#SET(%tplRel           ,%TheDate & '.' & %TheTime)                              #! RA.2019.11.30: Template generation
+#SET(%tplVerNumber     ,'Version ' & %tplVer & ' [ ' & %tplRel & ' ]'         ) #! RA.2019.11.30: Template generation
+#SET(%tplVerName       ,'Templates Generator Template Collection.'            ) #! RA.2019.11.30: Template generation
+#SET(%tplVerCopyrights ,'Templates copyright (c) by each individual author.'  ) #! RA.2019.11.30: Template generation
+#SET(%tplVerReserveAll ,'All rights reserved world wide.'                     ) #! RA.2019.11.30: Template generation
+#SET(%tplVerCollection ,'Collection created by Roberto Artigas y Soler.'      ) #! RA.2019.11.30: Template generation
+#SET(%tplVerContact    ,'E-MAIL: roberto.artigas.dev@gmail.com'               ) #! RA.2019.11.30: Template generation
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.20: Added 
 #! RA.2019.07,28: Moved all the the diffent OPTIONS declarations here.
