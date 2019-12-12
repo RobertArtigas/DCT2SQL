@@ -158,7 +158,8 @@
 #INCLUDE('D2M1_MYSQL.TPW')          #! ??) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MSSQL.TPW')          #! ??) DCT -> [COMBINED] MSSQL              generate [COMBINED] (Roberto Artigas y Soler)
 #!
-#!INCLUDE('D2C2_000.TPW')            #! ??) Class generation: Clarion            NOT MIT LICENSE FOR RIGHT NOW (Roberto Artigas y Soler)
+#INCLUDE('D2C2_000.TPW')            #! ??) Class generation: Clarion            (Roberto Artigas y Soler) NOT MIT LICENSE FOR RIGHT NOW
+#!INCLUDE('D2C2_001.TPW')            #! ??) Class generation: Clarion            (Roberto Artigas y Soler) #GROUP's for template generation
 #!---------------------------------------------------------------------
 #!GROUP(%zDct2SqlEnd)
 #!---------------------------------------------------------------------
