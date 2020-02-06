@@ -438,18 +438,18 @@
   #DECLARE(%TheFieldName)
 #ENDIF
 #!
-  #SET(%TheName   , '')
-  #SET(%TheName   , %TheName & ',NAME(<39>')
+  #SET(%TheName     , '')
+  #SET(%TheName     , %TheName & ',NAME(<39>')
   #CASE(UPPER(%FieldID))
   #OF  ('TIMESTAMP')
-    #SET(%TheName , %TheName & 'ts')
+    #SET(%TheName   , %TheName & 'ts')
   #OF  ('SERVERTIMESTAMP')
-    #SET(%TheName , %TheName & 'sts')
+    #SET(%TheName   , %TheName & 'sts')
   #OF  ('DELETETIMESTAMP')
   #OROF('DELETEDTIMESTAMP')
-    #SET(%TheName , %TheName & 'dts')
+    #SET(%TheName   , %TheName & 'dts')
   #ELSE
-    #SET(%TheName , %TheName & %FieldID)
+    #SET(%TheName   , %TheName & %FieldID)
   #ENDCASE
 #!
   #!CASE(UPPER(%FieldType))
@@ -467,14 +467,25 @@
     #!SET(%TheFieldType , %FieldType)
   #!ENDCASE
   #CALL(%BuildFieldType,%TheFieldType)
-  #SET(%TheName   , %TheName & ' | ' & %TheFieldType)
+  #SET(%TheName     , %TheName & ' | ' & %TheFieldType)
 #!
-  #SET(%TheName   , %TheName & ' | ' & %FieldDisplayPicture)
-#!
+  #SET(%TheName     , %TheName & ' | ' & UPPER(%FieldDisplayPicture))
+#!  
   #CASE(UPPER(%FieldID))
   #OF  ('GUID')
-    #SET(%TheName , %TheName & ' | Salt')
+    #SET(%TheName   , %TheName & ' | Salt')
   #ENDCASE
+#!
+#!  #SET(%TheName   , %TheName & ' | ' & EXTRACT(%FieldQuickOptions,'TAB'))
+#!  
+#! RA.2020.02.05: Add the field display prompt that way we can set the field edit prompt.
+  #FOR(%FieldScreenControl)
+    #IF(INSTRING('PROMPT(',%FieldScreenControl,1,1) > 0)
+      #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'PROMPT'))
+    #ENDIF
+  #ENDFOR
+  #CALL(%ReplaceSubString,%TheFieldName,'''','''''')
+  #SET(%TheName , %TheName & ' | ' & %TheFieldName)
 #!
 #! RA.2019.11.21: This contains the original name external attributes in the dictionary.
 #! There might be a need to parse what currently exists there in the old external name attributes  
@@ -482,11 +493,13 @@
 #! 
   #SET(%TheFieldName, %FieldName)
 #!
-  #SET(%TheName   , LOWER(%TheName) & '<39>)')
+  #! RA.2020.02.05: Leave case intact here.
+  #!SET(%TheName    , LOWER(%TheName) & '<39>)')
+  #SET(%TheName     , %TheName & '<39>)')
 #! [???] Add name string display for debugging
 #! ---- %TheFieldName
 #! ---- %TheName
-#SET(%pTheName    , %TheName)
+#SET(%pTheName      , %TheName)
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! BUILD QUALIFIED FIELDS (Audit GUID consistentancy)
