@@ -7,12 +7,28 @@
 #! Author:      Copyright ? 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.02.26.WED:      Roberto Artigas
+#!  *   Added %IsThisTimeStampName for the clarion timestamp field translation to SQL side field name.
 #! 2019.11.20.WED:      Roberto Artigas
 #!  *   Added logic to handle EncryptionVersion for MyTable, JFiles, Cryptonite
 #! 2019.07.24:          Roberto Artigas
 #!  *   Separated the SQL default options #GROUP to its own source file.
 #! 2017.09.29           Roberto Artigas
 #!  *   Creation of this generic structured template
+#!---------------------------------------------------------------------
+#!--------------------------------------------------------------------- 
+#GROUP(%IsThisTimeStampName,*%UseThisName,%WhatFieldName)               #! RA.2020.02.26.WED: Added 
+#CASE(UPPER(%WhatFieldName))
+#OF  ('TIMESTAMP')
+  #SET(%UseThisName   , 'ts')
+#OF  ('SERVERTIMESTAMP')
+  #SET(%UseThisName   , 'sts')
+#OF  ('DELETETIMESTAMP')
+#OROF('DELETEDTIMESTAMP')
+  #SET(%UseThisName   , 'dts')
+#ELSE
+  #SET(%UseThisName   , %WhatFieldName)
+#ENDCASE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! RA.2018.05.01: Check for SQL functions. 
