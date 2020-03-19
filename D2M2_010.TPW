@@ -8,7 +8,7 @@
 #!              All rights reserved world wide.
 #! Changes:
 #! 2020.02.26.WED:      Roberto Artigas
-#!  *   Added %IsThisTimeStampName for the clarion timestamp field translation to SQL side field name.
+#!  *   Added %IsThisTimeStampName for the Capesoft defined timestamp field to be translated to SQL side field name.
 #! 2019.11.20.WED:      Roberto Artigas
 #!  *   Added logic to handle EncryptionVersion for MyTable, JFiles, Cryptonite
 #! 2019.07.24:          Roberto Artigas
