@@ -11,6 +11,5 @@ The dictionaries should be SQL ready to be generated correctly and there are a n
 The templates have documentation built in that shows on the screen. Documentation is updated and improved on a regular basis. And since these templates only create output text files, they do not cause any changes to your existing systems and operations.
 
 
-Clarion Live Webinars explaining how to use the DCT2SQL templates
-
-#474    Aug 03, 2018    http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
+Clarion Live Webinars explaining how to use the DCT2SQL templates:
+#474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
