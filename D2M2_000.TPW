@@ -42,6 +42,8 @@
 #! All the specific items related to a backend can be coded with a case statement.
 #! This will make the code easier to maintain accross all the backends.
 #PREPARE
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'CLARION')                                                      #! TPLUTILITY: NOT A BACKEND
 #DECLARE(%BaseName)                                                             #! Define the BACKEND here
 #SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
 #SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???

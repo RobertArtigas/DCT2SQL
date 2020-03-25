@@ -16,8 +16,22 @@
 #! All the specific items related to a backend can be coded with a case statement.
 #! This will make the code easier to maintain accross all the backends.
 #PREPARE
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
 #DECLARE(%BaseName)                                                             #! Define the BACKEND here
-#SET(%BaseName, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
+#SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???
+#SET(%BaseName, 'PERVASIVE')                                                    #! PERVASIVE: ???
+#SET(%BaseName, 'FIREBIRD')                                                     #! FIREBIRD: ???
+#SET(%BaseName, 'SYBASE')                                                       #! SYBASE: ???
+#SET(%BaseName, 'DB2')                                                          #! DB2: ???
+#SET(%BaseName, 'ORACLE')                                                       #! ORACLE: ???
+#SET(%BaseName, 'MYSQL')                                                        #! MYSQL:         RAYS.2018.09.03: Tested. 
+#SET(%BaseName, 'SQLANYWHERE')                                                  #! SQLANYWHERE:   RAYS.2018.06.12: Tested.
+#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
+#SET(%BaseName, 'MSSQL')                                                        #! MSSQL:         RAYS.2018.06.03: Tested.
+#SET(%BaseName, 'MIMER')                                                        #! MIMER:         RAYS.2018.04.07: Tested.
+#SET(%BaseName, 'METABASE')                                                     #! METABASE:      Generic-Skeleton. NO backend.
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #INSERT(%VariablesCommon)                                                       #! Need a few simple variables
@@ -45,10 +59,10 @@
 #!#DEBUG(%DebugSet)
 #!
 #SET(%UtilityChekTable                    , %TRUE)
-#SET(%UtilityNameTable                    , %DictName & '_' & %BaseName & '_GUID_VERIFY.TXT')
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseUtil & '_GUID_VERIFY.TXT')       #! RA.2020.03.24: Changed
 #SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
 #!
-#CALL(%UtilityPrefix                      , %BaseName)
+#CALL(%UtilityPrefix                      , %BaseUtil)                                              #! RA.2020.03.24: Changed
 #CALL(%BuildQualifiedFiles)
 #IF(%TRUE)
 #SET(%AuditLines, 0)
@@ -62,11 +76,11 @@
         #SET(%NFilesFullPath  , '!' & %NFilesFullPath)
       #ENDIF
     #ENDIF
-    #!INSERT(%MetabaseSqlField,%BaseName)
+    #!INSERT(%MetabaseSqlField,%BaseUtil)
     #SET(%NFilesKeyCount    , ITEMS(%Key))
     #SET(%NFilesFieldCount  , ITEMS(%Field))
-    #INSERT(%BuildQualifiedFieldsGUID     , %BaseName)
-    #INSERT(%BuildQualifiedKeysGUID       , %BaseName)
+    #INSERT(%BuildQualifiedFieldsGUID     , %BaseUtil)      #! RA.2020.03.24: Changed
+    #INSERT(%BuildQualifiedKeysGUID       , %BaseUtil)      #! RA.2020.03.24: Changed
 -- %@N04@(%NFilesCount) %[0]NULL %[50]NFilesName %[0]NULL %[2]NFilesKeyCount-%[2]NFilesKeyPrimary-%[3]NFilesFieldCount %[1]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[0]NULL %[2]NFilesCountEncrypt %[5]NULL [%[12]FilePrefix] %[50]NFilesFullPath %[0]NULL %FileUserOptions
 #INSERT(%AuditFieldsAndKeys000)
     #SET(%AuditLines, %AuditLines + 1)
@@ -79,7 +93,7 @@
 --
 -- SEQ# %[0]NULL FILENAME %[42]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[1]NULL NCRPT %[3]NULL PREFIX %[6]NULL FILEPATH %[42]NULL FILEOPTIONS
 #ENDIF
-#CALL(%UtilitySuffix                      , %BaseName)
+#CALL(%UtilitySuffix                      , %BaseUtil)      #! RA.2020.03.24: Changed
 #!
 #!
 #!#SET(%DebugSet,0)
