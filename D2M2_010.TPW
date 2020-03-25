@@ -77,7 +77,7 @@
       #SET(%pFunctionReplace, '')
     #OF  ('MSSQL')
       #SET(%pResult         , TRUE)
-      #SET(%pFunctionReplace, 'SYSTEM_USER')
+      #SET(%pFunctionReplace, 'current_user')
     #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
       #SET(%pResult         , TRUE)
       #SET(%pFunctionReplace, 'current_user')
@@ -100,8 +100,36 @@
       #SET(%pResult         , TRUE)
       #SET(%pFunctionReplace, 'current_date')
     #OF  ('MSSQL')
+#!
+#! RA.2020.03.34: https://docs.microsoft.com/en-us/sql/t-sql/functions/sysdatetime-transact-sql?view=sql-server-ver15
+#!
+#! SELECT SYSDATETIME() AS [SYSDATETIME()]  
+#!    ,SYSDATETIMEOFFSET() AS [SYSDATETIMEOFFSET()]  
+#!    ,SYSUTCDATETIME() AS [SYSUTCDATETIME()]  
+#!    ,CURRENT_TIMESTAMP AS [CURRENT_TIMESTAMP]  
+#!    ,GETDATE() AS [GETDATE()]  
+#!    ,GETUTCDATE() AS [GETUTCDATE()];
+#! 
+#! /* Returned:  
+#! SYSDATETIME()      2007-04-30 13:10:02.0474381  
+#! SYSDATETIMEOFFSET()2007-04-30 13:10:02.0474381 -07:00  
+#! SYSUTCDATETIME()   2007-04-30 20:10:02.0474381  
+#! CURRENT_TIMESTAMP  2007-04-30 13:10:02.047  
+#! GETDATE()          2007-04-30 13:10:02.047  
+#! GETUTCDATE()       2007-04-30 20:10:02.047  
+#! */
+#!
+#!SELECT CONVERT (date, SYSDATETIME())  
+#!    ,CONVERT (date, SYSDATETIMEOFFSET())  
+#!    ,CONVERT (date, SYSUTCDATETIME())  
+#!    ,CONVERT (date, CURRENT_TIMESTAMP)  
+#!    ,CONVERT (date, GETDATE())  
+#!    ,CONVERT (date, GETUTCDATE());
+#!
+#! /* All returned 2007-04-30 */  
+#!
       #SET(%pResult         , TRUE)
-      #SET(%pFunctionReplace, 'convert(date,sysdatetime())')                    #! 'convert(date,utcdatetime())'
+      #SET(%pFunctionReplace, 'convert(date,sysdatetime())')                    #! 'convert(date,sysutcdatetime())'
     #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
       #SET(%pResult         , TRUE)
       #SET(%pFunctionReplace, 'current_date')
@@ -124,8 +152,43 @@
       #SET(%pResult         , TRUE)
       #SET(%pFunctionReplace, 'current_time')
     #OF  ('MSSQL')
+#!
+#! RA.2020.03.34: https://docs.microsoft.com/en-us/sql/t-sql/functions/sysdatetime-transact-sql?view=sql-server-ver15 
+#!
+#! SELECT SYSDATETIME()  
+#!    ,SYSDATETIMEOFFSET()  
+#!    ,SYSUTCDATETIME()  
+#!    ,CURRENT_TIMESTAMP  
+#!    ,GETDATE()  
+#!    ,GETUTCDATE(); 
+#! 
+#! /* Returned:  
+#! SYSDATETIME()      2007-04-30 13:10:02.0474381  
+#! SYSDATETIMEOFFSET()2007-04-30 13:10:02.0474381 -07:00  
+#! SYSUTCDATETIME()   2007-04-30 20:10:02.0474381  
+#! CURRENT_TIMESTAMP  2007-04-30 13:10:02.047  
+#! GETDATE()          2007-04-30 13:10:02.047  
+#! GETUTCDATE()       2007-04-30 20:10:02.047  
+#! */
+#!
+#! SELECT CONVERT (time, SYSDATETIME())  
+#!    ,CONVERT (time, SYSDATETIMEOFFSET())  
+#!    ,CONVERT (time, SYSUTCDATETIME())  
+#!    ,CONVERT (time, CURRENT_TIMESTAMP)  
+#!    ,CONVERT (time, GETDATE())  
+#!    ,CONVERT (time, GETUTCDATE());  
+#!  
+#! /* Returned  
+#! SYSDATETIME()      13:18:45.3490361  
+#! SYSDATETIMEOFFSET()13:18:45.3490361  
+#! SYSUTCDATETIME()   20:18:45.3490361  
+#! CURRENT_TIMESTAMP  13:18:45.3470000  
+#! GETDATE()          13:18:45.3470000  
+#! GETUTCDATE()       20:18:45.3470000  
+#! */
+#!
       #SET(%pResult         , TRUE)
-      #SET(%pFunctionReplace, 'convert(time,sysdatetime())')                    #! 'convert(time,utcdatetime())'
+      #SET(%pFunctionReplace, 'convert(time,sysdatetime())')                    #! 'convert(time,sysutcdatetime())'
     #OF  ('POSTGRESQL')                                                         #! RA.2019.04.30
       #SET(%pResult         , TRUE)
       #SET(%pFunctionReplace, 'current_time')
