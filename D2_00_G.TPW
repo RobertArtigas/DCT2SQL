@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.04.12   Roberto Artigas
+#!  *   Additional reserved words for SQL-2016 (Mimer Document)
 #! 2017.10.29   Roberto Artigas
 #!  *   Addtional functions to simply building the lists and searching them.
 #! 2007.04.27   Roberto Artigas
@@ -127,6 +129,8 @@
   #ADD(%SqlWordList,'APPLICATION')                          #! RAYS.2001.10.24
   #ADD(%SqlWordList,'ARE')
   #ADD(%SqlWordList,'ARRAY')
+  #ADD(%SqlWordList,'ARRAY_AGG')                            #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'ARRAY_MAX_CARDINALITY')                #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'ARRAYLEN')                             #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'ARCHIVE')                              #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'ARCHIVELOG')                           #! RAYS.2007.04.27 - Oracle
@@ -142,6 +146,8 @@
   #ADD(%SqlWordList,'ASSERTION')
   #ADD(%SqlWordList,'ASSIGN')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'ASSIGNMENT')
+  #ADD(%SqlWordList,'ASYMMETRIC')                           #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'AT')                                   #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'ATAN')
   #ADD(%SqlWordList,'ATAN2')
   #ADD(%SqlWordList,'ATOMIC')                               #! LMS.2001.12.30 / PSQL
@@ -176,6 +182,8 @@
   #ADD(%SqlWordList,'BECOME')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'BEFORE')
   #ADD(%SqlWordList,'BEGIN')
+  #ADD(%SqlWordList,'BEGIN_FRAME')                          #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'BEGIN_PARTITION')                      #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'BERKLEYDB')                            #! RAYS.2002.11.13 / MySQLv4
   #ADD(%SqlWordList,'BETWEEN')
   #ADD(%SqlWordList,'BFILE')
@@ -251,6 +259,7 @@
   #ADD(%SqlWordList,'CIDR')
   #ADD(%SqlWordList,'CIRCLE')
   #ADD(%SqlWordList,'CLASS')
+  #ADD(%SqlWordList,'CLASSIFIER')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'CLASS_ORIGIN')
   #ADD(%SqlWordList,'CLOB')
   #ADD(%SqlWordList,'CLOSE')
@@ -286,6 +295,7 @@
   #ADD(%SqlWordList,'COMPUTED')                             #! RAYS.2001.10.22
   #ADD(%SqlWordList,'CONCAT')
   #ADD(%SqlWordList,'CONCURRENT')                           #! RAYS.2001.10.27
+  #ADD(%SqlWordList,'CONDITION')                            #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'CONDITION_NUMBER')
   #ADD(%SqlWordList,'CONDITIONAL')                          #! RAYS.2001.10.22
   #ADD(%SqlWordList,'CONNECT')
@@ -307,8 +317,8 @@
   #ADD(%SqlWordList,'CONTROLFILE')                          #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'CONVERSION')                           #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'CONVERT')
-  #ADD(%SqlWordList,'CORR')
   #ADD(%SqlWordList,'COPY')                                 #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'CORR')
   #ADD(%SqlWordList,'CORRESPONDING')
   #ADD(%SqlWordList,'COS')
   #ADD(%SqlWordList,'COSH')
@@ -329,11 +339,14 @@
   #ADD(%SqlWordList,'CUME_DIST')
   #ADD(%SqlWordList,'CURDATE')
   #ADD(%SqlWordList,'CURRENT')
+  #ADD(%SqlWordList,'CURRENT_CATALOG')                      #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'CURRENT_DATE')
   #ADD(%SqlWordList,'CURRENT_DEFAULT_TRANSFORM_GROUP')
   #ADD(%SqlWordList,'CURRENT_LC_PATH')                      #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'CURRENT_PATH')
   #ADD(%SqlWordList,'CURRENT_ROLE')
+  #ADD(%SqlWordList,'CURRENT_ROW')                          #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'CURRENT_SCHEMA')                       #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'CURRENT_SERVER')                       #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'CURRENT_TIME')
   #ADD(%SqlWordList,'CURRENT_TIMESTAMP')
@@ -389,11 +402,13 @@
   #ADD(%SqlWordList,'DEBUFOFF')                             #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'DEBUFON')                              #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'DEC')
+  #ADD(%SqlWordList,'DECFLOAT')                             #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'DECIMAL')
   #ADD(%SqlWordList,'DECLARE')
   #ADD(%SqlWordList,'DEFAULT')
   #ADD(%SqlWordList,'DEFERRABLE')
   #ADD(%SqlWordList,'DEFERRED')
+  #ADD(%SqlWordList,'DEFINE')                               #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'DEFINED')
   #ADD(%SqlWordList,'DEFINER')
   #ADD(%SqlWordList,'DEFINITION')                           #! RAYS.2007.04.27 - Oracle
@@ -457,11 +472,14 @@
   #ADD(%SqlWordList,'ELSEIF')
   #ADD(%SqlWordList,'ELSIF')
   #ADD(%SqlWordList,'ELT')
+  #ADD(%SqlWordList,'EMPTY')                                #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'ENABLE')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'ENCLOSED')                             #! RAYS.2001.10.27
   #ADD(%SqlWordList,'ENCODING')                             #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'ENCRYPT')
   #ADD(%SqlWordList,'ENCRYPTED')                            #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'END_FRAME')                            #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'END_PARTITION')                        #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'END')
   #ADD(%SqlWordList,'END-EXEC')
   #ADD(%SqlWordList,'EQUALS')
@@ -514,6 +532,7 @@
   #ADD(%SqlWordList,'FINAL')
   #ADD(%SqlWordList,'FIND')
   #ADD(%SqlWordList,'FIRST')
+  #ADD(%SqlWordList,'FIRST_VALUE')                          #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'FIXED')                                #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'FLOAT')
   #ADD(%SqlWordList,'FLOAT4')
@@ -531,6 +550,7 @@
   #ADD(%SqlWordList,'FORTRAN')
   #ADD(%SqlWordList,'FORWARD')                              #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'FOUND')
+  #ADD(%SqlWordList,'FRAME_ROW')                            #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'FREE')
   #ADD(%SqlWordList,'FREE_IT')                              #! RAYS.2001.10.22
   #ADD(%SqlWordList,'FREELIST')                             #! RAYS.2007.04.27 - Oracle
@@ -544,6 +564,7 @@
   #ADD(%SqlWordList,'FULL')
   #ADD(%SqlWordList,'FULLTEXT')                             #! RAYS.2001.10.27
   #ADD(%SqlWordList,'FUNCTION')
+  #ADD(%SqlWordList,'FUSION')                               #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'G')                                    #! 'G'
   #ADD(%SqlWordList,'GDSCODE')                              #! RAYS.2001.10.22
   #ADD(%SqlWordList,'GEMINI')
@@ -563,10 +584,10 @@
   #ADD(%SqlWordList,'GRAPHIC')                              #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'GREATEST')
   #ADD(%SqlWordList,'GROUP')
-  #ADD(%SqlWordList,'GROUPS')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'GROUP_COMMIT_WAIT')                    #! RAYS.2001.10.22
   #ADD(%SqlWordList,'GROUP_COMMIT_WAIT_TIME')               #! RAYS.2001.10.22
   #ADD(%SqlWordList,'GROUPING')
+  #ADD(%SqlWordList,'GROUPS')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'H')                                    #! 'H'
   #ADD(%SqlWordList,'HANDLER')                              #! LMS.2001.12.30 / PSQL
   #ADD(%SqlWordList,'HAVING')
@@ -641,6 +662,7 @@
   #ADD(%SqlWordList,'INTERFACE')
   #ADD(%SqlWordList,'INTERNAL')                             #! LMS.2001.12.30 / PSQL
   #ADD(%SqlWordList,'INTERSECT')
+  #ADD(%SqlWordList,'INTERSECTION')                         #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'INTERVAL')
   #ADD(%SqlWordList,'INTO')
   #ADD(%SqlWordList,'INVOKER')
@@ -661,6 +683,16 @@
   #ADD(%SqlWordList,'JAVA')
   #ADD(%SqlWordList,'JIS')                                  #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'JOIN')
+  #ADD(%SqlWordList,'JSON')
+  #ADD(%SqlWordList,'JSON_ARRAY')                           #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_ARRAYAGG')                        #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_EXISTS')                          #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_OBJECT')                          #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_OBJECTAGG')                       #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_QUERY')                           #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_TABLE')                           #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_TABLE_PRIMITIVE')                 #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'JSON_VALUE')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'K')                                    #! 'K'
   #ADD(%SqlWordList,'KEY')
   #ADD(%SqlWordList,'KEY_MEMBER')
@@ -669,18 +701,21 @@
   #ADD(%SqlWordList,'KILL')
   #ADD(%SqlWordList,'L')                                    #! 'L'
   #ADD(%SqlWordList,'LABEL')                                #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'LAG')                                  #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'LANCOMPILER')                          #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'LANGUAGE')
   #ADD(%SqlWordList,'LARGE')
   #ADD(%SqlWordList,'LAST')
   #ADD(%SqlWordList,'LAST_DAY')
   #ADD(%SqlWordList,'LAST_INSERT_ID')
+  #ADD(%SqlWordList,'LAST_VALUE')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'LATERAL')
   #ADD(%SqlWordList,'LAYER')                                #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'LCASE')
   #ADD(%SqlWordList,'LC_CTYPE')                             #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'LC_MESSAGES')                          #! RAYS.2001.10.22
   #ADD(%SqlWordList,'LC_TYPE')                              #! RAYS.2001.10.22
+  #ADD(%SqlWordList,'LEAD')                                 #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'LEADING')
   #ADD(%SqlWordList,'LEAVE')
   #ADD(%SqlWordList,'LEFT')
@@ -690,6 +725,7 @@
   #ADD(%SqlWordList,'LEV')                                  #! RAYS.2001.10.22
   #ADD(%SqlWordList,'LEVEL')
   #ADD(%SqlWordList,'LIKE')
+  #ADD(%SqlWordList,'LIKE_REGEX')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'LIMIT')
   #ADD(%SqlWordList,'LIMITED')
   #ADD(%SqlWordList,'LINENO')                               #! RAYS.2002.11.13 / SQL2000
@@ -697,6 +733,8 @@
   #ADD(%SqlWordList,'LINK')                                 #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'LINKTYPE')                             #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'LISTEN')                               #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'LIST')
+  #ADD(%SqlWordList,'LISTAGG')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'LISTS')                                #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'LN')
   #ADD(%SqlWordList,'LOAD')
@@ -733,6 +771,8 @@
   #ADD(%SqlWordList,'MANUAL')                               #! RAYS.2001.10.22
   #ADD(%SqlWordList,'MAP')
   #ADD(%SqlWordList,'MATCH')
+  #ADD(%SqlWordList,'MATCH_NUMBER')                         #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'MATCH_RECOGNIZE')                      #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'MATCHES')
   #ADD(%SqlWordList,'MASTER_LOG_SEQ')                       #! RAYS.2002.11.13 / MySQLv4
   #ADD(%SqlWordList,'MASTER_SERVER_ID')                     #! RAYS.2002.11.13 / MySQLv4
@@ -832,6 +872,7 @@
   #ADD(%SqlWordList,'NOORDER')                              #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NORESETLOGS')                          #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NORMAL')                               #! RAYS.2007.04.27 - Oracle
+  #ADD(%SqlWordList,'NORMALIZE')                            #! RAYS.2020.04.11 - SQL-2016
   #ADD(%SqlWordList,'NOSORT')                               #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NOT')
   #ADD(%SqlWordList,'NOTFOUND')                             #! RAYS.2007.04.27 - Oracle
@@ -840,6 +881,8 @@
   #ADD(%SqlWordList,'NOTNULL')                              #! RAYS.2002.11.13 / PostgreSQLv7
   #ADD(%SqlWordList,'NOW')
   #ADD(%SqlWordList,'NOWAIT')
+  #ADD(%SqlWordList,'NTH_VALUE')                            #! RAYS.2020.04.12 - SQL-2016
+  #ADD(%SqlWordList,'NTILE')                                #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'NULL')
   #ADD(%SqlWordList,'NULLABLE')
   #ADD(%SqlWordList,'NULLIF')
@@ -857,6 +900,7 @@
   #ADD(%SqlWordList,'OBJECT')
   #ADD(%SqlWordList,'OBJECT_ID')
   #ADD(%SqlWordList,'OBJECTPROPERTY')
+  #ADD(%SqlWordList,'OCCURRENCES_REGEX')                    #! RA.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'OCIROWID')
   #ADD(%SqlWordList,'OCTET_LENGTH')
   #ADD(%SqlWordList,'ODBC')
@@ -868,7 +912,9 @@
   #ADD(%SqlWordList,'OID')
   #ADD(%SqlWordList,'OIDS')                                 #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'OLD')
+  #ADD(%SqlWordList,'OMIT')                                 #! RA.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'ON')
+  #ADD(%SqlWordList,'ONE')                                  #! RA.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'ONLINE')                               #! RAYS.2002.11.13 / Oracle9i
   #ADD(%SqlWordList,'ONLY')
   #ADD(%SqlWordList,'OPAQUE')
@@ -916,7 +962,6 @@
   #ADD(%SqlWordList,'PAGELENGTH')                           #! RAYS.2001.10.22
   #ADD(%SqlWordList,'PAGES')                                #! RAYS.2001.10.22
   #ADD(%SqlWordList,'PAGE_SIZE')                            #! RAYS.2001.10.22
-  #ADD(%SqlWordList,'OVERRIDING')
   #ADD(%SqlWordList,'PARALLEL')                             #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'PARAMETER')                            #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'PARAMETER_MODE')
@@ -935,14 +980,17 @@
   #ADD(%SqlWordList,'PASTE')
   #ADD(%SqlWordList,'PATH')                                 #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
   #ADD(%SqlWordList,'PATINDEX')
+  #ADD(%SqlWordList,'PATTERN')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'PCTFREE')
   #ADD(%SqlWordList,'PCTINCREASE')                          #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'PCTUSED')                              #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'PENDANT')                              #! RAYS.2007.04.27 - Postgres
+  #ADD(%SqlWordList,'PER')                                  #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'PERCENT')                              #! RAYS.2002.11.13 / SQL2000
+  #ADD(%SqlWordList,'PERCENT_RANK')
   #ADD(%SqlWordList,'PERCENTILE_CONT')
   #ADD(%SqlWordList,'PERCENTILE_DISC')
-  #ADD(%SqlWordList,'PERCENT_RANK')
+  #ADD(%SqlWordList,'PERIOD')                               #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'PERIOD_ADD')
   #ADD(%SqlWordList,'PERIOD_DIFF')
   #ADD(%SqlWordList,'PI')
@@ -953,8 +1001,10 @@
   #ADD(%SqlWordList,'PLS_INTEGER')
   #ADD(%SqlWordList,'POINT')
   #ADD(%SqlWordList,'POLYGON')
+  #ADD(%SqlWordList,'PORTION')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'POS')                                  #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'POSITION')
+  #ADD(%SqlWordList,'POSITION_REGEX')                       #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'POSITIVE')
   #ADD(%SqlWordList,'POSITIVEN')
   #ADD(%SqlWordList,'POSTFIX')
@@ -963,6 +1013,7 @@
   #ADD(%SqlWordList,'POWER')
   #ADD(%SqlWordList,'PRAGMA')
   #ADD(%SqlWordList,'PRECEDING')
+  #ADD(%SqlWordList,'PRECEDS')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'PRECISION')
   #ADD(%SqlWordList,'PREFIX')
   #ADD(%SqlWordList,'PREORDER')
@@ -983,6 +1034,7 @@
   #ADD(%SqlWordList,'PROGRAM')                              #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'PROTECTED')
   #ADD(%SqlWordList,'PSID')                                 #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'PTF')                                  #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'PUBLIC')
   #ADD(%SqlWordList,'PURGE')                                #! RAYS.2002.11.13 / MySQLv4
   #ADD(%SqlWordList,'Q')                                    #! 'Q'
@@ -1059,12 +1111,11 @@
   #ADD(%SqlWordList,'RESULT')
   #ADD(%SqlWordList,'RETAIN')                               #! RAYS.2001.10.22
   #ADD(%SqlWordList,'RETURN')
-  #ADD(%SqlWordList,'RETURNING')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
-  #ADD(%SqlWordList,'RETURNS')                              #! LMS.2001.12.30 / PSQL
   #ADD(%SqlWordList,'RETURNED_CARDINALITY')
   #ADD(%SqlWordList,'RETURNED_LENGTH')
   #ADD(%SqlWordList,'RETURNED_OCTET_LENGTH')
   #ADD(%SqlWordList,'RETURNED_SQLSTATE')
+  #ADD(%SqlWordList,'RETURNING')                            #! RAYS.2006.03.17 - ISO/IEC 9075-14:2006(E)
   #ADD(%SqlWordList,'RETURNING_VALUES')                     #! RAYS.2001.10.22
   #ADD(%SqlWordList,'RETURNS')
   #ADD(%SqlWordList,'REUSE')                                #! RAYS.2007.04.27 - Oracle
@@ -1098,6 +1149,7 @@
   #ADD(%SqlWordList,'RTRIM')
   #ADD(%SqlWordList,'RULE')
   #ADD(%SqlWordList,'RUN')                                  #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'RUNNING')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'RUNTIME')                              #! RAYS.2001.10.22
   #ADD(%SqlWordList,'S')                                    #! 'S'
   #ADD(%SqlWordList,'SAVE')                                 #! RAYS.2002.11.13 / SQL2000
@@ -1121,6 +1173,7 @@
   #ADD(%SqlWordList,'SECQTY')                               #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'SECTION')
   #ADD(%SqlWordList,'SECURITY')
+  #ADD(%SqlWordList,'SEEK')                                 #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SEGMENT')                              #! RAYS.2001.10.21
   #ADD(%SqlWordList,'SELECT')
   #ADD(%SqlWordList,'SELF')
@@ -1153,6 +1206,7 @@
   #ADD(%SqlWordList,'SINGULAR')                             #! RAYS.2001.10.22
   #ADD(%SqlWordList,'SINH')
   #ADD(%SqlWordList,'SIZE')
+  #ADD(%SqlWordList,'SKIP')                                 #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SMALLDATETIME')
   #ADD(%SqlWordList,'SMALLFLOAT')
   #ADD(%SqlWordList,'SMALLINT')
@@ -1241,11 +1295,14 @@
   #ADD(%SqlWordList,'SUBLIST')                              #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'SUBMULTISET')                          #! RAYS.2002.03.08
   #ADD(%SqlWordList,'SUBPAGES')                             #! RAYS.2002.11.13 / DB2v7
+  #ADD(%SqlWordList,'SUBSET')                               #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SUBSTR')
   #ADD(%SqlWordList,'SUBSTRING')
   #ADD(%SqlWordList,'SUBSTRING_INDEX')
+  #ADD(%SqlWordList,'SUBSTRING_REGEX')                      #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SUB_TYPE')                             #! RAYS.2001.10.21
   #ADD(%SqlWordList,'SUBTYPE')
+  #ADD(%SqlWordList,'SUCEEDS')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SUCESSFULL')
   #ADD(%SqlWordList,'SUM')
   #ADD(%SqlWordList,'SUSPEND')                              #! RAYS.2001.10.22
@@ -1257,6 +1314,7 @@
   #ADD(%SqlWordList,'SYSDATE')
   #ADD(%SqlWordList,'SYSID')                                #! RAYS.2007.04.27 - Postgres
   #ADD(%SqlWordList,'SYSTEM')
+  #ADD(%SqlWordList,'SYSTEM_TIME')                          #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'SYSTEM_USER')
   #ADD(%SqlWordList,'T')                                    #! 'T'
   #ADD(%SqlWordList,'TABAUTH')                              #! RAYS.2007.04.27 - Oracle
@@ -1265,6 +1323,7 @@
   #ADD(%SqlWordList,'TABLEEXTRACT')                         #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'TABLELOAD')                            #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'TABLES')
+  #ADD(%SqlWordList,'TABLESAMPLE')                          #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'TABLESPACE')                           #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'TABLEUNLOAD')                          #! RAYS.2002.06.28 / SAP
   #ADD(%SqlWordList,'TABLEUPDATE')                          #! RAYS.2002.06.28 / SAP
@@ -1315,6 +1374,7 @@
   #ADD(%SqlWordList,'TRANSFORM')
   #ADD(%SqlWordList,'TRANSFORMS')
   #ADD(%SqlWordList,'TRANSLATE')
+  #ADD(%SqlWordList,'TRANSLATE_REGEX')                      #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'TRANSLATION')
   #ADD(%SqlWordList,'TREAT')
   #ADD(%SqlWordList,'TRIGGER')
@@ -1323,6 +1383,7 @@
   #ADD(%SqlWordList,'TRIGGER_NAME')
   #ADD(%SqlWordList,'TRIGGERS')
   #ADD(%SqlWordList,'TRIM')
+  #ADD(%SqlWordList,'TRIM_ARRAY')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'TRUE')
   #ADD(%SqlWordList,'TRUNC')
   #ADD(%SqlWordList,'TRUNCATE')                             #! RAYS.2002.11.13 / SQL2000
@@ -1332,6 +1393,7 @@
   #ADD(%SqlWordList,'TYPE')
   #ADD(%SqlWordList,'U')                                    #! 'U'
   #ADD(%SqlWordList,'UCASE')
+  #ADD(%SqlWordList,'UESCAPE')                              #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'UID')
   #ADD(%SqlWordList,'UINT')
   #ADD(%SqlWordList,'UNBOUNDED')
@@ -1371,6 +1433,7 @@
   #ADD(%SqlWordList,'VALIDPROC')                            #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'VALUE')
   #ADD(%SqlWordList,'VALUES')
+  #ADD(%SqlWordList,'VALUE_OF')                             #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'VAR_POP')
   #ADD(%SqlWordList,'VAR_SAMP')
   #ADD(%SqlWordList,'VARBINARY')
@@ -1385,6 +1448,7 @@
   #ADD(%SqlWordList,'VCAT')                                 #! RAYS.2002.11.13 / DB2v7
   #ADD(%SqlWordList,'VERBOSE')                              #! RAYS.2002.11.13 / PostgreSQLv7
   #ADD(%SqlWordList,'VERSION')
+  #ADD(%SqlWordList,'VERSIONING')                           #! RAYS.2020.04.12 - SQL-2016
   #ADD(%SqlWordList,'VIEW')
   #ADD(%SqlWordList,'VIEWS')                                #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'VIRTUAL')
