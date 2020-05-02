@@ -87,7 +87,7 @@
     #IF(%AuditLines % 20 = 0)
 --
 -- %[10]NULL SEQ %[1]NULL (PAR ) %[0]NULL (CHI ) %[0]NULL CHI PAR  FILENAME %[093]NULL PREFIX %[2]NULL FULLPATH
-==
+--
     #ENDIF
   #ENDFOR
 --    
