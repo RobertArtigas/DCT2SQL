@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.04.22.WED:    Roberto Artigas
+#!  *  IF deleted table record, THEN update the Server and Delete time stamps.
 #! 2019.11.20         Roberto Artigas
 #!  *   Added the EncryptionVersion logic to the template.
 #! 2019.08.15:        Roberto Artigas
@@ -17,7 +19,7 @@
 #!      ... converting this stuff is difficult.  MS has extensions to the merge statement, 
 #!      Oracle has their own extensions, neither are part of the standard, just a mine field of issues.
 #!  *   Mr. Dennis has clearly stated in the above statements the why this area of databases is "difficult"
-#!      to deal with. And while ANSI has standards, there is no "efforcement" of those standards thru
+#!      to deal with. And while ANSI has standards, there is no "enforcement" of those standards thru
 #!      incentives or disincentives monetary or otherwise. Vendors +1, customers -1.
 #!      The reality is that vendor lock-in can happen. There are current trends that are helping that.
 #! 2019.07.28         Roberto Artigas
@@ -66,7 +68,6 @@
   #OROF('MIMER')
   #OROF('MYSQL')
   #OROF('MSSQL')
-  #OROF('MYSQL')
   #OROF('ORACLE')
   #OROF('DB2')
 -- No TRIGGER CREATE generated [No CODE exists]
@@ -96,7 +97,6 @@
   #OROF('MIMER')
   #OROF('MYSQL')
   #OROF('MSSQL')
-  #OROF('MYSQL')
   #OROF('ORACLE')
   #OROF('DB2')
 -- No TRIGGER DROP generated [No CODE exists]
@@ -222,12 +222,14 @@ IF    (TG_WHEN = 'BEFORE') THEN
         #SET(%ServerTimeStamp   , 'NEW.' & %FieldNameExt)
         #SET(%Nextline          , 'NEW.' & %FieldNameExt)
     %[29]NextLine = define.ryb_sf_getelapsedtimeutc();   
-      #ENDIF
+     #ENDIF
       #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
         #!SET(%NextLine          , 'NEW.' & %FieldID)
         #!SET(%DeletedTimeStamp  , 'NEW.' & %FieldID)
         #SET(%DeletedTimeStamp  , 'NEW.' & %FieldNameExt)
         #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+      #! RA.2020.20.23: IF you are UPDATING, THEN the Delete time stamp should be zero.
+    %[29]NextLine = 0;   
       #ENDIF
       #! RA.2019.11.20: Added the EncryptionVersion logic to the template.
       #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION')
@@ -305,11 +307,20 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
       #!!!
+      #! RA.2020.04.22: 
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
       #ENDIF
       #IF (UPPER(%FieldID) = 'STS' OR UPPER(%FieldID) = 'SERVERTIMESTAMP')
+        #! RA.2020.04.22: When DELETED update the Server and Delete time stamps
+        #SET(%ServerTimeStamp   , 'NEW.' & %FieldNameExt)
+        #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+    %[29]NextLine = define.ryb_sf_getelapsedtimeutc();   
       #ENDIF
       #IF (UPPER(%FieldID) = 'DTS' OR UPPER(%FieldID) = 'DELETETIMESTAMP' OR UPPER(%FieldID) = 'DELETEDTIMESTAMP')
+        #! RA.2020.04.22: When DELETED update the Server and Delete time stamps
+        #SET(%DeletedTimeStamp  , 'NEW.' & %FieldNameExt)
+        #SET(%Nextline          , 'NEW.' & %FieldNameExt)
+    %[29]NextLine = define.ryb_sf_getelapsedtimeutc();   
       #ENDIF
       #! RA.2019.11.20: Added the EncryptionVersion logic to the template.
       #IF (UPPER(%FieldID) = 'ENCRYPTIONVERSION')
@@ -350,12 +361,12 @@ END IF;
 END $$
 LANGUAGE plpgsql VOLATILE
 ;
-#!DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable;
+DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable;
 CREATE TRIGGER trigger_before_%NFilesName
   BEFORE INSERT OR UPDATE OR DELETE ON %TheTable
   FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
 ;
-#!DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable;
+DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable;
 CREATE TRIGGER trigger_after_%NFilesName
   AFTER INSERT OR UPDATE OR DELETE ON %TheTable
   FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
