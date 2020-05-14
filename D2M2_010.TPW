@@ -481,6 +481,140 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2020.05.13.WED: Now calls the #GROUP that calculates length and decimals.
+#! RA.2020.05.12.TUE: Decimal and digits should be already set when we come here.
+#! Used for the Report Control horizontal field widths. May have other uses. [???]
+#GROUP(%CalcDspSize,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pDecLength,%pDecDigits,%pFieldID,%pFieldHeader)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zFixit10)
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+  #DECLARE(%zDspSize)
+  #DECLARE(%zAdjusts)
+#ENDIF
+#SET(%zFixit10, 10)
+#SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
+#SET(%zDspSize, %pFieldFormatWidth)
+#SET(%zDspSize, (%zAdjusts * %zFixit10))
+#CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#CASE(%pFieldType)
+#OF  ('STRING')
+#OROF('CSTRING')
+  #IF(%zAdjusts > 30)
+    #SET(%zDspSize,   INT(30.0 * %zFixit10))
+  #ENDIF
+  #!
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
+  #ENDCASE
+  #!
+#OF  ('DATE')
+#OROF('TIME')
+  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
+#OF  ('SHORT')  
+#OROF('USHORT')  
+#OROF('WORD')  
+  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
+#OF  ('LONG')  
+#OROF('ULONG')  
+#OROF('DWORD')  
+  #SET(%zDspSize,     INT( 6.0 * %zFixit10))
+#ENDCASE
+#!
+#IF(INSTRING('GUID',UPPER(%pFieldID),1,1) > 0)
+  #SET(%zDspSize,     INT( 9.0 * %zFixit10))
+#ENDIF
+#!
+! --999-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize, %zDspSize)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.05.13.WED: Changed so it should handle all the Clarion types.
+#! RA.2020.05.13.WED: Need to implement all the types as I get some testing fields.
+#! RA.2020.05.12.TUE: Get the decimal length and digits from the mask.
+#GROUP(%CalcLenDig,*%pLength,*%pDigits,%pFieldType,%pFieldPicture)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+#ENDIF
+#IF(NOT VAREXISTS(%zPos1))
+  #DECLARE(%zPos1)
+#ENDIF
+#SET(%zLength, 0)
+#SET(%zDigits, 0)
+#!SET(%zLenDec, '')
+#SET(%zLenDec,UPPER(%pFieldPicture))
+#!
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#!
+#CASE(%pFieldType)
+#OF  ('DECIMAL')
+#OROF('PDECIMAL')
+#OROF('DEC')
+#OROF('NUMERIC')
+#!
+#OROF('SREAL')
+#OROF('BFLOAT4')
+#OROF('FLOAT')
+#OROF('FLOAT4')
+#!
+#OROF('REAL')
+#OROF('BFLOAT8')
+#OROF('DOUBLE')
+#OROF('FLOAT8')
+#!
+#OROF('SHORT')
+#OROF('LONG')
+  #CALL(%ReplaceSubString,%zLenDec,'-','')
+  #CALL(%ReplaceSubString,%zLenDec,'_','')
+  #CALL(%ReplaceSubString,%zLenDec,'$','')
+  #CALL(%ReplaceSubString,%zLenDec,'@','')
+  #CALL(%ReplaceSubString,%zLenDec,'N','')
+  #CALL(%ReplaceSubString,%zLenDec,'B','')
+  #CALL(%ReplaceSubString,%zLenDec,'(','')
+  #CALL(%ReplaceSubString,%zLenDec,')','')
+  #SET(%zPos1,INSTRING('.',%zLenDec,1,1))
+  #IF(%zPos1 > 0)
+    #SET(%zLength,SUB(%zLenDec,1,%zPos1-1))
+    #SET(%zDigits,SUB(%zLenDec,%zPos1+1,LEN(%zLenDec)))
+  #ELSE 
+    #SET(%zLength,%zLenDec)
+    #SET(%zDigits,0)
+  #ENDIF
+#OF  ('STRING')
+#OROF('CSTRING')
+  #CALL(%ReplaceSubString,%zLenDec,'@','')
+  #CALL(%ReplaceSubString,%zLenDec,'S','')
+  #SET(%zLength,%zLenDec)
+  #SET(%zDigits,0)
+#OF  ('DATE')
+  #SET(%zLength,8)
+  #SET(%zDigits,0)
+#OF  ('TIME')
+  #SET(%zLength,6)
+  #SET(%zDigits,0)
+#ENDCASE
+#!
+#IF(NOT (%zLength=0 AND %zDigits=0))
+#! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S10@(%pFieldPicture) %%zLenDec=%@S10@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+#ENDIF
+#!
+#SET(%pLength, %zLength)
+#SET(%pDigits, %zDigits)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #! RA.2019.11.21: This has to be inside a field loop for all fields to get something.
 #! This will give you an alternative if there is nothing added to the external name attributes.
 #! Results can be also used to replace the name external attributes in the dictionary.
