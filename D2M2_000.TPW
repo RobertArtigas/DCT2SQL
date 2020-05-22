@@ -352,11 +352,15 @@
 #TAB('Options')
   #BOXED('Cosmetic Options'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Do DDL table create statement alignment for verification purposes',CHECK),%optDoSpaceAlign,AT(10)
+    #PROMPT('Do DDL table create statement alignment for verification purposes? (ON=Align. OFF=No align.)',CHECK),%optDoSpaceAlign,AT(10)
   #ENDBOXED
   #BOXED('Tables, Fields, Sequences, Indexes, Relations'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Add "_" to the end of reserved SQL words?',CHECK),%optUnderReservedWords,AT(10)
+    #PROMPT('Add "_" to the end of reserved SQL words? (ON=Add "_". OFF=Do not add "_".)',CHECK),%optUnderReservedWords,AT(10)
+  #ENDBOXED
+  #BOXED('Odd and Ends Options'),AT(,,454)
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('Do not change Clarion LONG to SQL backend DATE and TIME? (ON=Leave LONG. OFF=Make change to DATE and TIME.)',CHECK),%optDoNotChangeLongToDateAndTime,AT(10)
     #!DISPLAY('')
   #ENDBOXED
 #ENDTAB
@@ -1569,7 +1573,8 @@ CREATE UNIQUE INDEX %TheKey
         #SET(%NKeyFieldAD, '(')
         #FOR(%KeyField)
           #FIX(%Field,%KeyField)
-          #SET(%NKeyFieldID,%FieldID)
+          #SET(%NKeyFieldID,%FieldID)                                                   #! RA.2020.05.22.FRI: ERROR reported by John Hickey
+          #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)             #! RA.2020.05.22.FRI: Handle EXTERNAL name
           #CALL(%PadToLength,%NKeyFieldID,90)
           #CALL(%GiveMeSortOrder,%NKeySortOrder,%KeyFieldSequence)
           #!SET(%NKeyFieldAD, %NKeyFieldAD & %NKeyFieldID & ' ' & %KeyFieldSequence)
@@ -2506,11 +2511,17 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #OROF('INT4')
   #OROF('INTEGER')
       #SET(%NFieldsTSql,            'INTEGER')
-      #IF(INSTRING('@D',%NFieldsFormat,1,1))
-        #SET(%NFieldsTSql,          'DATE')
-      #ENDIF
-      #IF(INSTRING('@T',%NFieldsFormat,1,1))
-        #SET(%NFieldsTSql,          'TIME')
+      #!--------------------------------------------------------------------!
+      #! RA.2020.05.22.FRI: This might have been an option a long time ago. !
+      #! Some inviduals rather have clarion dates on the SQL back end.      !
+      #!--------------------------------------------------------------------!
+      #IF(NOT %optDoNotChangeLongToDateAndTime)                                 #! RA.2020.05.20.FRI: John Hickey request
+        #IF(INSTRING('@D',%NFieldsFormat,1,1))
+          #SET(%NFieldsTSql,          'DATE')
+        #ENDIF
+        #IF(INSTRING('@T',%NFieldsFormat,1,1))
+          #SET(%NFieldsTSql,          'TIME')
+        #ENDIF
       #ENDIF
       #!
       #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS

@@ -7,6 +7,8 @@
 #! Author:      Copyright ? 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.05.21.THU:      Roberto Artigas
+#!  *   Enhancements to the field width calculation for list boxes (Clarion, Noyantis)
 #! 2020.02.26.WED:      Roberto Artigas
 #!  *   Added %IsThisTimeStampName for the Capesoft defined timestamp field to be translated to SQL side field name.
 #! 2019.11.20.WED:      Roberto Artigas
@@ -51,9 +53,9 @@
 #! This might be necessary for some BACKENDs to CAST %NFieldOpt2 to the correct %NFieldOpt3
 #! Example: PostgreSQL: TimeStamp TIMESTAMPTZ DEFAULT current_timestamp::TIMESTAMPTZ
 #! This goes back to GUID tables and DISTRIBUTED data that gets syncronized accross locations.
-#!
-#! RA.2019.07.04: Some reseach into PostgreSQL options for date, time, user, guid [not tested!!!]
-#! RA.2019.07.04: Some reseach into MySQL options for date, time, user, guid [not tested!!!]
+#!---------------------------------------------------------------------------------------------
+#! RA.2019.07.04: Some reseach into PostgreSQL options for date, time, user, guid [not tested in production!!!]
+#! RA.2019.07.04: Some reseach into MySQL options for date, time, user, guid [not tested in production!!!]
 #! RA.2018.06.09: Added the [USER] type backend SQL keyword.
 #! RA.2018.05.07: Experimental ease of use coding. The goal is to provide
 #! some equivalence of the DATE()/TIME() function in clarion in a form that
@@ -479,142 +481,6 @@
 #ENDIF
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#!---------------------------------------------------------------------
-#!---------------------------------------------------------------------
-#! RA.2020.05.13.WED: Now calls the #GROUP that calculates length and decimals.
-#! RA.2020.05.12.TUE: Decimal and digits should be already set when we come here.
-#! Used for the Report Control horizontal field widths. May have other uses. [???]
-#GROUP(%CalcDspSize,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pDecLength,%pDecDigits,%pFieldID,%pFieldHeader)
-#IF(NOT VAREXISTS(%zLength))
-  #DECLARE(%zFixit10)
-  #DECLARE(%zLength)
-  #DECLARE(%zDigits)
-  #DECLARE(%zLenDec)
-  #DECLARE(%zDspSize)
-  #DECLARE(%zAdjusts)
-#ENDIF
-#SET(%zFixit10, 10)
-#SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
-#SET(%zDspSize, %pFieldFormatWidth)
-#SET(%zDspSize, (%zAdjusts * %zFixit10))
-#CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
-#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
-#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
-#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
-#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
-#CASE(%pFieldType)
-#OF  ('STRING')
-#OROF('CSTRING')
-  #IF(%zAdjusts > 30)
-    #SET(%zDspSize,   INT(30.0 * %zFixit10))
-  #ENDIF
-  #!
-  #CASE(%zAdjusts)
-  #OF  (1)
-  #OROF(2)
-  #OROF(3)
-    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
-  #ENDCASE
-  #!
-#OF  ('DATE')
-#OROF('TIME')
-  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
-#OF  ('SHORT')  
-#OROF('USHORT')  
-#OROF('WORD')  
-  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
-#OF  ('LONG')  
-#OROF('ULONG')  
-#OROF('DWORD')  
-  #SET(%zDspSize,     INT( 6.0 * %zFixit10))
-#ENDCASE
-#!
-#IF(INSTRING('GUID',UPPER(%pFieldID),1,1) > 0)
-  #SET(%zDspSize,     INT( 9.0 * %zFixit10))
-#ENDIF
-#!
-! --999-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
-#SET(%pDspSize, %zDspSize)
-#!---------------------------------------------------------------------
-#!---------------------------------------------------------------------
-#! RA.2020.05.13.WED: Changed so it should handle all the Clarion types.
-#! RA.2020.05.13.WED: Need to implement all the types as I get some testing fields.
-#! RA.2020.05.12.TUE: Get the decimal length and digits from the mask.
-#GROUP(%CalcLenDig,*%pLength,*%pDigits,%pFieldType,%pFieldPicture)
-#IF(NOT VAREXISTS(%zLength))
-  #DECLARE(%zLength)
-  #DECLARE(%zDigits)
-  #DECLARE(%zLenDec)
-#ENDIF
-#IF(NOT VAREXISTS(%zPos1))
-  #DECLARE(%zPos1)
-#ENDIF
-#SET(%zLength, 0)
-#SET(%zDigits, 0)
-#!SET(%zLenDec, '')
-#SET(%zLenDec,UPPER(%pFieldPicture))
-#!
-#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
-#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
-#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
-#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
-#!
-#CASE(%pFieldType)
-#OF  ('DECIMAL')
-#OROF('PDECIMAL')
-#OROF('DEC')
-#OROF('NUMERIC')
-#!
-#OROF('SREAL')
-#OROF('BFLOAT4')
-#OROF('FLOAT')
-#OROF('FLOAT4')
-#!
-#OROF('REAL')
-#OROF('BFLOAT8')
-#OROF('DOUBLE')
-#OROF('FLOAT8')
-#!
-#OROF('SHORT')
-#OROF('LONG')
-  #CALL(%ReplaceSubString,%zLenDec,'-','')
-  #CALL(%ReplaceSubString,%zLenDec,'_','')
-  #CALL(%ReplaceSubString,%zLenDec,'$','')
-  #CALL(%ReplaceSubString,%zLenDec,'@','')
-  #CALL(%ReplaceSubString,%zLenDec,'N','')
-  #CALL(%ReplaceSubString,%zLenDec,'B','')
-  #CALL(%ReplaceSubString,%zLenDec,'(','')
-  #CALL(%ReplaceSubString,%zLenDec,')','')
-  #SET(%zPos1,INSTRING('.',%zLenDec,1,1))
-  #IF(%zPos1 > 0)
-    #SET(%zLength,SUB(%zLenDec,1,%zPos1-1))
-    #SET(%zDigits,SUB(%zLenDec,%zPos1+1,LEN(%zLenDec)))
-  #ELSE 
-    #SET(%zLength,%zLenDec)
-    #SET(%zDigits,0)
-  #ENDIF
-#OF  ('STRING')
-#OROF('CSTRING')
-  #CALL(%ReplaceSubString,%zLenDec,'@','')
-  #CALL(%ReplaceSubString,%zLenDec,'S','')
-  #SET(%zLength,%zLenDec)
-  #SET(%zDigits,0)
-#OF  ('DATE')
-  #SET(%zLength,8)
-  #SET(%zDigits,0)
-#OF  ('TIME')
-  #SET(%zLength,6)
-  #SET(%zDigits,0)
-#ENDCASE
-#!
-#IF(NOT (%zLength=0 AND %zDigits=0))
-#! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S10@(%pFieldPicture) %%zLenDec=%@S10@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
-#ENDIF
-#!
-#SET(%pLength, %zLength)
-#SET(%pDigits, %zDigits)
-#!---------------------------------------------------------------------
-#!---------------------------------------------------------------------
 #! RA.2019.11.21: This has to be inside a field loop for all fields to get something.
 #! This will give you an alternative if there is nothing added to the external name attributes.
 #! Results can be also used to replace the name external attributes in the dictionary.
@@ -907,6 +773,605 @@
 #!          --1 %@N03@(%NKeyFieldSize): %NKeyFieldEQ %[20]KeyFieldID %[30]KeyField %NFilesFieldDTS
     #ENDFOR
   #ENDIF
+#ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.05.19.SUN: Removed the passed parameters %pDecLength and %pDecDigits. 
+#! RA.2020.05.17.SUN: HOW, WHEN: Does this need to handle arrays? 
+#! RA.2020.05.17.SUN: Will need more testing. Better if there is a bit extra space.
+#! RA.2020.05.13.WED: Now calls the #GROUP that calculates length and decimals.
+#! RA.2020.05.12.TUE: Decimal and digits should be already set when we come here.
+#!---------------------------------------------------------------------
+#! RA.2020.05.19.SUN: Used as replacement for the dictionary calculated list field display width. [???]
+#! RA.2020.05.12.TUE: Used for the Report Control horizontal field widths. May have other uses. [???]
+#!---------------------------------------------------------------------
+#!GROUP(%CalcDspSize,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pDecLength,%pDecDigits,%pFieldID,%pFieldHeader)
+#GROUP(%CalcDspSize,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zFixit10)
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+  #DECLARE(%zDspSize)
+  #DECLARE(%zAdjusts)
+#ENDIF
+#CASE(UPPER(%pFieldType))
+#OF  ('CSTRING')
+  #SET(%pFieldMemoSize , %pFieldMemoSize - 1)
+#! --997-- %%pFieldMemoSize = %pFieldMemoSize
+#ENDCASE
+#SET(%zFixit10, 10)
+#SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
+#!SET(%zDspSize, %pFieldFormatWidth)
+#SET(%zDspSize, (%zAdjusts * %zFixit10))
+#CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#CASE(%pFieldType)
+#OF  ('STRING') 
+#OROF('ASTRING')
+#OROF('BSTRING')
+#OROF('CSTRING')
+#OROF('PSTRING')
+#OROF('USTRING')
+#OROF('MEMO')
+#OROF('BLOB')
+ #IF(%zAdjusts > 30)
+    #SET(%zDspSize,   INT(30.0 * %zFixit10))
+  #ENDIF
+  #!
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
+  #ENDCASE
+  #!
+#OF  ('DATE')
+#OROF('TIME')
+  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
+#OF  ('SHORT')  
+#OROF('USHORT')  
+#OROF('WORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 5.0 * %zFixit10))
+  #ENDCASE
+  #!
+#OF  ('LONG')  
+#OROF('ULONG')  
+#OROF('DWORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 6.0 * %zFixit10))
+  #ENDCASE
+  #!
+#OF  ('REAL')  
+#OROF('SREAL')  
+#OROF('DECIMAL')  
+#OROF('PDECIMAL')  
+#OROF('BFLOAT4')  
+#OROF('BFLOAT8')  
+  #!
+  #SET(%zAdjusts, %zLength + %zDigits)
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit10 * %zAdjusts))
+  #ENDCASE
+  #!
+#OF  ('BYTE')  
+#OROF('BOOL')  
+#OROF('BOOLEAN')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit10))
+  #ENDCASE
+  #!
+#ENDCASE
+#!
+#IF(INSTRING('GUID',UPPER(%pFieldID),1,1) > 0)
+  #SET(%zDspSize,     INT( 9.0 * %zFixit10))
+#ENDIF
+#!
+#! --999-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize, %zDspSize)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.05.13.WED: Changed so it should handle all the Clarion types.
+#! RA.2020.05.13.WED: Need to implement all the types as I get some testing fields.
+#! RA.2020.05.12.TUE: Get the decimal length and digits from the mask.
+#GROUP(%CalcLenDig,*%pLength,*%pDigits,%pFieldType,%pFieldPicture)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+#ENDIF
+#IF(NOT VAREXISTS(%zPos1))
+  #DECLARE(%zPos1)
+#ENDIF
+#SET(%zLength, 0)
+#SET(%zDigits, 0)
+#!SET(%zLenDec, '')
+#SET(%zLenDec,UPPER(%pFieldPicture))
+#!
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#!
+#CASE(%pFieldType)
+#OF  ('DECIMAL')
+#OROF('PDECIMAL')
+#OROF('DEC')
+#OROF('NUMERIC')
+#!
+#OROF('SREAL')
+#OROF('BFLOAT4')
+#OROF('FLOAT')
+#OROF('FLOAT4')
+#!
+#OROF('REAL')
+#OROF('BFLOAT8')
+#OROF('DOUBLE')
+#OROF('FLOAT8')
+#!
+#OROF('SHORT')
+#OROF('LONG')
+  #CALL(%ReplaceSubString,%zLenDec,'-','')
+  #CALL(%ReplaceSubString,%zLenDec,'_','')
+  #CALL(%ReplaceSubString,%zLenDec,'$','')
+  #CALL(%ReplaceSubString,%zLenDec,'@','')
+  #CALL(%ReplaceSubString,%zLenDec,'N','')
+  #CALL(%ReplaceSubString,%zLenDec,'B','')
+  #CALL(%ReplaceSubString,%zLenDec,'(','')
+  #CALL(%ReplaceSubString,%zLenDec,')','')
+  #SET(%zPos1,INSTRING('.',%zLenDec,1,1))
+  #IF(%zPos1 > 0)
+    #SET(%zLength,SUB(%zLenDec,1,%zPos1-1))
+    #SET(%zDigits,SUB(%zLenDec,%zPos1+1,LEN(%zLenDec)))
+  #ELSE 
+    #SET(%zLength,%zLenDec)
+    #SET(%zDigits,0)
+  #ENDIF
+#OF  ('STRING')
+#OROF('CSTRING')
+  #CALL(%ReplaceSubString,%zLenDec,'@','')
+  #CALL(%ReplaceSubString,%zLenDec,'S','')
+  #SET(%zLength,%zLenDec)
+  #SET(%zDigits,0)
+#OF  ('DATE')
+  #SET(%zLength,8)
+  #SET(%zDigits,0)
+#OF  ('TIME')
+  #SET(%zLength,6)
+  #SET(%zDigits,0)
+#ENDCASE
+#!
+#IF(NOT (%zLength=0 AND %zDigits=0))
+#! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S10@(%pFieldPicture) %%zLenDec=%@S10@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+#ENDIF
+#!
+#SET(%pLength, %zLength)
+#SET(%pDigits, %zDigits)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.05.21.THU: Create internal table of what fields are in which tab.
+#! A '~' is applied to the front of fields that are not shown to the user.
+#! IOW: They are for programmers and system usage. They sort to the end.
+#! ----- PURPOSE -----
+#! The List Box Formatter (IMHO) has for a long time been a time comsuming IDE editing bit.
+#! No matter how well you edit the dictionary (DCT) the resuling LIST control has to be edited.
+#! The LIST control complain is the short fields are too short and the long fields are too long.
+#! This is my attempt at making it a bit easier at what the lengths should be for LESS editing.
+#! This handles the list field widths for: 1) Clarion, 2) Noyantis.
+#! While this by no means is perfect and will required more adjustments as use cases are found,
+#! it produces a generated list that has a bit better spacing (IMHO) than the IDE generated one.
+#! It DOES NOT eliminate editing, we hope it should just reduce the editing that has to be done.
+#! IF you find a better calculation to do this, THEN just add the calculation here.
+#GROUP(%d2c2aTabsFields)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#PREPARE
+#IF(NOT VAREXISTS(%d2c2aTabsFields))
+#DECLARE(%d2c2aWork)
+#DECLARE(%d2c2aTabsFields),MULTI,UNIQUE
+#DECLARE(%d2c2aTab       ,%d2c2aTabsFields)     #! TAB where this field is
+#DECLARE(%d2c2aSeq       ,%d2c2aTabsFields)     #! Display #??# of the field (recall style byte)
+#DECLARE(%d2c2aFld       ,%d2c2aTabsFields)     #! Field with prefix
+#DECLARE(%d2c2aDSP       ,%d2c2aTabsFields)     #! Clarion DCT value
+#DECLARE(%d2c2aType      ,%d2c2aTabsFields)     #! Field Type
+#DECLARE(%d2c2aFMS       ,%d2c2aTabsFields)     #! Field Memo Size (DCT)
+#DECLARE(%d2c2aDHL       ,%d2c2aTabsFields)     #! Length of the column header
+#DECLARE(%d2c2aFDP       ,%d2c2aTabsFields)     #! Field display picture
+#DECLARE(%d2c2aLen       ,%d2c2aTabsFields)     #! Length of display picture
+#DECLARE(%d2c2aDig       ,%d2c2aTabsFields)     #! Digits of display picture
+#DECLARE(%d2c2aCalc1     ,%d2c2aTabsFields)     #! Calculation: Clarion
+#DECLARE(%d2c2aCalc2     ,%d2c2aTabsFields)     #! Calculation: Noyantis
+#END
+#ENDPREPARE
+#!
+#FREE(%d2c2aTabsFields)
+#SET(%CountFields           , 1)
+#FOR(%Field)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+  #INSERT(%UseQualifiedFieldsD2C)
+  #IF(SUB(%NFieldOpt1,1,1)='N')
+    #CYCLE
+  #ENDIF
+#!
+  #CASE(UPPER(EXTRACT(%FieldQuickOptions,'TAB',1)))
+  #OF  ('INTERNAL')
+  #OROF('WORK')
+    #SET(%d2c2aWork, '~' & EXTRACT(%FieldQuickOptions,'TAB',1) & '-' & FORMAT(%CountFields,@N03) & '-' & %FieldID)
+  #ELSE 
+    #SET(%d2c2aWork,       EXTRACT(%FieldQuickOptions,'TAB',1) & '-' & FORMAT(%CountFields,@N03) & '-' & %FieldID) 
+  #ENDCASE
+#!
+  #ADD(%d2c2aTabsFields     , %d2c2aWork)
+  #SET(%d2c2aTab            , EXTRACT(%FieldQuickOptions,'TAB',1))
+  #SET(%d2c2aSeq            , %CountFields)
+  #SET(%d2c2aFld            , %Field)
+  #SET(%d2c2aDSP            , %FieldFormatWidth)
+  #SET(%d2c2aFMS            , %FieldMemoSize)
+  #SET(%d2c2aType           , %FieldType)
+  #SET(%d2c2aDHL            , LEN(%FieldHeader))
+  #SET(%d2c2aFDP            , %FieldDisplayPicture)                         #! Display Width: DCT original
+  #CALL(%CalcLenDig         , %d2c2aLen, %d2c2aDig, %d2c2aType, %d2c2aFDP)
+  #SET(%d2c2aCalc1          , %d2c2aDSP)                                    #! Display Width: Clarion
+  #SET(%d2c2aCalc2          , %d2c2aDSP)                                    #! Display Width: Noyantis
+  #CALL(%CalcWidthClarion   , %d2c2aCalc1, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
+  #CALL(%CalcWidthNoyantis  , %d2c2aCalc2, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
+#!
+  #SET(%CountFields         , %CountFields + 2)                             #! There is a style byte in between
+#ENDFOR
+#FOR(%d2c2aTabsFields)
+! %%d2c2aTabsFields = %[50]d2c2aTabsFields ( %[10]d2c2aTab, %@N03@(%d2c2aSeq), %[50]d2c2aFld, %@N04@(%d2c2aDSP), %@N04@(%d2c2aCalc1), %@N04@(%d2c2aCalc2) )
+#ENDFOR
+#!---------------------------------------------------------------------
+#!--------------------------------------------------------------------- 
+#GROUP(%CalcWidthClarion,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zFixit04)
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+  #DECLARE(%zDspSize)
+  #DECLARE(%zAdjusts)
+#ENDIF
+#CASE(UPPER(%pFieldType))
+#OF  ('CSTRING')
+  #SET(%pFieldMemoSize , %pFieldMemoSize - 1)
+#! --995-- %%pFieldMemoSize = %pFieldMemoSize
+#ENDCASE
+#IF(%pHeaderLength > %pFieldMemoSize)
+  #SET(%pHeaderLength , %pHeaderLength + 2)
+#! --997-- %pHeaderLength >= %pFieldMemoSize [%pFieldID , %pFieldHeader (%pHeaderLength)]
+#ENDIF
+#SET(%zFixit04, 04)
+#SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
+#!SET(%zDspSize, %pFieldFormatWidth)
+#! --002--- (%%pFieldMemoSize=%pFieldMemoSize > %%pHeaderLength=%pHeaderLength) = %%zAdjusts = %zAdjusts
+#SET(%zDspSize, (%zAdjusts * %zFixit04))
+#CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#CASE(%pFieldType)
+#OF  ('STRING') 
+#OROF('ASTRING')
+#OROF('BSTRING')
+#OROF('CSTRING')
+#OROF('PSTRING')
+#OROF('USTRING')
+#OROF('MEMO')
+#OROF('BLOB')
+  #!
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 2.5 * %zFixit04 * %zAdjusts))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit04 * %zAdjusts))
+  #ENDCASE
+  #!
+  #IF(%zAdjusts > 50)
+    #SET(%zDspSize,   INT(50.0 * %zFixit04))
+  #ENDIF
+  #!
+#OF  ('DATE')
+#OROF('TIME')
+  #SET(%zDspSize,     INT(11.0 * %zFixit04))
+#OF  ('SHORT')  
+#OROF('USHORT')  
+#OROF('WORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 2.5 * %zFixit04 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 7.0 * %zFixit04))
+  #ENDCASE
+  #!
+#OF  ('LONG')  
+#OROF('ULONG')  
+#OROF('DWORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 2.5 * %zFixit04 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 9.0 * %zFixit04))
+  #ENDCASE
+  #!
+#OF  ('REAL')  
+#OROF('SREAL')  
+#OROF('DECIMAL')  
+#OROF('PDECIMAL')  
+#OROF('BFLOAT4')  
+#OROF('BFLOAT8')  
+  #!
+  #SET(%zAdjusts, %zLength + %zDigits)
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 2.5 * %zFixit04 * %zAdjusts))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit04 * %zAdjusts))
+  #ENDCASE
+  #!
+#OF  ('BYTE')  
+#OROF('BOOL')  
+#OROF('BOOLEAN')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 2.5 * %zFixit04 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit04))
+  #ENDCASE
+  #!
+#ENDCASE
+#!
+#IF(INSTRING('GUID',UPPER(%pFieldID),1,1) > 0)
+  #SET(%zDspSize,     INT(22.0 * %zFixit04))
+#ENDIF
+#!
+#! --111-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize, %zDspSize)
+#!---------------------------------------------------------------------
+#!--------------------------------------------------------------------- 
+#GROUP(%CalcWidthNoyantis,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
+#IF(NOT VAREXISTS(%zLength))
+  #DECLARE(%zFixit10)
+  #DECLARE(%zLength)
+  #DECLARE(%zDigits)
+  #DECLARE(%zLenDec)
+  #DECLARE(%zDspSize)
+  #DECLARE(%zAdjusts)
+#ENDIF
+#CASE(UPPER(%pFieldType))
+#OF  ('CSTRING')
+  #SET(%pFieldMemoSize , %pFieldMemoSize - 1)
+#! --997-- %%pFieldMemoSize = %pFieldMemoSize
+#ENDCASE
+#SET(%zFixit10, 10)
+#SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
+#!SET(%zDspSize, %pFieldFormatWidth)
+#!SET(%zAdjusts, %zAdjusts + 2)
+#SET(%zDspSize, (%zAdjusts * %zFixit10))
+#CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
+#! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
+#! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
+#! BSTRING, CSTRING, USTRING, WORD, DWORD, BOOLEAN. 
+#CASE(%pFieldType)
+#OF  ('STRING') 
+#OROF('ASTRING')
+#OROF('BSTRING')
+#OROF('CSTRING')
+#OROF('PSTRING')
+#OROF('USTRING')
+#OROF('MEMO')
+#OROF('BLOB')
+  #!
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit10 * %zAdjusts))
+  #ENDCASE
+  #!
+  #IF(%zAdjusts > 30)
+    #SET(%zDspSize,   INT(30.0 * %zFixit10))
+  #ENDIF
+  #!
+#OF  ('DATE')
+#OROF('TIME')
+  #SET(%zDspSize,     INT( 5.0 * %zFixit10))
+#OF  ('SHORT')  
+#OROF('USHORT')  
+#OROF('WORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 5.0 * %zFixit10))
+  #ENDCASE
+  #!
+#OF  ('LONG')  
+#OROF('ULONG')  
+#OROF('DWORD')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 6.0 * %zFixit10))
+  #ENDCASE
+  #!
+#OF  ('REAL')  
+#OROF('SREAL')  
+#OROF('DECIMAL')  
+#OROF('PDECIMAL')  
+#OROF('BFLOAT4')  
+#OROF('BFLOAT8')  
+  #!
+  #SET(%zAdjusts, %zLength + %zDigits)
+  #CASE(%zAdjusts)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zAdjusts))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit10 * %zAdjusts))
+  #ENDCASE
+  #!
+#OF  ('BYTE')  
+#OROF('BOOL')  
+#OROF('BOOLEAN')  
+  #!
+  #CASE(%zLength)
+  #OF  (1)
+  #OROF(2)
+  #OROF(3)
+    #SET(%zDspSize,   INT( 1.5 * %zFixit10 * %zLength))
+  #ELSE
+    #SET(%zDspSize,   INT( 1.0 * %zFixit10))
+  #ENDCASE
+  #!
+#ENDCASE
+#!
+#IF(INSTRING('GUID',UPPER(%pFieldID),1,1) > 0)
+  #SET(%zDspSize,     INT( 9.0 * %zFixit10))
+#ENDIF
+#!
+#! --222-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize, %zDspSize)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.05.22.FRI: Implemented. See the commented items below.
+#! RA.2020.05.21.THU: This needs generalization by passing parameters.
+#! 
+#!SET(%NextLine, '?' & %FilePrefix & '_oList')               #! pScreenID
+#!SET(%WorkLine, %FilePrefix & '_oListClass')                #! pObjectID 
+#!SET(%MoreLine, 'ListQ')                                    #! pQueueID
+#!CALL(%ScreenListForClarion,%NextLine,%WorkLine,%MoreLine)
+#!
+#GROUP(%ScreenListForClarion,%pScreenID,%pObjectID,%pQueueuID)
+#SET(%IndexFields,0)
+#SET(%CountFields,1)
+#FOR(%d2c2aTabsFields)
+  #FIX(%Field, %d2c2aFld)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+  #INSERT(%UseQualifiedFieldsD2C)
+  #IF(SUB(%NFieldOpt1,1,1)='N')                                                   #! Ignore this field
+    #CYCLE
+  #ENDIF
+  #SET(%IndexFields,%IndexFields+1)
+  #SET(%BuildPart1, '')
+  #IF(%IndexFields=1)
+#! ! LIST,AT(4,40,400,48),USE(?%FilePrefix_oList),HVSCROLL, |
+! LIST,AT(4,40,400,48),USE(%pScreenID),HVSCROLL, |
+    #SET(%BuildPart1, 'FORMAT(')
+  #ENDIF
+  #! RA.2020.05.21.THU: The fields in the GROUP get build in record order. They get a diffennt display order.
+  #! Make sure the sequence number #???# points to the correct field. You grab the '%d2c2aSeq' to set it up.
+  #!SET(%NextWork, 0)
+  #!SET(%NextWork, %d2c2aCalc1)
+  #!CALL(%CalcDspSize, %NextWork, %FieldFormatWidth, %FieldMemoSize, %FieldType, LEN(%FieldHeader), %FieldDisplayPicture, %Field, %FieldHeader) 
+  #SET(%BuildPart2, %d2c2aCalc1 & %FieldJustType & '(' & %FieldJustIndent & ')|MY~' & %FieldHeader & '~' & %FieldPicture & '@#' & %d2c2aSeq & '#')   
+  #!SET(%BuildPart2, %FieldFormatWidth & %FieldJustType & '(' & %FieldJustIndent & ')|MY~' & %FieldHeader & '~' & %FieldPicture & '@#' & %CountFields & '#')   
+  #SET(%BuildPart1, %BuildPart1 & '''' & %BuildPart2 & '''')
+  #IF(%IndexFields=ITEMS(%Field))
+    #!SET(%NextWork, %FilePrefix & '_oListClass.ListQ')
+    #SET(%NextWork, %pObjectID & '.' & %pQueueuID)
+    #SET(%BuildPart1, %BuildPart1 & '),FROM(' & %NextWork & '),IMM, |')
+  #ELSE
+    #SET(%BuildPart1, %BuildPart1 & ' & |')
+  #ENDIF
+!   %BuildPart1
+  #SET(%CountFields,%CountFields+2) 
+#ENDFOR
+#!
+#SET(%IndexFields,0)
+#SET(%CountFields,1)
+#FOR(%d2c2aTabsFields)
+  #FIX(%Field, %d2c2aFld)
+  #CASE(%FieldType)
+  #OF  ('GROUP')
+  #OROF('END')
+    #CYCLE
+  #ENDCASE
+  #INSERT(%UseQualifiedFieldsD2C)
+  #IF(SUB(%NFieldOpt1,1,1)='N')                                                   #! Ignore this field
+    #CYCLE
+  #ENDIF
+  #SET(%IndexFields,%IndexFields+1)
+  #SET(%BuildPart1, '')
+  #IF(%IndexFields=1)
+    #SET(%BuildPart1, '#FIELDS(')
+  #ENDIF
+  #SET(%BuildPart1, %BuildPart1 & %NextWork & '.' & %FieldID)
+  #IF(%IndexFields=ITEMS(%Field))
+    #SET(%BuildPart1, %BuildPart1 & ')')
+  #ELSE
+    #SET(%BuildPart1, %BuildPart1 & ', |')
+  #ENDIF
+!   %BuildPart1
+  #SET(%CountFields,%CountFields+2) 
 #ENDFOR
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------

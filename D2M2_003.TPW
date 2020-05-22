@@ -49,6 +49,8 @@
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #GROUP(%VariablesDeclare)                                                       #! Option checks and output file names
 #PREPARE
 #!---------------------------------------------------------------------
@@ -515,10 +517,12 @@
 #SET(%optDefineNames                      ,'Table Names')
 #!---------------------------------------------------------------------
 #! RA.2018.09.03: We align the table DDL statements to allow verification by sight to be made easier.                
-#DECLARE(%optDoSpaceAlign                 ,LONG)                                #! RA.2018.09.03 - Align table DDL statements
+#DECLARE(%optDoSpaceAlign                 ,LONG)                                #! RA.2018.09.03: Align table DDL statements
 #SET(%optDoSpaceAlign                     ,TRUE)   
 #DECLARE(%optUnderReservedWords           ,LONG)                                #! Underscore RESERVED words
 #SET(%optUnderReservedWords               ,FALSE)
+#DECLARE(%optDoNotChangeLongToDateAndTime ,LONG)                                #! RA.2020.05.10: REQUEST: John Hickey 
+#SET(%optDoNotChangeLongToDateAndTime     ,FALSE)                               #! This was an option a long time ago. [???]
 #!---------------------------------------------------------------------
 #DECLARE(%optGenIntlString                ,LONG)                                #! Generate INTERNATIONAL strings
 #SET(%optGenIntlString                    ,FALSE)
