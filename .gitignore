@@ -18,6 +18,8 @@ obj/**
 *.ap~
 PWEE*.txt
 
+_archive_
+
 ############
 ## Windows
 ############
