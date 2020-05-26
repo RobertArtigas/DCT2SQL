@@ -1109,8 +1109,8 @@
     #SET(%zDspSize,   INT( 1.0 * %zFixit04 * %zAdjusts))
   #ENDCASE
   #!
-  #IF(%zAdjusts > 50)
-    #SET(%zDspSize,   INT(50.0 * %zFixit04))
+  #IF(%zAdjusts > 40)
+    #SET(%zDspSize,   INT(40.0 * %zFixit04))
   #ENDIF
   #!
 #OF  ('DATE')
@@ -1225,8 +1225,8 @@
     #SET(%zDspSize,   INT( 1.0 * %zFixit10 * %zAdjusts))
   #ENDCASE
   #!
-  #IF(%zAdjusts > 30)
-    #SET(%zDspSize,   INT(30.0 * %zFixit10))
+  #IF(%zAdjusts > 16)
+    #SET(%zDspSize,   INT(16.0 * %zFixit10))
   #ENDIF
   #!
 #OF  ('DATE')
@@ -1323,8 +1323,8 @@
   #SET(%IndexFields,%IndexFields+1)
   #SET(%BuildPart1, '')
   #IF(%IndexFields=1)
-#! ! LIST,AT(4,40,400,48),USE(?%FilePrefix_oList),HVSCROLL, |
-! LIST,AT(4,40,400,48),USE(%pScreenID),HVSCROLL, |
+#! ! LIST,AT(4,40,400,40),USE(?%FilePrefix_oList),HVSCROLL, |
+! LIST,AT(4,40,400,40),USE(%pScreenID),HVSCROLL, |
     #SET(%BuildPart1, 'FORMAT(')
   #ENDIF
   #! RA.2020.05.21.THU: The fields in the GROUP get build in record order. They get a diffennt display order.
