@@ -3526,7 +3526,7 @@ CREATE TABLE %TheTable (
         #FOR(%KeyField)                                                         #! Beginning FOR(%KeyField)
           #FIX(%Field,%KeyField)
           #SET(%NFilesPKeyField,%FieldID)                                       #! Table Primary Field Name
-          #CALL(%SetupTheField,%NFilesPKeyField,%pBaseName,%FieldID,%FieldName) #! RA.2020.05.25.MON: Handle EXTERNAL name
+          #CALL(%SetupTheField,%NFilesPKeyField,%BaseName,%FieldID,%FieldName)  #! RA.2020.05.26.MON: Handle EXTERNAL name
 #!----??? Key="%Key", KeyField="%KeyField", FieldType="%FieldType"
           #! RA.2018.04.29: Build up the PRIMARY KEY field table (needed for the NOT-NULL logic).
           #ADD(%NFieldsPRIMARY,%KeyField)
