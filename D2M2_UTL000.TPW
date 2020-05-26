@@ -111,6 +111,7 @@
     #DISPLAY(''),AT(,,,1)
     #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.', CHECK), %opt000AuditFields, AT(10)
     #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.', CHECK), %opt000AuditKeys, AT(10)
+    #PROMPT('OFF: Do NOT audit relations. ON: Audit the relations.', CHECK), %opt000AuditRelations, AT(10)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -251,28 +252,44 @@
 #DECLARE(%KeyFieldList)
 #DECLARE(%KeyFieldID)
 #DECLARE(%AuditLines)
+#DECLARE(%RelKeyFromID)
+#DECLARE(%RelKeyToID)
+#DECLARE(%RelFieldFromList)
+#DECLARE(%RelFieldToList)
+#DECLARE(%RelSort),MULTI,UNIQUE
+#DECLARE(%RelFind     , %RelSort)
+#DECLARE(%RelShow     , %RelSort)
+#DECLARE(%RelType     , %RelSort)
+#DECLARE(%RelPrefix   , %RelSort)
+#DECLARE(%RelRASQL    , %RelSort)
+#DECLARE(%RelFromId   , %RelSort)
+#DECLARE(%RelToId     , %RelSort)
+#DECLARE(%RelFromList , %RelSort)
+#DECLARE(%RelToList   , %RelSort)
 #!
 #DECLARE(%opt000AuditFields               ,LONG)
 #SET(%opt000AuditFields                   ,FALSE)
 #DECLARE(%opt000AuditKeys                 ,LONG)
 #SET(%opt000AuditKeys                     ,FALSE)
+#DECLARE(%opt000AuditRelations            ,LONG)                                #! RA.2020.05.22: Added
+#SET(%opt000AuditRelations                ,FALSE)
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%AuditFieldsAndKeys000)
     #IF(ITEMS(%Field) AND %opt000AuditFields)
--- %[05]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[27]NULL FIELD-OPTIONS  
--- %[05]NULL ========== %[40]NULL ============= %[37]NULL ============= %[27]NULL =============  
+-- %[05]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[25]NULL FIELD-OPTIONS  
+-- %[05]NULL ========== %[40]NULL ============= %[37]NULL ============= %[25]NULL =============  
       #FOR(%Field)
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
--- %[05]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[40]FieldInitial %[0]NULL %FieldUserOptions  
+-- %[05]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[38]FieldInitial %[0]NULL %FieldUserOptions  
       #ENDFOR
     #ENDIF
     #!
     #IF(ITEMS(%Key) AND %opt000AuditKeys)               
--- %[05]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[66]NULL KEY-OPTIONS  
--- %[05]NULL ======== %[22]NULL ============= %[17]NULL ============== %[66]NULL ===========  
+-- %[05]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[64]NULL KEY-OPTIONS  
+-- %[05]NULL ======== %[22]NULL ============= %[17]NULL ============== %[64]NULL ===========  
       #FOR(%Key)
         #SET(%NextLine, EXTRACT(%KeyStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
@@ -285,8 +302,80 @@
         #IF(LEN(%KeyFieldList) > 80)
           #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
         #ENDIF
--- %[05]NULL %[30]KeyID %[0]NULL %[30]NextLine %[0]NULL %[80]KeyFieldList %[0]NULL %KeyUserOptions  
+-- %[05]NULL %[30]KeyID %[0]NULL %[30]NextLine %[0]NULL %[78]KeyFieldList %[0]NULL %KeyUserOptions  
       #ENDFOR
+    #ENDIF
+    #IF(ITEMS(%Relation) AND %opt000AuditRelations)               
+-- %[05]NULL R-TYPE %[0]NULL FROM-HERE     %[45]NULL TO-THERE       %[60]NULL RELATION-OPTIONS  
+-- %[05]NULL ====== %[0]NULL ============= %[45]NULL ============== %[60]NULL ================
+      #FREE(%RelSort)  
+      #FOR(%Relation)
+        #IF(CLIP(EXTRACT(%RelationUserOptions,'RASQL',4)) <> '')
+          #ADD(%RelSort     , %FileRelationType & '-' & EXTRACT(%RelationUserOptions,'RASQL',4))
+        #ELSE
+          #ADD(%RelSort     , %FileRelationType & '-' & %RelationKey)
+        #END
+        #SET(%RelPrefix     , %RelationPrefix)
+        #SET(%RelType       , %FileRelationType)
+        #SET(%RelRASQL      , %RelationUserOptions)
+        #SET(%RelFind       , %RelationKey)
+        #SET(%RelShow       , SUB(%RelationKey      , INSTRING(':',%RelationKey,1,1) + 1      , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+        #SET(%RelFromId     , SUB(%FileKey          , INSTRING(':',%FileKey,1,1) + 1          , LEN(%FileKey)     - INSTRING(':',%FileKey,1,1)))
+        #SET(%RelToId       , SUB(%RelationKey      , INSTRING(':',%RelationKey,1,1) + 1      , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+        #SET(%RelFromList   ,'')
+        #SET(%RelToList     ,'')
+        #FOR(%FileKeyField)
+          #SET(%RelFromList , %RelFromList & SUB(%FileKeyField     , INSTRING(':',%FileKeyField,1,1) + 1     , LEN(%FileKeyField)     - INSTRING(':',%FileKeyField,1,1))     & ';')
+          #SET(%RelToList   , %RelToList   & SUB(%FileKeyFieldLink , INSTRING(':',%FileKeyFieldLink,1,1) + 1 , LEN(%FileKeyFieldLink) - INSTRING(':',%FileKeyFieldLink,1,1)) & ';')
+        #ENDFOR       
+      #ENDFOR
+      #!-----------------------------------------------------------------------------------------!
+      #! RA.2020.05.23.SAT: The plain GUID is on the left side. Consistency helps with patterns. !
+      #!-----------------------------------------------------------------------------------------!
+      #FOR(%RelSort)
+#!---- %[60]RelSort %@S30@(%RelFind) %@S30@(%RelShow) (%[60]RelRASQL)
+        #IF(%RelType='1:MANY') 
+-- %[05]NULL %[06]RelType %[0]NULL %[58]RelFromId %[0]NULL %[58]RelToId %[1]NULL [%[12]RelPrefix] %RelRASQL 
+-- %[13]NULL %[58]RelFromList %[0]NULL %[58]RelToList
+        #ELSE
+-- %[05]NULL %[06]RelType %[0]NULL %[58]RelToId %[0]NULL %[58]RelFromId %[1]NULL [%[12]RelPrefix] %RelRASQL 
+-- %[13]NULL %[58]RelToList %[0]NULL %[58]RelFromList
+        #ENDIF
+      #ENDFOR
+#!
+#!       #FOR(%Relation)
+#!         #IF(%FileRelationType='1:MANY')
+#!           #SET(%RelKeyFromID,SUB(%FileKey    , INSTRING(':',%FileKey,1,1) + 1     , LEN(%FileKey)     - INSTRING(':',%FileKey,1,1)))
+#!           #SET(%RelKeyToID  ,SUB(%RelationKey, INSTRING(':',%RelationKey,1,1) + 1 , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+#! -- %[05]NULL %[06]FileRelationType %[0]NULL %[67]RelKeyFromID %[0]NULL %[67]RelKeyToID %[0]NULL %RelationUserOptions 
+#! #!-- %[05]NULL %[06]FileRelationType %[0]NULL %[67]FileKey %[0]NULL %[67]RelationKey %[0]NULL %RelationUserOptions 
+#!           #SET(%RelFieldFromList,'')
+#!           #SET(%RelFieldToList,'')
+#!           #FOR(%FileKeyField)
+#!             #SET(%RelFieldFromList, SUB(%FileKeyField    , INSTRING(':',%FileKeyField,1,1) + 1     , LEN(%FileKeyField)     - INSTRING(':',%FileKeyField,1,1))     & ';')
+#!             #SET(%RelFieldToList  , SUB(%FileKeyFieldLink, INSTRING(':',%FileKeyFieldLink,1,1) + 1 , LEN(%FileKeyFieldLink) - INSTRING(':',%FileKeyFieldLink,1,1)) & ';')
+#! #!-- %[05]NULL %[30]FileKeyField %[0]NULL %[30]FileKeyFieldLink
+#!           #ENDFOR       
+#! -- %[13]NULL %[67]RelFieldFromList %[0]NULL %[67]RelFieldToList
+#!         #ENDIF 
+#!       #ENDFOR
+#!       #FOR(%Relation)
+#!         #IF(%FileRelationType='MANY:1')
+#!           #SET(%RelKeyFromID,SUB(%FileKey    , INSTRING(':',%FileKey,1,1) + 1     , LEN(%FileKey)     - INSTRING(':',%FileKey,1,1)))
+#!           #SET(%RelKeyToID  ,SUB(%RelationKey, INSTRING(':',%RelationKey,1,1) + 1 , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+#! -- %[05]NULL %[06]FileRelationType %[0]NULL %[67]RelKeyFromID %[0]NULL %[67]RelKeyToID %[0]NULL %RelationUserOptions 
+#! #!-- %[05]NULL %[06]FileRelationType %[0]NULL %[67]FileKey %[0]NULL %[67]RelationKey %[0]NULL %RelationUserOptions 
+#!           #SET(%RelFieldFromList,'')
+#!           #SET(%RelFieldToList,'')
+#!           #FOR(%FileKeyField)
+#!             #SET(%RelFieldFromList, SUB(%FileKeyField    , INSTRING(':',%FileKeyField,1,1) + 1     , LEN(%FileKeyField)     - INSTRING(':',%FileKeyField,1,1))     & ';')
+#!             #SET(%RelFieldToList  , SUB(%FileKeyFieldLink, INSTRING(':',%FileKeyFieldLink,1,1) + 1 , LEN(%FileKeyFieldLink) - INSTRING(':',%FileKeyFieldLink,1,1)) & ';')
+#! #!-- %[05]NULL %[30]FileKeyField %[0]NULL %[30]FileKeyFieldLink
+#!           #ENDFOR       
+#! -- %[13]NULL %[67]RelFieldFromList %[0]NULL %[67]RelFieldToList
+#!         #ENDIF 
+#!       #ENDFOR
+#!
     #ENDIF
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
