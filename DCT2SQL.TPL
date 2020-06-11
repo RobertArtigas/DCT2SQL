@@ -153,6 +153,7 @@
 #INCLUDE('D2M2_003.TPW')            #! 40) Variable related #GROUP's            INTERNAL CODE (Roberto Artigas y Soler)
 #INCLUDE('D2M2_011.TPW')            #! 41) Do TRIGGER generation                INTERNAL CODE (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL003.TPW')         #! 42) [UTIL] FILE related AUDIT            verify [UTIL] (Roberto Artigas y Soler)
+#INCLUDE('D2M2_012.TPW')            #! 43) Do QUOTING generation                INTERNAL CODE (Roberto Artigas y Soler)
 #!
 #INCLUDE('D2M1_POSTGRESQL.TPW')     #! ??) DCT -> [COMBINED] POSTGRESQL         generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MYSQL.TPW')          #! ??) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)

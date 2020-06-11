@@ -7,10 +7,14 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
-#! 2019.07.26:  Roberto Artigas
+#! 2020.06.11           Roberto Artigas
+#!  *   Handle quoting for names. Added them to the EXTERNAL routines.
+#! 2019.08.10:          Roberto Artigas         (Conversation with Mr. Bruce Johnson) 
+#!  *   External name changes need to be handled (time stamp and GUID processing)
+#! 2019.07.26:          Roberto Artigas
 #!  *   Separated self contained #GROUPs to their own source file.
 #!      Re-worked the OPTIONS declarions due to the AUDIT untilities.
-#! 2017.09.29   Roberto Artigas
+#! 2017.09.29           Roberto Artigas
 #!  *   Creation of this generic structured template
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -245,6 +249,8 @@ GO
   #ENDCASE                                                                      #! BACKEND EXCEPTIONS
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #! RA.2018.04.26: Processing the options in one place for consistency.
 #! This might be used when doing a really large dictionary where the
 #! tables are distributed accross many backends, databases, owners, etc.
@@ -252,6 +258,8 @@ GO
 #! RA.2018.04.25: Setup the TRUE file name for the DDL script.
 #! RA.2018.04.25: Setup in the create table. Got to add it everywhere
 #! that %TheTable is used to process a file loop. Many uses for this.
+#!---------------------------------------------------------------------
+#! The FOURTH option is the EXTERNAL name. This might get implemented in the future.
 #!---------------------------------------------------------------------
 #! %SetupTheTable             = #GROUP name
 #! *%pTheTable                = Return the table name to use
@@ -348,6 +356,8 @@ GO
 #! a pipe symbol ( | ) and then everything after the pipe is not part of the name. For example | Readonly and 
 #! | Binary etc. Although these are sometimes used to modify the type used by the CREATE statement.
 #!---------------------------------------------------------------------
+#! The FOURTH option is the EXTERNAL name. This might get implemented in the future.
+#!---------------------------------------------------------------------
 #GROUP(%SetupTheField,*%pTheField,%pBaseName,%pFieldID,%pFieldName)
 #!---------------------------------------------------------------------
 #IF(NOT VAREXISTS(%ExtFieldName))
@@ -382,7 +392,12 @@ GO
   #ENDIF
 #ENDIF
 #!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #! RA.2019.08.10: External name changes need to be handled (time stamp and GUID processing)
+#!---------------------------------------------------------------------
+#! The FOURTH option is the EXTERNAL name. This might get implemented in the future.
 #!---------------------------------------------------------------------
 #GROUP(%SetupTheKey,*%pTheKey,%pBaseName,%pKeyID,%pKeyName)
 #!---------------------------------------------------------------------
@@ -402,6 +417,35 @@ GO
   #IF(%TraceDetail)
 ---- [%%SetupTheKey], pBaseName = "%pBaseName", pKeyID = "%pKeyID", ExtKeyName = "%ExtKeyName", pKeyName = "%pKeyName"
 ---- pTheKey = "%pTheKey" 
+  #ENDIF
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2019.08.10: External name changes need to be handled (time stamp and GUID processing)
+#! NOTE: This is a place holder. Clarion does not have any external name for the relationships.
+#!---------------------------------------------------------------------
+#! The FOURTH option is the EXTERNAL name. This might get implemented in the future.
+#!---------------------------------------------------------------------
+#GROUP(%SetupTheRelation,*%pTheRela,%pBaseName,%pRelaID,%pRelaName)
+#!---------------------------------------------------------------------
+#IF(NOT VAREXISTS(%ExtRelaName))
+  #DECLARE(%ExtRelaName)
+#ENDIF
+#SET(%ExtRelaName,%pRelaName)
+#CALL(%ReplaceSubString,%ExtRelaName,'''','')
+#! RA.2019.08.10: Handle the vertical BAR and extra parameters BEFORE comparison.
+  #IF(%TraceDetail)
+---- [%%SetupTheRelation], pBaseName = "%pBaseName", pRelaID = "%pRelaID", ExtRelaName = "%ExtRelaName", pRelaName = "%pRelaName"
+  #ENDIF
+#IF   (%ExtRelaName =  '')
+#ELSIF(%ExtRelaName =  %pRelaID)
+#ELSIF(%ExtRelaName <> %pRelaID)
+  #SET(%pTheRela,%ExtRelaName)    
+  #IF(%TraceDetail)
+---- [%%SetupTheRelation], pBaseName = "%pBaseName", pRelaID = "%pRelaID", ExtRelaName = "%ExtRelaName", pRelaName = "%pRelaName"
+---- pTheRela = "%pTheRela" 
   #ENDIF
 #ENDIF
 #!---------------------------------------------------------------------

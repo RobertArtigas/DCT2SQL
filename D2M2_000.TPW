@@ -7,23 +7,29 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
-#! 2019.07.25:  Roberto Artigas
+#! 2020.06.11.WED:        Roberto Artigas
+#!  *   Let's add quoting. Need to deal with Postgres "MixedCase" names.
+#! 2020.05.25.MON:        Roberto Artigas     (Mr. John Hickey found bug.)         
+#!  *   Correct missed external options for some items.
+#! 2019.07.25:            Roberto Artigas
 #!  *   Moved some code into other source files.
-#! 2019.07.19:  Roberto Artigas
+#! 2019.07.19:            Roberto Artigas
 #!  *   Added basic GUID/UUID create table generation setup options. Not much else.
-#! 2019.07.04:  Roberto Artigas
+#! 2019.07.04:            Roberto Artigas
 #!  *   Added option to select files to do SQL generation.
-#! 2018.11.09   Roberto Artigas 
+#! 2018.11.09             Roberto Artigas 
 #!  *   No AUTO-INCREMENT flag found (And you need to generate a ROW level AUTO-INCREMENT)
-#! 2018.04.07   Roberto Artigas
+#!      Problem created by Mr. Michael Gorman. Changed how he does things with no warning.
+#!      Lucky: There is enough information available to ---guess--- this needs to happen.
+#! 2018.04.07             Roberto Artigas
 #!  *   The backend being generated for is now passed as a parameter.
-#! 2018.03.15   Roberto Artigas
+#! 2018.03.15             Roberto Artigas
 #!  *   Metabase and Mimer templates use WinSQL to process DDL statements.
 #!      This means the semi-colons at the end get replaced with GO.
 #!  *   Seems that WinSQL has a problem with comments being submitted
 #!      by themselves and then reaching the end of a DDL script.
 #!      You get a syntax error that has nothing to do with anything.
-#! 2017.09.29   Roberto Artigas
+#! 2017.09.29             Roberto Artigas
 #!  *   Creation of this generic structured template
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -357,6 +363,7 @@
   #BOXED('Tables, Fields, Sequences, Indexes, Relations'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
     #PROMPT('Add "_" to the end of reserved SQL words? (ON=Add "_". OFF=Do not add "_".)',CHECK),%optUnderReservedWords,AT(10)
+    #PROMPT('Add "quotes" around SQL names? (ON=Add quotes. OFF=Do not add quotes.)',CHECK),%optQuoteAllThings,AT(10)
   #ENDBOXED
   #BOXED('Odd and Ends Options'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
@@ -1193,6 +1200,7 @@
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #! RA.2018.04.19: Is it a valid backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -1243,6 +1251,7 @@ DROP TABLE %TheTable
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NKeyPrimaryValidSeq)
     #! RA.2018.04.19: Is it a valid backend
@@ -1329,6 +1338,7 @@ ALTER TABLE %TheTable
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NKeyPrimaryValidSeq)
     #! RA.2018.04.19: Is it a VALID backend?
@@ -1390,6 +1400,7 @@ DROP SEQUENCE %NFilesSeqName CASCADE
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NFilesPKeyName)
     #! RA.2018.04.19: Is it a valid backend?
@@ -1438,6 +1449,7 @@ ALTER TABLE %TheTable
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NFilesPKeyName)
     #! RA.2018.04.19: Is is a valid backend?
@@ -1549,6 +1561,7 @@ ALTER TABLE %TheTable
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1573,8 +1586,9 @@ CREATE UNIQUE INDEX %TheKey
         #SET(%NKeyFieldAD, '(')
         #FOR(%KeyField)
           #FIX(%Field,%KeyField)
-          #SET(%NKeyFieldID,%FieldID)                                                   #! RA.2020.05.22.FRI: ERROR reported by John Hickey
-          #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)             #! RA.2020.05.22.FRI: Handle EXTERNAL name
+          #SET(%NKeyFieldID,%FieldID)                                                         #! RA.2020.05.22.FRI: ERROR reported by John Hickey
+          #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)                   #! RA.2020.05.22.FRI: Handle EXTERNAL name
+          #CALL(%QuoteThisThing,%NKeyFieldID,%NKeyFieldID,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
           #CALL(%PadToLength,%NKeyFieldID,90)
           #CALL(%GiveMeSortOrder,%NKeySortOrder,%KeyFieldSequence)
           #!SET(%NKeyFieldAD, %NKeyFieldAD & %NKeyFieldID & ' ' & %KeyFieldSequence)
@@ -1624,6 +1638,7 @@ CREATE UNIQUE INDEX %TheKey
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                           #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1688,6 +1703,7 @@ DROP INDEX %TheKey
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1713,7 +1729,8 @@ CREATE INDEX %TheKey
         #FOR(%KeyField)
           #FIX(%Field,%KeyField)
           #SET(%NKeyFieldID,%FieldID)
-          #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)     #! RA.2019.08.10: Handle EXTERNAL name
+          #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)                   #! RA.2019.08.10: Handle EXTERNAL name
+          #CALL(%QuoteThisThing,%NKeyFieldID,%NKeyFieldID,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
           #CALL(%PadToLength,%NKeyFieldID,90)
           #CALL(%GiveMeSortOrder,%NKeySortOrder,%KeyFieldSequence)
           #!SET(%NKeyFieldAD, %NKeyFieldAD & %NKeyFieldID & ' ' & %KeyFieldSequence)
@@ -1763,6 +1780,7 @@ CREATE INDEX %TheKey
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1828,6 +1846,7 @@ DROP INDEX %TheKey
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NRelaFound)
       #! RA.2018.04.19: Is this a VALID backend?
@@ -1873,6 +1892,7 @@ DROP INDEX %TheKey
 #! RA.2018.06.03.SUN: This is a simple fix. No combinatorial changes OR extreme exceptions considered.
 #! RA.2018.06.03.SUN: ALTER TABLE %NRelasFileLink to ALTER TABLE %TheTable2
 #CALL(%SetupTheTable,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NRelasFileLink,%optNameOwnerUse,%NameOwner,%NameDatabase)
+#CALL(%QuoteThisThing,%TheTable2,%TheTable2,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
 ALTER TABLE %TheTable2
       #!ADD CONSTRAINT FROM_%NRelasFileFrom_TO_%NRelasKeyLink
@@ -1927,6 +1947,7 @@ ALTER TABLE %TheTable2
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #IF(%NRelaFound)
     #! RA.2018.04.19: Is it a valid backend?
@@ -1961,6 +1982,7 @@ ALTER TABLE %TheTable2
 #! RA.2018.06.03.SUN: Change FROM_%TheTable (Could have <schema>.<tablename> format) to FROM_%NRelasFileFrom
 #! RA.2018.03.17.SAT: (TESTING) Per Mr. Michael Gorman - Changed the order.
 #CALL(%SetupTheTable,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NRelasFileLink,%optNameOwnerUse,%NameOwner,%NameDatabase)
+#CALL(%QuoteThisThing,%TheTable2,%TheTable2,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
 #!ALTER TABLE %NRelasFileLink
 ALTER TABLE %TheTable2
@@ -2020,6 +2042,7 @@ ALTER TABLE %TheTable2
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #! RA.2018.04.09: Is it a VALID backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -2058,6 +2081,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #!CALL(%ReserveWordReplace,%TheTable)
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!
   #! RA.2018.04.19: Is it a VALID backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -2173,6 +2197,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #SET(%NFieldsKey        ,%Field)                                              #! Prefix:FieldName
   #SET(%NFieldsName       ,%FieldID)                                            #! FieldName
   #CALL(%SetupTheField,%NFieldsName,%pBaseName,%FieldID,%FieldName)             #! RA.2019.08.10: Handle EXTERNAL name
+  #CALL(%QuoteThisThing,%NFieldsName,%NFieldsName,%pBaseName,%optQuoteAllThings)#! RA.2020.06.11: Add quotes
   #SET(%NFieldsType       ,%FieldType)
   #SET(%NFieldsFormat     ,UPPER(%FieldDisplayPicture))
   #SET(%NFieldsOpts       ,%FieldUserOptions)                                   #! RA.2019.04.30.TUE
@@ -3430,6 +3455,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
   #SET(%FieldComma, ITEMS(%AFields) - 1)                                        #! How many commas do I need?
 #!
 CREATE TABLE %TheTable (
@@ -3520,13 +3546,15 @@ CREATE TABLE %TheTable (
       #!---------------------------------------------------------------------------------------------------!
       #! RA.2017.12.23: There can only be one primary key with only ane integer field
       #!                for a sequence to be valid. Otherwise, NOT a valid sequence.
-      #IF(ITEMS(%KeyField)=1)                                                   #! [?=1]
-        #SET(%NFilesPKeyName,%KeyID)                #! [Table Primary Key Name] #! RA.2020.05.25.MON: ERROR reported by John Hickey 
-        #CALL(%SetupTheKey,%NFilesPKeyName,%BaseName,%KeyID,%KeyName)           #! RA.2020.05.25.MON: Handle EXTERNAL key name
-        #FOR(%KeyField)                                                         #! Beginning FOR(%KeyField)
+      #IF(ITEMS(%KeyField)=1)                                                                         #! [?=1]
+        #SET(%NFilesPKeyName,%KeyID)                                      #! [Table Primary Key Name] #! RA.2020.05.25.MON: ERROR reported by John Hickey 
+        #CALL(%SetupTheKey,%NFilesPKeyName,%BaseName,%KeyID,%KeyName)                                 #! RA.2020.05.25.MON: Handle EXTERNAL key name
+        #CALL(%QuoteThisThing,%NFilesPKeyName,%NFilesPKeyName,%BaseName,%optQuoteAllThings)           #! RA.2020.06.11: Add quotes
+        #FOR(%KeyField)                                                                               #! Beginning FOR(%KeyField)
           #FIX(%Field,%KeyField)
-          #SET(%NFilesPKeyField,%FieldID)                                       #! Table Primary Field Name
-          #CALL(%SetupTheField,%NFilesPKeyField,%BaseName,%FieldID,%FieldName)  #! RA.2020.05.26.MON: Handle EXTERNAL name
+          #SET(%NFilesPKeyField,%FieldID)                                                             #! Table Primary Field Name
+          #CALL(%SetupTheField,%NFilesPKeyField,%BaseName,%FieldID,%FieldName)                        #! RA.2020.05.26.MON: Handle EXTERNAL name
+          #CALL(%QuoteThisThing,%NFilesPKeyField,%NFilesPKeyField,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #!----??? Key="%Key", KeyField="%KeyField", FieldType="%FieldType"
           #! RA.2018.04.29: Build up the PRIMARY KEY field table (needed for the NOT-NULL logic).
           #ADD(%NFieldsPRIMARY,%KeyField)
@@ -3626,6 +3654,7 @@ CREATE TABLE %TheTable (
     #SET(%NKeysKey            , %Key)                                           #! Key Prefix:Name
     #SET(%NKeysName           , %KeyID)                                         #! Key Name
     #CALL(%SetupTheKey,%NKeysName,%BaseName,%KeyID,%KeyName)                    #! RA.2019.08.10: Handle External Key Name
+    #CALL(%QuoteThisThing,%NKeysName,%NKeysName,%BaseName,%optQuoteAllThings)   #! RA.2020.06.11: Add quotes
     #SET(%NKeysType           , %KeyIndex)                                      #! Key Type
     #SET(%NKeysFlagPri        , 'N')                                            #! Key is: Primary
     #SET(%NKeysFlagSeq        , 'N')                                            #! Key is: Sequence
@@ -3699,47 +3728,56 @@ CREATE TABLE %TheTable (
 #CASE(%NKeyFieldIndex)
 #OF(1)
   #SET(%NKeysField01, %FieldID)
-  #CALL(%SetupTheField,%NKeysField01,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField01,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField01,%NKeysField01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort01, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort01, %NKeysSort01)
 #OF(2)
   #SET(%NKeysField02, %FieldID)
-  #CALL(%SetupTheField,%NKeysField02,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField02,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField02,%NKeysField02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort02, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort02, %NKeysSort02)
 #OF(3)
   #SET(%NKeysField03, %FieldID)
-  #CALL(%SetupTheField,%NKeysField03,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField03,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField03,%NKeysField03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort03, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort03, %NKeysSort03)
 #OF(4)
   #SET(%NKeysField04, %FieldID)
-  #CALL(%SetupTheField,%NKeysField04,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField04,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField04,%NKeysField04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort04, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort04, %NKeysSort04)
 #OF(5)
   #SET(%NKeysField05, %FieldID)
-  #CALL(%SetupTheField,%NKeysField05,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField05,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField05,%NKeysField05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort05, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort05, %NKeysSort05)
 #OF(6)
   #SET(%NKeysField06, %FieldID)
-  #CALL(%SetupTheField,%NKeysField06,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField06,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField06,%NKeysField06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort06, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort06, %NKeysSort06)
 #OF(7)
   #SET(%NKeysField07, %FieldID)
-  #CALL(%SetupTheField,%NKeysField07,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField07,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField07,%NKeysField07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort07, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort07, %NKeysSort07)
 #OF(8)
   #SET(%NKeysField08, %FieldID)
-  #CALL(%SetupTheField,%NKeysField08,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField08,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField08,%NKeysField08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort08, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort08, %NKeysSort08)
 #OF(9)
   #SET(%NKeysField09, %FieldID)
-  #CALL(%SetupTheField,%NKeysField09,%BaseName,%FieldID,%FieldName)            #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%SetupTheField,%NKeysField09,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
+  #CALL(%QuoteThisThing,%NKeysField09,%NKeysField09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
   #SET(%NKeysSort09, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort09, %NKeysSort09)
 #ENDCASE
@@ -3785,25 +3823,29 @@ CREATE TABLE %TheTable (
       #CYCLE
     #ENDIF
     #SET(%NRelaFound, %TRUE)
-    #ADD(%NRelas              , ITEMS(%NRelas) + 1)                             #! This RELATION is processed
-    #SET(%NRelasCount         , ITEMS(%NRelas))                                 #! Relation ID number
-    #SET(%NRelasFileFromKey   , %FilePrefix & ':' & %NFilesName)                #! File From: Prefix:Name
-    #SET(%NRelasFileLinkKey   , %RelationPrefix & ':' & %Relation)              #! File Link: Prefix:Name
-    #SET(%NRelasKeyFromKey    , %FileKey)                                       #!  Key From: Prefix:Name
-    #SET(%NRelasKeyLinkKey    , %RelationKey)                                   #!  Key Link: Prefix:Name
-    #SET(%NRelasType          , %FileRelationType)                              #! Relation Type
-    #SET(%NRelasFileFrom      , %NFilesName)                                    #! File From: Main from
-    #SET(%NRelasFileLink      , %Relation)                                      #! File Link: Relate To
-    #SET(%NRelasKeyFrom       , %FileKey)                                       #!  Key From: Main from
-    #CALL(%RemovePrefix,':',%NRelasKeyFrom)                                     #! Remove the FROM prefix
-    #SET(%NRelasKeyLink       , %RelationKey)                                   #!  Key Link: Relate To
-    #CALL(%RemovePrefix,':',%NRelasKeyLink)                                     #! Remove the LINK prefix
-    #!SET(%NRelasOnUpdate      , %RelationConstraintUpdate)                     #! ON UPDATE: What to do?
-    #!SET(%NRelasOnDelete      , %RelationConstraintDelete)                     #! ON DELETE: What to do?
-    #!CALL(%GiveMeRestrict, %NRelasOnUpdate, %RelationConstraintUpdate)         #! ON UPDATE: What to do?
-    #!CALL(%GiveMeRestrict, %NRelasOnDelete, %RelationConstraintDelete)         #! ON DELETE: What to do?
-    #CALL(%GiveMeRestrict, %NRelasOnUpdate, %RelationConstraintUpdate ,%pBaseName)  #! RA.2018.06.03: Changes
-    #CALL(%GiveMeRestrict, %NRelasOnDelete, %RelationConstraintDelete ,%pBaseName)  #! RA.2018.06.03: Changes
+    #ADD(%NRelas              , ITEMS(%NRelas) + 1)                                           #! This RELATION is processed
+    #SET(%NRelasCount         , ITEMS(%NRelas))                                               #! Relation ID number
+    #SET(%NRelasFileFromKey   , %FilePrefix & ':' & %NFilesName)                              #! File From: Prefix:Name
+    #SET(%NRelasFileLinkKey   , %RelationPrefix & ':' & %Relation)                            #! File Link: Prefix:Name
+    #SET(%NRelasKeyFromKey    , %FileKey)                                                     #!  Key From: Prefix:Name
+    #SET(%NRelasKeyLinkKey    , %RelationKey)                                                 #!  Key Link: Prefix:Name
+    #SET(%NRelasType          , %FileRelationType)                                            #! Relation Type
+    #SET(%NRelasFileFrom      , %NFilesName)                                                  #! File From: Main from
+    #SET(%NRelasFileLink      , %Relation)                                                    #! File Link: Relate To
+    #!
+    #SET(%NRelasKeyFrom       , %FileKey)                                                     #!  Key From: Main from
+    #CALL(%RemovePrefix,':',%NRelasKeyFrom)                                                   #! Remove the FROM prefix
+    #CALL(%QuoteThisThing,%NRelasKeyFrom,%NRelasKeyFrom,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes
+    #SET(%NRelasKeyLink       , %RelationKey)                                                 #!  Key Link: Relate To
+    #CALL(%RemovePrefix,':',%NRelasKeyLink)                                                   #! Remove the LINK prefix
+    #CALL(%QuoteThisThing,%NRelasKeyLink,%NRelasKeyLink,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes
+    #!
+    #!SET(%NRelasOnUpdate      , %RelationConstraintUpdate)                                   #! ON UPDATE: What to do?
+    #!SET(%NRelasOnDelete      , %RelationConstraintDelete)                                   #! ON DELETE: What to do?
+    #!CALL(%GiveMeRestrict, %NRelasOnUpdate, %RelationConstraintUpdate)                       #! ON UPDATE: What to do?
+    #!CALL(%GiveMeRestrict, %NRelasOnDelete, %RelationConstraintDelete)                       #! ON DELETE: What to do?
+    #CALL(%GiveMeRestrict, %NRelasOnUpdate, %RelationConstraintUpdate ,%pBaseName)            #! RA.2018.06.03: Changes
+    #CALL(%GiveMeRestrict, %NRelasOnDelete, %RelationConstraintDelete ,%pBaseName)            #! RA.2018.06.03: Changes
 #!--01 %[3]NRelasCount, %NRelasFileFromKey, %NRelasType, %NRelasFileLinkKey
 #!--01 %[3]NRelasCount, %NRelasKeyFromKey,  %NRelasType, %NRelasKeyLinkKey
 #!--01 %[3]NRelasCount, FROM: %[90]NRelasFileFrom, %NRelasKeyFrom
@@ -3906,6 +3948,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel01, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel01)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel01,%NRelasKFlabel01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel01,%NRelasKLlabel01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ''  & %NRelasKFlabel01)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ''  & %NRelasKLlabel01)
 #OF(2)
@@ -3916,6 +3961,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel02, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel02)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel02,%NRelasKFlabel02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel02,%NRelasKLlabel02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel02)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel02)
 #OF(3)
@@ -3926,6 +3974,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel03, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel03)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel03,%NRelasKFlabel03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel03,%NRelasKLlabel03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel03)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel03)
 #OF(4)
@@ -3936,6 +3987,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel04, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel04)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel04,%NRelasKFlabel04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel04,%NRelasKLlabel04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel04)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel04)
 #OF(5)
@@ -3946,6 +4000,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel05, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel05)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel05,%NRelasKFlabel05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel05,%NRelasKLlabel05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel05)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel05)
 #OF(6)
@@ -3956,6 +4013,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel06, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel06)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel06,%NRelasKFlabel06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel06,%NRelasKLlabel06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel06)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel06)
 #OF(7)
@@ -3966,6 +4026,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel07, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel07)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel07,%NRelasKFlabel07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel07,%NRelasKLlabel07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel07)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel07)
 #OF(8)
@@ -3976,6 +4039,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel08, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel08)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel08,%NRelasKFlabel08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel08,%NRelasKLlabel08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel08)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel08)
 #OF(9)
@@ -3986,6 +4052,9 @@ CREATE TABLE %TheTable (
   #SET(%NRelasKLlabel09, %FileKeyFieldLink)
   #CALL(%RemovePrefix,':',%NRelasKLlabel09)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
+  #CALL(%QuoteThisThing,%NRelasKFlabel09,%NRelasKFlabel09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%NRelasKLlabel09,%NRelasKLlabel09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel09)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel09)
 #ENDCASE

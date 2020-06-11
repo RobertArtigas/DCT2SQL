@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.06.11.THU:    Roberto Artigas
+#!  *  QUOTE option [???]
 #! 2020.04.22.WED:    Roberto Artigas
 #!  *  IF deleted table record, THEN update the Server and Delete time stamps.
 #! 2019.11.20         Roberto Artigas
@@ -28,6 +30,16 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%VariablesCreate011)
+#PREPARE
+#IF(NOT VAREXISTS(%TheTableTrigger))                                            #! RA.2020.06.11.THU: Add quotes
+  #DECLARE(%TheTableTrigger)
+#ENDIF
+#IF(NOT VAREXISTS(%TheTriggerBefore))                                           #! RA.2020.06.11.THU: Add quotes
+  #DECLARE(%TheTriggerBefore)
+#ENDIF
+#IF(NOT VAREXISTS(%TheTriggerAfter))                                            #! RA.2020.06.11.THU: Add quotes
+  #DECLARE(%TheTriggerAfter)
+#ENDIF
 #IF(NOT VAREXISTS(%NextLine))
   #DECLARE(%NextLine)
 #ENDIF
@@ -43,6 +55,7 @@
 #IF(NOT VAREXISTS(%DeletedTimeStamp))
   #DECLARE(%DeletedTimeStamp)
 #ENDIF
+#ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%MetabaseTriggerCreateGenerate                       ,%pBaseName)        #! TRIGGER create generate
@@ -60,6 +73,14 @@
   #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #!SET(%TheTableTrigger , %TheTable & '_Trigger')                                              #! RA.2020.06.11: Add quotes
+  #SET(%TheTableTrigger , %TheTable & '_trigger')                                               #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)                      #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTableTrigger,%TheTableTrigger,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #SET(%TheTriggerBefore, 'trigger_before_' & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #SET(%TheTriggerAfter , 'trigger_after_'  & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTriggerBefore,%TheTriggerBefore,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes  
+  #CALL(%QuoteThisThing,%TheTriggerAfter,%TheTriggerAfter,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
   #CASE(%pBaseName)
   #OF  ('POSTGRESQL')
 #INSERT(%PostgreSQLCreateTrigger)
@@ -89,6 +110,14 @@
   #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #!SET(%TheTableTrigger, %TheTable & '_Trigger')                                               #! RA.2020.06.11: Add quotes
+  #SET(%TheTableTrigger, %TheTable & '_trigger')                                                #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)                      #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTableTrigger,%TheTableTrigger,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #SET(%TheTriggerBefore, 'trigger_before_' & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #SET(%TheTriggerAfter , 'trigger_after_'  & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #CALL(%QuoteThisThing,%TheTriggerBefore,%TheTriggerBefore,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes  
+  #CALL(%QuoteThisThing,%TheTriggerAfter,%TheTriggerAfter,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
   #CASE(%pBaseName)
   #OF  ('POSTGRESQL')
 #INSERT(%PostgreSQLDropItTrigger)
@@ -105,7 +134,7 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%PostgreSQLCreateTrigger)
-CREATE OR REPLACE FUNCTION %TheTable_trigger()
+CREATE OR REPLACE FUNCTION %TheTableTrigger()
   RETURNS "trigger"
 AS $$
 BEGIN
@@ -122,6 +151,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
       #! RA.2019.08.01: Doing something at the console.
@@ -209,6 +239,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
         #!SET(%TimeStamp         , 'NEW.' & %FieldID)
@@ -278,6 +309,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
         #!SET(%NextLine, 'NEW.' & %FieldID)
@@ -306,6 +338,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
       #!!!
       #! RA.2020.04.22: 
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
@@ -361,25 +394,25 @@ END IF;
 END $$
 LANGUAGE plpgsql VOLATILE
 ;
-DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable;
-CREATE TRIGGER trigger_before_%NFilesName
+DROP TRIGGER IF EXISTS %TheTriggerBefore ON %TheTable;
+CREATE TRIGGER %TheTriggerBefore
   BEFORE INSERT OR UPDATE OR DELETE ON %TheTable
-  FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
+  FOR EACH ROW EXECUTE PROCEDURE %TheTableTrigger()
 ;
-DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable;
-CREATE TRIGGER trigger_after_%NFilesName
+DROP TRIGGER IF EXISTS %TheTriggerAfter ON %TheTable;
+CREATE TRIGGER %TheTriggerAfter
   AFTER INSERT OR UPDATE OR DELETE ON %TheTable
-  FOR EACH ROW EXECUTE PROCEDURE %TheTable_trigger()
+  FOR EACH ROW EXECUTE PROCEDURE %TheTableTrigger()
 ;
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%PostgreSQLDropItTrigger)
-DROP TRIGGER IF EXISTS trigger_before_%NFilesName ON %TheTable
+DROP TRIGGER IF EXISTS %TheTriggerBefore ON %TheTable
 ;
-DROP TRIGGER IF EXISTS trigger_after_%NFilesName ON %TheTable
+DROP TRIGGER IF EXISTS %TheTriggerAfter ON %TheTable
 ;
-DROP FUNCTION IF EXISTS %TheTable_trigger
+DROP FUNCTION IF EXISTS %TheTableTrigger
 ;
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------

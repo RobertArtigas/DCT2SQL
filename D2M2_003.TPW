@@ -54,6 +54,9 @@
 #GROUP(%VariablesDeclare)                                                       #! Option checks and output file names
 #PREPARE
 #!---------------------------------------------------------------------
+#DECLARE(%optQuoteAllThings               ,LONG)                                #! RA.2020.06.11: Use BACKEND quoting
+#SET(%optQuoteAllThings                   ,FALSE)
+#!---------------------------------------------------------------------
 #! RA.2019.07.04: Added option to select files to do SQL generation.
 #DECLARE(%optUseAllFiles                  ,LONG)                                #! RA.2019.07.04: Select all files
 #DECLARE(%optFileSelection),MULTI,UNIQUE                                        #! RA.2019.07.04: File selection
