@@ -1,0 +1,87 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_012.tpw
+#! Purpose:     METABASE: Additional functionality
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2020.06.11         Roberto Artigas
+#!  *   Creation of this generic structured template
+#!      Created new file, other files getting large again
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.06.11.THU: Tested to TWO (2) levels. Seems functional at that level.
+#! RA.2020.06.11.THU: Begin "quote" procedure. 
+#! Will need to double check all the left and right quoting constants. Some are known.
+#! NOTE: This DOES NOT deal with SQL environment settings. Options for: 'stuff',"stuff"
+#GROUP(%QuoteThisThing,*%VariableOut,%VariableIn,%pBaseName,%QuoteOption)
+#IF(NOT VAREXISTS(%QuoteLeft))
+  #DECLARE(%QuoteLeft)
+  #DECLARE(%QuoteRight)
+  #DECLARE(%QuoteNames)
+#ENDIF
+#!
+#CASE(%pBaseName)
+#OF  ('MSSQL')
+  #SET(%QuoteLeft , '[')
+  #SET(%QuoteRight, ']')
+#OF  ('POSTGRESQL')
+#OROF('SQLANYWHERE')
+#OROF('MYSQL')
+#OROF('ORACLE')
+#OROF('DB2')
+#OROF('METABASE')
+#OROF('MIMER')
+  #SET(%QuoteLeft , '"')
+  #SET(%QuoteRight, '"')
+#ENDCASE
+#!
+#SET(%VariableOut, %VariableIn)
+#!
+#IF(%QuoteOption)
+  #SET(%QuoteNames, %VariableIn)
+  #CALL(%QuotePieces,%QuoteNames,%QuoteNames,%QuoteLeft,%QuoteRight)
+  #SET(%VariableOut, %QuoteNames)
+#ENDIF
+#!---- [%%QuoteThisThing], %%VariableOut='%VariableOut', %%VariableIn='%VariableIn', %%pBaseName='%pBaseName', %%QuoteOption='%QuoteOption'
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%QuotePieces,*%pNamesOut,%pNamesIn,%pQuoteLeft,%pQuoteRight)
+#IF(NOT VAREXISTS(%HaveSep))
+  #DECLARE(%ThisVar)
+  #DECLARE(%ThisOut)
+  #DECLARE(%ThisLoc)
+  #DECLARE(%NextLoc)
+#ENDIF
+#!
+#SET(%pNamesOut, %pQuoteLeft & %pNamesIn & %pQuoteRight)
+#!
+#SET(%ThisVar, %pNamesIn)
+#SET(%ThisOut, '')
+#SET(%ThisLoc, 1)
+#SET(%NextLoc, INSTRING('.',%ThisVar,1,%ThisLoc))
+#IF(%NextLoc>0)
+  #LOOP,WHILE(%NextLoc>0)
+#!---- %%NextLoc=%NextLoc
+    #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, %ThisLoc + (%NextLoc-%ThisLoc) - 1) & %pQuoteRight) 
+    #SET(%ThisOut, %ThisOut & '.')
+    #SET(%ThisLoc, %NextLoc + 1)
+    #SET(%NextLoc, INSTRING('.',%ThisVar,1,%ThisLoc))
+    #IF(%NextLoc>0)
+      #!--------------------------------------------------------------------------------------------------------------!
+      #! RA.2020.06.11.WED: Preliminary testing done to two levels. Applicable to "schema"."tablename" functionality. !
+      #! Beyond the two levels. Not tested. Assume this algorithm will not work in your specific situation.           !
+      #!--------------------------------------------------------------------------------------------------------------!
+    #ELSE
+      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - 1) & %pQuoteRight)
+    #END
+  #END
+  #SET(%pNamesOut, %ThisOut)
+#END
+#!---- [%%QuotePieces], %%pNamesOut='%pNamesOut', %%pNamesIn='%pNamesIn', %%pQuoteLeft='%pQuoteLeft', %%pQuoteRight='%pQuoteRight'
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
