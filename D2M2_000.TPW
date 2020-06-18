@@ -3571,12 +3571,16 @@ CREATE TABLE %TheTable (
             #IF(%TraceDetail)
 #!---- IGNORED SEQUENCE: "%File-%Key-%KeyField-%FieldType" [Not a valid field type]
             #ENDIF
-          #ELSE                                                                 #! Valid sequence field type
-            #SET(%NKeyPrimaryValidSeq, 1)                                       #! Valid sequence, numeric only
-            #SET(%NFilesSeqField,%FieldID)                                      #! Field to DEFAULT to SEQUENCE
+          #ELSE                                                                                       #! Valid sequence field type
+            #SET(%NKeyPrimaryValidSeq, 1)                                                             #! Valid sequence, numeric only
+            #SET(%NFilesSeqField,%FieldID)                                                            #! Field to DEFAULT to SEQUENCE
+            #!------------------------------------------------------!
+            #! RA.2020.06.18.THU: Add quotes logic to the variable. !
+            #!------------------------------------------------------!
+            #CALL(%QuoteThisThing,%NFilesSeqField,%NFilesSeqField,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
           #ENDCASE
-        #ENDFOR                                                                 #! Ending FOR(%KeyField)
-      #ENDIF                                                                    #! [?=1]
+        #ENDFOR                                                                                       #! Ending FOR(%KeyField)
+      #ENDIF                                                                                          #! [?=1]
       #!
     #ENDIF
   #ENDFOR

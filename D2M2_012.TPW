@@ -83,10 +83,11 @@
       #SET(%NextLoc, INSTRING('.',%ThisVar,1,%ThisLoc))
     #ELSE
       #!------------------------------------------------------------------------------------------------------------!
+      #! RA.2020.06.18.THU: Correction to new calculation. Adding + 1 to the calculated range. Off by one error.    !
       #! This deals with the last piece [*.*.*.<last piece here>] which you have set up if you have no more pieces. !
       #!------------------------------------------------------------------------------------------------------------!
       #!SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - 1) & %pQuoteRight)
-      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - %ThisLoc - 0) & %pQuoteRight)
+      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - %ThisLoc + 1) & %pQuoteRight)
     #END
   #END
   #SET(%pNamesOut, %ThisOut)
