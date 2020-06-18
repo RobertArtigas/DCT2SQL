@@ -648,6 +648,9 @@
 #DECLARE(%NFiles),MULTI                       #!,UNIQUE
 #DECLARE(%NFilesCount             ,%NFiles)   #! ID: Table Count
 #DECLARE(%NFilesName              ,%NFiles)   #! Table Name
+#DECLARE(%NFilesDatabase          ,%NFiles)   #! Table Database                 #! RA.2020.06.18: (Earlier part of the name)
+#DECLARE(%NFilesOwner             ,%NFiles)   #! Table Owner                    #! RA.2020.06.18: (Prefix|Schema part of the name)
+#DECLARE(%NFilesSeqWhere          ,%NFiles)   #! Table Sequence Location        #! RA.2020.06.18: Sequence Location
 #DECLARE(%NFilesSeqName           ,%NFiles)   #! Table Sequence Name
 #DECLARE(%NFilesSeqField          ,%NFiles)   #! Table Sequence Field
 #DECLARE(%NFilesPKeyName          ,%NFiles)   #! Table Primary Key Name
@@ -920,21 +923,30 @@
   #!-------------------------------------------------------------!
   #! The first option RASQL(NO) controls if a file is processed. !
   #!-------------------------------------------------------------!
-  #IF(SUB(%NFileOpt1,1,1)='N')                                                  #! Ignore this file
+  #IF(SUB(%NFileOpt1,1,1)='N')                                                              #! Ignore this file
 ---- IGNORED: "%File" [FILE options say NO]
     #CYCLE
   #ENDIF
   #!---------------------------!
   #! We pass FILE requirements !
   #!---------------------------!
-  #!#ADD(%NFiles,%File)                                                         #! This FILE is processed
+  #!#ADD(%NFiles,%File)                                                                     #! This FILE is processed
   #! RA.2017.12.05 - Changes to track and output CSV files
-  #ADD(%NFiles,ITEMS(%NFiles) + 1)                                              #! This FILE is processed
-  #SET(%NFilesCount  , ITEMS(%NFiles))                                          #! Table ID number
-  #SET(%NFilesName   , %File)                                                   #! Table Name
-  #SET(%NFilesSeqName, %NFilesName & '_seq')                                    #! Table Sequence Name - RA.2017.12.21
+  #ADD(%NFiles,ITEMS(%NFiles) + 1)                                                          #! This FILE is processed
+  #SET(%NFilesCount  , ITEMS(%NFiles))                                                      #! Table ID number
+  #SET(%NFilesName   , %File)                                                               #! Table Name
 #!
-  #CALL(%HasOnePrimaryKey)                                                      #! At least ONE primary key
+  #!--------------------------------------------------------------------------------!
+  #! RA.2020.06.18: Sequences need to be in the same schema in which they are used. !
+  #!--------------------------------------------------------------------------------!
+  #SET (%NFilesDatabase, %NameDatabase)                                                     #! RA.2020.06.18: From TPL options
+  #SET (%NFilesOwner   , %NameOwner)                                                        #! RA.2020.06.18: From TPL options
+  #SET (%NFilesSeqName , %NFilesName & '_seq')                                              #! Table Sequence Name - RA.2017.12.21
+  #CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.18: Add quotes
+  #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
+  #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
+#!
+  #CALL(%HasOnePrimaryKey)                                                                  #! At least ONE primary key
 #!
 #ENDFOR
 #!
@@ -1027,16 +1039,26 @@
   #!---------------------------!
   #! We pass FILE requirements !
   #!---------------------------!
-  #!#ADD(%NFiles,%File)                                                         #! This FILE is processed
+  #!#ADD(%NFiles,%File)                                                                     #! This FILE is processed
   #! RA.2017.12.05 - Changes to track and output CSV files
-  #ADD(%NFiles,ITEMS(%NFiles) + 1)                                              #! This FILE is processed
-  #SET(%NFilesCount       ,ITEMS(%NFiles))                                      #! Table ID number
-  #SET(%NFilesName        ,%File)                                               #! Table Name
-  #SET(%NFilesSeqName     ,%NFilesName & '_seq')                                #! Table Sequence Name - RA.2017.12.21
-  #SET(%NFilesFullPath    ,%FileName)                                           #! Table Full Path Name - RA.2018.04.12
+  #ADD(%NFiles,ITEMS(%NFiles) + 1)                                                          #! This FILE is processed
+  #SET(%NFilesCount       ,ITEMS(%NFiles))                                                  #! Table ID number
+  #SET(%NFilesName        ,%File)                                                           #! Table Name
+#!
+  #!--------------------------------------------------------------------------------!
+  #! RA.2020.06.18: Sequences need to be in the same schema in which they are used. !
+  #!--------------------------------------------------------------------------------!
+  #SET (%NFilesDatabase, %NameDatabase)                                                     #! RA.2020.06.18: From TPL options
+  #SET (%NFilesOwner   , %NameOwner)                                                        #! RA.2020.06.18: From TPL options
+  #SET (%NFilesSeqName , %NFilesName & '_seq')                                              #! Table Sequence Name - RA.2017.12.21
+  #CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.18: Add quotes
+  #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
+  #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
+#!
+  #SET(%NFilesFullPath    ,%FileName)                                                       #! Table Full Path Name - RA.2018.04.12
   #CALL(%ReplaceSubString ,%NFilesFullPath ,'''','')
 #!
-  #CALL(%HasOnePrimaryKey)                                                      #! At least ONE primary key
+  #CALL(%HasOnePrimaryKey)                                                                  #! At least ONE primary key
 #!
 #! RA.2019.07.06: Additional GUID items to track per file
 #SET(%NFilesKeyCount      ,%NKeyCount)                                          #! RA.2019.07.06: Table Count Keys
@@ -1276,7 +1298,11 @@ CREATE SEQUENCE %NFilesSeqName INITIAL_VALUE = 1
 ---- IGNORE: [GENERATE SEQUENCE CREATE]
         #ENDIF
       #OF  ('POSTGRESQL')
-CREATE SEQUENCE %NFilesSeqName START WITH 1
+#!--------------------------------------------------------------------------------------!
+#! RA.2020.06.18.THU: Sequences need to be in the schema in which they need to be used. !
+#!--------------------------------------------------------------------------------------!
+#!CREATE SEQUENCE %NFilesSeqName START WITH 1
+CREATE SEQUENCE %NFilesSeqWhere START WITH 1                                    #! RA.2020.06.18.THU: Added
 #CALL(%TerminatorTerminates,%pBaseName)                                         #! RA.2018.06.07.THU: Added
       #OF  ('MYSQL')
       #OF  ('ORACLE')
@@ -1298,7 +1324,15 @@ ALTER TABLE %TheTable
       #!
       #OF  ('POSTGRESQL')
 ALTER TABLE %TheTable
+      #!---------------------------------------------------------------------------------------------!
+      #! RA.2020.06.18.THU: Sequences need to be in the schema in which they need to be used.        !
+      #! RA.2020.06.18.THU: Generate Changes: "MixedCase" ---and--- location of SEQUENCE definition. !
+      #!---------------------------------------------------------------------------------------------!
+      #IF(%optQuoteAllThings)                                                   #! RA.2020.06.18: Add quotes
+      ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL(%NFilesSeqName)          #! [???? NOT TESTED YET]
+      #ELSE
       ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqName')
+      #END
 #CALL(%TerminatorTerminates,%pBaseName)                                         #! RA.2018.06.07.THU: Added
       #OF  ('MYSQL')
       #OF  ('ORACLE')
@@ -1353,9 +1387,18 @@ ALTER TABLE %TheTable
     #OROF('DB2')
       #! RA.2018.04.19: Drop the SEQUENCE object
       #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
+#!====
+      #OF  ('POSTGRESQL')                                                       #! RA.2020.06.18.THU: Moved POSTGRESQL here
+#!--------------------------------------------------------------------------------------!
+#! RA.2020.06.18.THU: Sequences need to be in the schema in which they need to be used. !
+#!--------------------------------------------------------------------------------------!
+#!DROP SEQUENCE %NFilesSeqName CASCADE
+DROP SEQUENCE %NFilesSeqWhere CASCADE
+#CALL(%TerminatorTerminates,%pBaseName)                                         #! RA.2018.04.21.SAT: Refactor code
+#!====
       #OF  ('METABASE')
       #OROF('MIMER')
-      #OROF('POSTGRESQL')
+      #!OROF('POSTGRESQL')                                                      #! RA.2020.06.18.THU: Moved POSTGRESQL up there
       #OROF('MYSQL')
       #OROF('ORACLE')
       #OROF('DB2')
