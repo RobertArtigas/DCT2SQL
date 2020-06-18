@@ -1329,7 +1329,7 @@ ALTER TABLE %TheTable
       #! RA.2020.06.18.THU: Generate Changes: "MixedCase" ---and--- location of SEQUENCE definition. !
       #!---------------------------------------------------------------------------------------------!
       #IF(%optQuoteAllThings)                                                   #! RA.2020.06.18: Add quotes
-      ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL(%NFilesSeqName)          #! [???? NOT TESTED YET]
+      ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqWhere')       #! RA.2020.06.18: Where is this.
       #ELSE
       ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqName')
       #END
