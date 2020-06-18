@@ -12,7 +12,8 @@
 #!      Created new file, other files getting large again
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#! RA.2020.06.11.THU: Tested to TWO (2) levels. Seems functional at that level.
+#! RA.2020.06.13.SAT: Additional comments added. I might need to come back to this code.
+#! RA.2020.06.11.THU: Tested to TWO (2) levels. Seems functional at that level. Tested.
 #! RA.2020.06.11.THU: Begin "quote" procedure. 
 #! Will need to double check all the left and right quoting constants. Some are known.
 #! NOTE: This DOES NOT deal with SQL environment settings. Options for: 'stuff',"stuff"
@@ -70,12 +71,22 @@
     #SET(%ThisLoc, %NextLoc + 1)
     #SET(%NextLoc, INSTRING('.',%ThisVar,1,%ThisLoc))
     #IF(%NextLoc>0)
-      #!--------------------------------------------------------------------------------------------------------------!
-      #! RA.2020.06.11.WED: Preliminary testing done to two levels. Applicable to "schema"."tablename" functionality. !
-      #! Beyond the two levels. Not tested. Assume this algorithm will not work in your specific situation.           !
-      #!--------------------------------------------------------------------------------------------------------------!
+      #!-------------------------------------------------------------------------------------------------------------------!
+      #! RA.2020.06.18.THU: Added the aditional code. No current context to test. Have to come back to code later.         !
+      #! RA.2020.06.11.WED: Preliminary testing done to two levels. Applicable to "schema"."tablename" functionality.      !
+      #! Beyond the two levels. Not tested. Assume this algorithm will not work in your specific situation. -----TEST----- !
+      #! And YOU WILL need additional code HERE to parse the NEXT in between quoted piece of the variable. See above code. !
+      #!-------------------------------------------------------------------------------------------------------------------!
+      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, %ThisLoc + (%NextLoc-%ThisLoc) - 1) & %pQuoteRight) 
+      #SET(%ThisOut, %ThisOut & '.')
+      #SET(%ThisLoc, %NextLoc + 1)
+      #SET(%NextLoc, INSTRING('.',%ThisVar,1,%ThisLoc))
     #ELSE
-      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - 1) & %pQuoteRight)
+      #!------------------------------------------------------------------------------------------------------------!
+      #! This deals with the last piece [*.*.*.<last piece here>] which you have set up if you have no more pieces. !
+      #!------------------------------------------------------------------------------------------------------------!
+      #!SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - 1) & %pQuoteRight)
+      #SET(%ThisOut, %ThisOut & %pQuoteLeft & SUB(%pNamesIn, %ThisLoc, LEN(%pNamesIn) - %ThisLoc - 0) & %pQuoteRight)
     #END
   #END
   #SET(%pNamesOut, %ThisOut)

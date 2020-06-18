@@ -8,9 +8,9 @@
 #!              All rights reserved world wide.
 #! Changes:
 #! 2020.06.11.THU:    Roberto Artigas
-#!  *  QUOTE option [???]
+#!  *   QUOTE option implemented [tested and goes thru without errors on postgres]
 #! 2020.04.22.WED:    Roberto Artigas
-#!  *  IF deleted table record, THEN update the Server and Delete time stamps.
+#!  *   IF deleted table record, THEN update the Server and Delete time stamps.
 #! 2019.11.20         Roberto Artigas
 #!  *   Added the EncryptionVersion logic to the template.
 #! 2019.08.15:        Roberto Artigas
@@ -31,13 +31,13 @@
 #!---------------------------------------------------------------------
 #GROUP(%VariablesCreate011)
 #PREPARE
-#IF(NOT VAREXISTS(%TheTableTrigger))                                            #! RA.2020.06.11.THU: Add quotes
+#IF(NOT VAREXISTS(%TheTableTrigger))                                                            #! RA.2020.06.11.THU: Add quotes
   #DECLARE(%TheTableTrigger)
 #ENDIF
-#IF(NOT VAREXISTS(%TheTriggerBefore))                                           #! RA.2020.06.11.THU: Add quotes
+#IF(NOT VAREXISTS(%TheTriggerBefore))                                                           #! RA.2020.06.11.THU: Add quotes
   #DECLARE(%TheTriggerBefore)
 #ENDIF
-#IF(NOT VAREXISTS(%TheTriggerAfter))                                            #! RA.2020.06.11.THU: Add quotes
+#IF(NOT VAREXISTS(%TheTriggerAfter))                                                            #! RA.2020.06.11.THU: Add quotes
   #DECLARE(%TheTriggerAfter)
 #ENDIF
 #IF(NOT VAREXISTS(%NextLine))
@@ -58,8 +58,8 @@
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%MetabaseTriggerCreateGenerate                       ,%pBaseName)        #! TRIGGER create generate
-#INSERT(%ProcessTriggerCreate                               ,%pBaseName)        #! RA.2019.10.11: Tested
+#GROUP(%MetabaseTriggerCreateGenerate                       ,%pBaseName)                        #! TRIGGER create generate
+#INSERT(%ProcessTriggerCreate                               ,%pBaseName)                        #! RA.2019.10.11: Tested
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%ProcessTriggerCreate,%pBaseName)
@@ -70,7 +70,7 @@
 #ENDIF
 #FOR(%NFiles)
   #FIX(%File,%NFilesName)
-  #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
+  #INSERT(%TableNameComments,%pBaseName)                                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #!SET(%TheTableTrigger , %TheTable & '_Trigger')                                              #! RA.2020.06.11: Add quotes
@@ -96,8 +96,8 @@
 #ENDFOR
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%MetabaseTriggerDropItGenerate                       ,%pBaseName)        #! TRIGGER drop generate
-#INSERT(%ProcessTriggerDropIt                               ,%pBaseName)        #! RA.2019.10.11: Tested
+#GROUP(%MetabaseTriggerDropItGenerate                       ,%pBaseName)                        #! TRIGGER drop generate
+#INSERT(%ProcessTriggerDropIt                               ,%pBaseName)                        #! RA.2019.10.11: Tested
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #GROUP(%ProcessTriggerDropIt,%pBaseName)
@@ -107,7 +107,7 @@
 #ENDIF
 #FOR(%NFiles)
   #FIX(%File,%NFilesName)
-  #INSERT(%TableNameComments,%pBaseName)                                        #! OPTION: Table name comments
+  #INSERT(%TableNameComments,%pBaseName)                                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #!SET(%TheTableTrigger, %TheTable & '_Trigger')                                               #! RA.2020.06.11: Add quotes
@@ -141,8 +141,8 @@ BEGIN
 IF    (TG_WHEN = 'BEFORE') THEN
   IF    (TG_OP = 'INSERT') THEN
     #FOR(%Field)
-      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
-      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+      #INSERT(%GetFieldOptions)                                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                                             #! Ignore this field
         #CYCLE
       #ENDIF
       #IF(%FieldType='GROUP' OR %FieldType='END')
@@ -151,7 +151,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
-      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)          #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
       #! RA.2019.08.01: Doing something at the console.
@@ -229,8 +229,8 @@ IF    (TG_WHEN = 'BEFORE') THEN
     #ENDFOR
   ELSIF (TG_OP = 'UPDATE') THEN
     #FOR(%Field)
-      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
-      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+      #INSERT(%GetFieldOptions)                                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                                             #! Ignore this field
         #CYCLE
       #ENDIF
       #IF(%FieldType='GROUP' OR %FieldType='END')
@@ -239,7 +239,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
-      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)          #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
         #!SET(%TimeStamp         , 'NEW.' & %FieldID)
@@ -299,8 +299,8 @@ IF    (TG_WHEN = 'BEFORE') THEN
     #ENDFOR
     #! RA.2019.08.01: Check for consistency in record status changes.
     #FOR(%Field)
-      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
-      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+      #INSERT(%GetFieldOptions)                                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                                             #! Ignore this field
         #CYCLE
       #ENDIF
       #IF(%FieldType='GROUP' OR %FieldType='END')
@@ -309,7 +309,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
-      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)          #! RA.2020.06.11: Add quotes
       #!!!
       #IF (UPPER(%FieldID) = 'ACTIVE_FLAG')
         #!SET(%NextLine, 'NEW.' & %FieldID)
@@ -328,8 +328,8 @@ IF    (TG_WHEN = 'BEFORE') THEN
     #!
   ELSIF (TG_OP = 'DELETE') THEN
     #FOR(%Field)
-      #INSERT(%GetFieldOptions)                                                 #! RASQL(,,,) for Fields
-      #IF(SUB(%NFieldOpt1,1,1)='N')                                             #! Ignore this field
+      #INSERT(%GetFieldOptions)                                                                 #! RASQL(,,,) for Fields
+      #IF(SUB(%NFieldOpt1,1,1)='N')                                                             #! Ignore this field
         #CYCLE
       #ENDIF
       #IF(%FieldType='GROUP' OR %FieldType='END')
@@ -338,7 +338,7 @@ IF    (TG_WHEN = 'BEFORE') THEN
       #!!!
       #SET(%FieldNameExt,%FieldID)
       #CALL(%SetupTheField,%FieldNameExt,%pBaseName,%FieldID,%FieldName)
-      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+      #CALL(%QuoteThisThing,%FieldNameExt,%FieldNameExt,%pBaseName,%optQuoteAllThings)          #! RA.2020.06.11: Add quotes
       #!!!
       #! RA.2020.04.22: 
       #IF (UPPER(%FieldID) = 'TS'  OR UPPER(%FieldID) = 'TIMESTAMP')
