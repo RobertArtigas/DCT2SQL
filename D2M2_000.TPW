@@ -364,6 +364,7 @@
     #DISPLAY(''),AT(,,,1)
     #PROMPT('Add "_" to the end of reserved SQL words? (ON=Add "_". OFF=Do not add "_".)',CHECK),%optUnderReservedWords,AT(10)
     #PROMPT('Add "quotes" around SQL names? (ON=Add quotes. OFF=Do not add quotes.)',CHECK),%optQuoteAllThings,AT(10)
+    #PROMPT('Make SQL names lower case? (ON=Make lower case. OFF=Leave case alone.)',CHECK),%optLowerCaseAllThings,AT(10)
   #ENDBOXED
   #BOXED('Odd and Ends Options'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
@@ -945,6 +946,7 @@
   #!CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)       #! RA.2020.06.18: Add quotes
   #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
   #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
+  #CALL(%MakeSingleCase,%NFilesSeqWhere,%NFilesSeqWhere,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #CALL(%HasOnePrimaryKey)                                                                  #! At least ONE primary key
 #!
@@ -1054,6 +1056,7 @@
   #!CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)       #! RA.2020.06.18: Add quotes
   #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
   #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
+  #CALL(%MakeSingleCase,%NFilesSeqWhere,%NFilesSeqWhere,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #SET(%NFilesFullPath    ,%FileName)                                                       #! Table Full Path Name - RA.2018.04.12
   #CALL(%ReplaceSubString ,%NFilesFullPath ,'''','')
@@ -1223,6 +1226,7 @@
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #! RA.2018.04.19: Is it a valid backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -1274,6 +1278,7 @@ DROP TABLE %TheTable
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NKeyPrimaryValidSeq)
     #! RA.2018.04.19: Is it a valid backend
@@ -1328,11 +1333,11 @@ ALTER TABLE %TheTable
       #! RA.2020.06.18.THU: Sequences need to be in the schema in which they need to be used.        !
       #! RA.2020.06.18.THU: Generate Changes: "MixedCase" ---and--- location of SEQUENCE definition. !
       #!---------------------------------------------------------------------------------------------!
-      #IF(%optQuoteAllThings)                                                   #! RA.2020.06.18: Add quotes
+#!      #IF(%optQuoteAllThings)                                                   #! RA.2020.06.18: Add quotes
       ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqWhere')       #! RA.2020.06.18: Where is this.
-      #ELSE
-      ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqName')
-      #END
+#!      #ELSE
+#!      ALTER COLUMN %NFilesSeqField SET DEFAULT NEXTVAL('%NFilesSeqName')
+#!      #END
 #CALL(%TerminatorTerminates,%pBaseName)                                         #! RA.2018.06.07.THU: Added
       #OF  ('MYSQL')
       #OF  ('ORACLE')
@@ -1373,6 +1378,7 @@ ALTER TABLE %TheTable
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NKeyPrimaryValidSeq)
     #! RA.2018.04.19: Is it a VALID backend?
@@ -1444,6 +1450,7 @@ DROP SEQUENCE %NFilesSeqName CASCADE
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NFilesPKeyName)
     #! RA.2018.04.19: Is it a valid backend?
@@ -1493,6 +1500,7 @@ ALTER TABLE %TheTable
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NFilesPKeyName)
     #! RA.2018.04.19: Is is a valid backend?
@@ -1605,6 +1613,7 @@ ALTER TABLE %TheTable
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1632,6 +1641,7 @@ CREATE UNIQUE INDEX %TheKey
           #SET(%NKeyFieldID,%FieldID)                                                         #! RA.2020.05.22.FRI: ERROR reported by John Hickey
           #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)                   #! RA.2020.05.22.FRI: Handle EXTERNAL name
           #CALL(%QuoteThisThing,%NKeyFieldID,%NKeyFieldID,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+          #CALL(%MakeSingleCase,%NKeyFieldID,%NKeyFieldID,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
           #CALL(%PadToLength,%NKeyFieldID,90)
           #CALL(%GiveMeSortOrder,%NKeySortOrder,%KeyFieldSequence)
           #!SET(%NKeyFieldAD, %NKeyFieldAD & %NKeyFieldID & ' ' & %KeyFieldSequence)
@@ -1682,6 +1692,7 @@ CREATE UNIQUE INDEX %TheKey
   #SET(%TheTable,'')                                                           #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1747,6 +1758,7 @@ DROP INDEX %TheKey
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1774,6 +1786,7 @@ CREATE INDEX %TheKey
           #SET(%NKeyFieldID,%FieldID)
           #CALL(%SetupTheField,%NKeyFieldID,%pBaseName,%FieldID,%FieldName)                   #! RA.2019.08.10: Handle EXTERNAL name
           #CALL(%QuoteThisThing,%NKeyFieldID,%NKeyFieldID,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+          #CALL(%MakeSingleCase,%NKeyFieldID,%NKeyFieldID,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
           #CALL(%PadToLength,%NKeyFieldID,90)
           #CALL(%GiveMeSortOrder,%NKeySortOrder,%KeyFieldSequence)
           #!SET(%NKeyFieldAD, %NKeyFieldAD & %NKeyFieldID & ' ' & %KeyFieldSequence)
@@ -1824,6 +1837,7 @@ CREATE INDEX %TheKey
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #SET(%NKeyDidIndex, %FALSE)
   #FOR(%NKeys)                                                                  #! Beginn FOR(%NKeys)
@@ -1890,6 +1904,7 @@ DROP INDEX %TheKey
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NRelaFound)
       #! RA.2018.04.19: Is this a VALID backend?
@@ -1936,6 +1951,7 @@ DROP INDEX %TheKey
 #! RA.2018.06.03.SUN: ALTER TABLE %NRelasFileLink to ALTER TABLE %TheTable2
 #CALL(%SetupTheTable,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NRelasFileLink,%optNameOwnerUse,%NameOwner,%NameDatabase)
 #CALL(%QuoteThisThing,%TheTable2,%TheTable2,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+#CALL(%MakeSingleCase,%TheTable2,%TheTable2,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
 ALTER TABLE %TheTable2
       #!ADD CONSTRAINT FROM_%NRelasFileFrom_TO_%NRelasKeyLink
@@ -1991,6 +2007,7 @@ ALTER TABLE %TheTable2
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #IF(%NRelaFound)
     #! RA.2018.04.19: Is it a valid backend?
@@ -2026,6 +2043,7 @@ ALTER TABLE %TheTable2
 #! RA.2018.03.17.SAT: (TESTING) Per Mr. Michael Gorman - Changed the order.
 #CALL(%SetupTheTable,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NRelasFileLink,%optNameOwnerUse,%NameOwner,%NameDatabase)
 #CALL(%QuoteThisThing,%TheTable2,%TheTable2,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+#CALL(%MakeSingleCase,%TheTable2,%TheTable2,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
 #!ALTER TABLE %NRelasFileLink
 ALTER TABLE %TheTable2
@@ -2086,6 +2104,7 @@ ALTER TABLE %TheTable2
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #! RA.2018.04.09: Is it a VALID backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -2125,6 +2144,7 @@ GRANT SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
   #! RA.2018.04.19: Is it a VALID backend?
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
@@ -2241,6 +2261,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #SET(%NFieldsName       ,%FieldID)                                            #! FieldName
   #CALL(%SetupTheField,%NFieldsName,%pBaseName,%FieldID,%FieldName)             #! RA.2019.08.10: Handle EXTERNAL name
   #CALL(%QuoteThisThing,%NFieldsName,%NFieldsName,%pBaseName,%optQuoteAllThings)#! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NFieldsName,%NFieldsName,%optLowerCaseAllThings)       #! RA.2020.07.03: Make lower case
   #SET(%NFieldsType       ,%FieldType)
   #SET(%NFieldsFormat     ,UPPER(%FieldDisplayPicture))
   #SET(%NFieldsOpts       ,%FieldUserOptions)                                   #! RA.2019.04.30.TUE
@@ -3499,6 +3520,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #SET(%TheTable,'')                                                            #! RA.2018.04.25: Default nothing
   #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%FieldComma, ITEMS(%AFields) - 1)                                        #! How many commas do I need?
 #!
 CREATE TABLE %TheTable (
@@ -3593,11 +3615,13 @@ CREATE TABLE %TheTable (
         #SET(%NFilesPKeyName,%KeyID)                                      #! [Table Primary Key Name] #! RA.2020.05.25.MON: ERROR reported by John Hickey 
         #CALL(%SetupTheKey,%NFilesPKeyName,%BaseName,%KeyID,%KeyName)                                 #! RA.2020.05.25.MON: Handle EXTERNAL key name
         #CALL(%QuoteThisThing,%NFilesPKeyName,%NFilesPKeyName,%BaseName,%optQuoteAllThings)           #! RA.2020.06.11: Add quotes
+        #CALL(%MakeSingleCase,%NFilesPKeyName,%NFilesPKeyName,%optLowerCaseAllThings)                 #! RA.2020.07.03: Make lower case
         #FOR(%KeyField)                                                                               #! Beginning FOR(%KeyField)
           #FIX(%Field,%KeyField)
           #SET(%NFilesPKeyField,%FieldID)                                                             #! Table Primary Field Name
           #CALL(%SetupTheField,%NFilesPKeyField,%BaseName,%FieldID,%FieldName)                        #! RA.2020.05.26.MON: Handle EXTERNAL name
           #CALL(%QuoteThisThing,%NFilesPKeyField,%NFilesPKeyField,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
+          #CALL(%MakeSingleCase,%NFilesPKeyField,%NFilesPKeyField,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!----??? Key="%Key", KeyField="%KeyField", FieldType="%FieldType"
           #! RA.2018.04.29: Build up the PRIMARY KEY field table (needed for the NOT-NULL logic).
           #ADD(%NFieldsPRIMARY,%KeyField)
@@ -3621,6 +3645,7 @@ CREATE TABLE %TheTable (
             #! RA.2020.06.18.THU: Add quotes logic to the variable. !
             #!------------------------------------------------------!
             #CALL(%QuoteThisThing,%NFilesSeqField,%NFilesSeqField,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
+            #CALL(%MakeSingleCase,%NFilesSeqField,%NFilesSeqField,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
           #ENDCASE
         #ENDFOR                                                                                       #! Ending FOR(%KeyField)
       #ENDIF                                                                                          #! [?=1]
@@ -3702,6 +3727,7 @@ CREATE TABLE %TheTable (
     #SET(%NKeysName           , %KeyID)                                         #! Key Name
     #CALL(%SetupTheKey,%NKeysName,%BaseName,%KeyID,%KeyName)                    #! RA.2019.08.10: Handle External Key Name
     #CALL(%QuoteThisThing,%NKeysName,%NKeysName,%BaseName,%optQuoteAllThings)   #! RA.2020.06.11: Add quotes
+    #CALL(%MakeSingleCase,%NKeysName,%NKeysName,%optLowerCaseAllThings)         #! RA.2020.07.03: Make lower case
     #SET(%NKeysType           , %KeyIndex)                                      #! Key Type
     #SET(%NKeysFlagPri        , 'N')                                            #! Key is: Primary
     #SET(%NKeysFlagSeq        , 'N')                                            #! Key is: Sequence
@@ -3777,54 +3803,63 @@ CREATE TABLE %TheTable (
   #SET(%NKeysField01, %FieldID)
   #CALL(%SetupTheField,%NKeysField01,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField01,%NKeysField01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField01,%NKeysField01,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort01, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort01, %NKeysSort01)
 #OF(2)
   #SET(%NKeysField02, %FieldID)
   #CALL(%SetupTheField,%NKeysField02,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField02,%NKeysField02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField02,%NKeysField02,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort02, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort02, %NKeysSort02)
 #OF(3)
   #SET(%NKeysField03, %FieldID)
   #CALL(%SetupTheField,%NKeysField03,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField03,%NKeysField03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField03,%NKeysField03,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort03, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort03, %NKeysSort03)
 #OF(4)
   #SET(%NKeysField04, %FieldID)
   #CALL(%SetupTheField,%NKeysField04,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField04,%NKeysField04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField04,%NKeysField04,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort04, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort04, %NKeysSort04)
 #OF(5)
   #SET(%NKeysField05, %FieldID)
   #CALL(%SetupTheField,%NKeysField05,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField05,%NKeysField05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField05,%NKeysField05,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort05, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort05, %NKeysSort05)
 #OF(6)
   #SET(%NKeysField06, %FieldID)
   #CALL(%SetupTheField,%NKeysField06,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField06,%NKeysField06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField06,%NKeysField06,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort06, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort06, %NKeysSort06)
 #OF(7)
   #SET(%NKeysField07, %FieldID)
   #CALL(%SetupTheField,%NKeysField07,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField07,%NKeysField07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField07,%NKeysField07,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort07, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort07, %NKeysSort07)
 #OF(8)
   #SET(%NKeysField08, %FieldID)
   #CALL(%SetupTheField,%NKeysField08,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField08,%NKeysField08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField08,%NKeysField08,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort08, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort08, %NKeysSort08)
 #OF(9)
   #SET(%NKeysField09, %FieldID)
   #CALL(%SetupTheField,%NKeysField09,%BaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL fields
   #CALL(%QuoteThisThing,%NKeysField09,%NKeysField09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NKeysField09,%NKeysField09,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #SET(%NKeysSort09, %KeyFieldSequence)
   #CALL(%GiveMeSortOrder, %NKeysSort09, %NKeysSort09)
 #ENDCASE
@@ -3883,9 +3918,11 @@ CREATE TABLE %TheTable (
     #SET(%NRelasKeyFrom       , %FileKey)                                                     #!  Key From: Main from
     #CALL(%RemovePrefix,':',%NRelasKeyFrom)                                                   #! Remove the FROM prefix
     #CALL(%QuoteThisThing,%NRelasKeyFrom,%NRelasKeyFrom,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes
+    #CALL(%MakeSingleCase,%NRelasKeyFrom,%NRelasKeyFrom,%optLowerCaseAllThings)               #! RA.2020.07.03: Make lower case
     #SET(%NRelasKeyLink       , %RelationKey)                                                 #!  Key Link: Relate To
     #CALL(%RemovePrefix,':',%NRelasKeyLink)                                                   #! Remove the LINK prefix
     #CALL(%QuoteThisThing,%NRelasKeyLink,%NRelasKeyLink,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes
+    #CALL(%MakeSingleCase,%NRelasKeyLink,%NRelasKeyLink,%optLowerCaseAllThings)               #! RA.2020.07.03: Make lower case
     #!
     #!SET(%NRelasOnUpdate      , %RelationConstraintUpdate)                                   #! ON UPDATE: What to do?
     #!SET(%NRelasOnDelete      , %RelationConstraintDelete)                                   #! ON DELETE: What to do?
@@ -3996,7 +4033,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel01)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel01,%NRelasKFlabel01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel01,%NRelasKFlabel01,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel01,%NRelasKLlabel01,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel01,%NRelasKLlabel01,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ''  & %NRelasKFlabel01)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ''  & %NRelasKLlabel01)
@@ -4009,7 +4048,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel02)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel02,%NRelasKFlabel02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel02,%NRelasKFlabel02,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel02,%NRelasKLlabel02,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel02,%NRelasKLlabel02,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel02)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel02)
@@ -4022,7 +4063,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel03)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel03,%NRelasKFlabel03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel03,%NRelasKFlabel03,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel03,%NRelasKLlabel03,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel03,%NRelasKLlabel03,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel03)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel03)
@@ -4035,7 +4078,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel04)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel04,%NRelasKFlabel04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel04,%NRelasKFlabel04,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel04,%NRelasKLlabel04,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel04,%NRelasKLlabel04,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel04)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel04)
@@ -4048,7 +4093,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel05)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel05,%NRelasKFlabel05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel05,%NRelasKFlabel05,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel05,%NRelasKLlabel05,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel05,%NRelasKLlabel05,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel05)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel05)
@@ -4061,7 +4108,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel06)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel06,%NRelasKFlabel06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel06,%NRelasKFlabel06,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel06,%NRelasKLlabel06,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel06,%NRelasKLlabel06,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel06)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel06)
@@ -4074,7 +4123,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel07)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel07,%NRelasKFlabel07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel07,%NRelasKFlabel07,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel07,%NRelasKLlabel07,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel07,%NRelasKLlabel07,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel07)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel07)
@@ -4087,7 +4138,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel08)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel08,%NRelasKFlabel08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel08,%NRelasKFlabel08,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel08,%NRelasKLlabel08,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel08,%NRelasKLlabel08,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel08)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel08)
@@ -4100,7 +4153,9 @@ CREATE TABLE %TheTable (
   #CALL(%RemovePrefix,':',%NRelasKLlabel09)
   #! RA.2019.08.10: The %NRelasKFlabel(01-09) and %NRelasKLlabel(01-09) will need external.
   #CALL(%QuoteThisThing,%NRelasKFlabel09,%NRelasKFlabel09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKFlabel09,%NRelasKFlabel09,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #CALL(%QuoteThisThing,%NRelasKLlabel09,%NRelasKLlabel09,%BaseName,%optQuoteAllThings)       #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NRelasKLlabel09,%NRelasKLlabel09,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
   #!
   #SET(%NRelaFieldsParent,%NRelaFieldsParent & ',' & %NRelasKFlabel09)
   #SET(%NRelaFieldsChild ,%NRelaFieldsChild  & ',' & %NRelasKLlabel09)

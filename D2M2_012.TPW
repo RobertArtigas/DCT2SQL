@@ -7,7 +7,9 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
-#! 2020.06.11         Roberto Artigas
+#! 2020.07.03.FRI       Roberto Artigas
+#!  *   Make me lower case (with posible additional functionality)
+#! 2020.06.11           Roberto Artigas
 #!  *   Creation of this generic structured template
 #!      Created new file, other files getting large again
 #!---------------------------------------------------------------------
@@ -93,6 +95,17 @@
   #SET(%pNamesOut, %ThisOut)
 #END
 #!---- [%%QuotePieces], %%pNamesOut='%pNamesOut', %%pNamesIn='%pNamesIn', %%pQuoteLeft='%pQuoteLeft', %%pQuoteRight='%pQuoteRight'
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.07.03.FRI: Make me lower case (with posible additional functionality)
+#GROUP(%MakeSingleCase,*%pSingleCaseOut,%pMixedCaseIn,%pLowerCase)
+#IF(%pLowerCase)
+  #SET(%pSingleCaseOut,LOWER(%pMixedCaseIn))
+#! #ELSE
+#!   #SET(%pSingleCaseOut,UPPER(%pMixedCaseIn))
+#ENDIF
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
