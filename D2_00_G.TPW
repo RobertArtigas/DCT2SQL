@@ -67,7 +67,17 @@
     #DISPLAY('DEALINGS IN THE SOFTWARE.')
   #ENDBOXED
 #ENDTAB
-#!---------------------------------------------------------------------
+#!--------------------------------------------------------------------!
+#!--------------------------------------------------------------------!
+#! 2020.07.11.SAT: Not checking your DCT for reserved words?          !
+#!                 EXTREME WARNING: DON'T DO THAT !!!                 !
+#! Having reserved words from Clarion or the SQL backend in your DCT  !
+#! will likely cause you some intense grief somewhere along the line. !
+#!--------------------------------------------------------------------!
+#! The most obvious will be the 47 structure errors when you read an  !
+#! ODBC record with a /VERIFYVIASELECT=TRUE in the driver option for  !
+#! your table. It can get worse after that.  **YOU HAVE BEEN WARNED** !
+#!--------------------------------------------------------------------!
 #!--------------------------------------------------------------------!
 #! 2001.01.18.THU - Roberto Artigas Jr          IMPORTANT PLEASE READ !
 #!--------------------------------------------------------------------!
