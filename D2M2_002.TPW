@@ -251,6 +251,9 @@ GO
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2020.07.11: The "FilePrefix" options has to be added inside this group.
+#! It needes to be added to the file name portion of #GROUP(%SetupTheTable2,...)
+#!---------------------------------------------------------------------
 #! RA.2018.04.26: Processing the options in one place for consistency.
 #! This might be used when doing a really large dictionary where the
 #! tables are distributed accross many backends, databases, owners, etc.
@@ -272,14 +275,20 @@ GO
 #! %pOwnerDo                  = Prepend the Owner Name [TRUE|FALSE]
 #! %pOwnerName                = Owner to prepend to the table or file
 #! %pDatabaseName             = The Database Name (might be needed)
+#! RA.2020.07.11: New file prefix option
+#! %pPrefix                   = The table prefix for the table
+#! %pPrefixDo                 = Do the prefix option
+#! %pPrefixLiteral            = Literal between the table prefix and the name
 #!---------------------------------------------------------------------
-#GROUP(%SetupTheTable,*%pTheTable,%pBaseName,%pCount,%pNameDo,%pNameOption,%pNameTable,%pNameFile,%pOwnerDo,%pOwnerName,%pDatabaseName)
+#!GROUP(%SetupTheTable,*%pTheTable,%pBaseName,%pCount,%pNameDo,%pNameOption,%pNameTable,%pNameFile,%pOwnerDo,%pOwnerName,%pDatabaseName)
+#GROUP(%SetupTheTable_20200711,*%pTheTable,%pBaseName,%pCount,%pNameDo,%pNameOption,%pNameTable,%pNameFile,%pOwnerDo,%pOwnerName,%pDatabaseName)
 #!---------------------------------------------------------------------
 #IF(%TraceFlow)
   #SET(%CountNFiles,ITEMS(%NFiles))
 ---- #GROUP(%%SetupTheTable,'%pBaseName'): CountNFiles: %CountNFiles
 #ENDIF
-#IF(%TraceDetail)
+#!IF(%TraceDetail)
+#IF(%TRUE)
 ---- %[3]pCount , [%%SetupTheTable]
 ---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable" 
 ---- %[3]pCount , pNameDo = "%pNameDo", pNameOption = "%pNameOption", pNameTable = "%pNameTable", pNameFile = "%pNameFile"
@@ -341,7 +350,99 @@ GO
   #ENDIF
   #! RA.2018.04.27: CHECKBOX: Prefix the owner string?
   #!---------------------------------------------------------------------
+#!IF(%TraceDetail)
+#IF(%TRUE)
+---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable"
+#ENDIF 
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.07.11: The "FilePrefix" options has to be added inside this group.
+#! It needes to be added to the file name portion of #GROUP(%SetupTheTable2,...)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%SetupTheTable2,*%pTheTable,%pBaseName,%pCount,%pNameDo,%pNameOption,%pNameTable,%pNameFile,%pOwnerDo,%pOwnerName,%pDatabaseName,%pPrefix,%pPrefixDo,%pPrefixLiteral)
+#!---------------------------------------------------------------------
+#IF(%TraceFlow)
+  #SET(%CountNFiles,ITEMS(%NFiles))
+---- #GROUP(%%SetupTheTable2,'%pBaseName'): CountNFiles: %CountNFiles
+#ENDIF
 #IF(%TraceDetail)
+#!IF(%TRUE)
+---- %[3]pCount , [%%SetupTheTable2]
+---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable" 
+---- %[3]pCount , pNameDo = "%pNameDo", pNameOption = "%pNameOption", pNameTable = "%pNameTable", pNameFile = "%pNameFile"
+---- %[3]pCount , pOwnerDo = "%pOwnerDo", pOwnerName = "%pOwnerName", pDatabaseName = "%pDatabaseName"
+---- %[3]pCount , pPrefix = "%pPrefix", pPrefixDo = "%pPrefixDo", pPrefixLiteral = "%pPrefixLiteral"
+#ENDIF
+  #!---------------------------------------------------------------------
+  #! RA.2018.04.25: OPTION: Table Names | File Names
+  #SET(%pTheTable,%pNameTable)                                                  #! RA.2018.04.25: Default TABLE names
+  #!
+  #! RA.2020.06.11: CHECKBOX: Use the Table Prefix to qualify all names?
+  #IF(%pPrefixDo)                                                               #! RA.2020.07.11: Table Prefix Option?
+    #IF(%pPrefixLiteral)
+      #SET(%pTheTable, %pPrefix & %pPrefixLiteral & %pNameTable)
+    #ENDIF
+  #ENDIF
+  #! RA.2020.07.11: For NOW we leave the 'File Names' alone. The reasoning is the that developoer set up those names
+  #! and took the time to do so for a specific purpose. So do not touch this. If change is needed, he needs to do it.
+  #IF(%pNameDo)
+    #IF(%pNameOption = 'File Names')
+      #SET(%pTheTable,%pNameFile)                                               #! RA.2018.04.25: Set FILE names
+    #ENDIF
+  #ENDIF
+  #! 
+  #IF(VAREXISTS(%LastPeriodBefore)=0)
+    #DECLARE(%LastPeriodBefore)
+  #ENDIF
+  #IF(VAREXISTS(%LastPeriodAfter)=0)
+    #DECLARE(%LastPeriodAfter)
+  #ENDIF
+  #!
+  #! RA.2018.04.26: Separate "<owner>.<table>" into pieces,
+  #! then check for both pieces being reserved words. 
+  #SET(%nLoc1, INSTRING('.',%pTheTable,-1,LEN(CLIP(%pTheTable))))
+  #IF(%nLoc1 > 0)
+    #SET(%LastPeriodBefore , SUB( %pTheTable ,        1 , %nLoc1-1              ))
+    #SET(%LastPeriodAfter  , SUB( %pTheTable , %nLoc1+1 , LEN(CLIP(%pTheTable)) ))
+#!--00 %[3]pCount , %[3]nLoc1 , LastPeriodBefore="%LastPeriodBefore", LastPeriodAfter="%LastPeriodAfter"
+    #CALL(%ReserveWordReplace,%LastPeriodBefore)
+    #CALL(%ReserveWordReplace,%LastPeriodAfter )
+#!--01 %[3]pCount , %[3]nLoc1 , LastPeriodBefore="%LastPeriodBefore", LastPeriodAfter="%LastPeriodAfter"
+    #SET(%pTheTable, %LastPeriodBefore & '.' & %LastPeriodAfter)
+#!--02 %[3]pCount , %[3]nLoc1 , pTheTable="%pTheTable"
+  #ELSE
+    #CALL(%ReserveWordReplace,%pTheTable)
+  #ENDIF
+  #! RA.2018.04.25: OPTION: Table Names | File Names
+  #!---------------------------------------------------------------------
+  #! RA.2018.04.27: CHECKBOX: Prefix the owner string?
+  #IF(%pOwnerDo)
+    #SET(%nLoc1, INSTRING('.',%pTheTable,-1,LEN(CLIP(%pTheTable))))
+    #SET(%nLoc2, LEN(%pOwnerName))
+#!--10 %[3]pCount , %[3]nLoc1 , %[3]nLoc2, pOwnerDo="%pOwnerDo", pOwnerName="%pOwnerName"
+    #IF((%nLoc1 < 1) AND (%nLoc2 > 0))
+      #IF(%pNameOption <> 'File Names')
+        #SET(%pTheTable, %pOwnerName & '.' & %pTheTable)
+      #ENDIF
+      #CASE(%pBaseName)                                                           #! BACKEND EXCEPTIONS
+      #OF  ('METABASE')
+      #OROF('MIMER')
+      #OROF('MSSQL')
+      #OROF('POSTGRESQL')
+      #OROF('SQLANYWHERE')
+      #OROF('MYSQL')
+      #OROF('ORACLE')
+      #OROF('DB2')
+      #ENDCASE                                                                    #! BACKEND EXCEPTIONS
+    #ENDIF
+  #ENDIF
+  #! RA.2018.04.27: CHECKBOX: Prefix the owner string?
+  #!---------------------------------------------------------------------
+#IF(%TraceDetail)
+#!IF(%TRUE)
 ---- %[3]pCount , pBaseName = "%pBaseName", pTheTable = "%pTheTable"
 #ENDIF 
 #!---------------------------------------------------------------------

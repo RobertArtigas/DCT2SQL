@@ -107,6 +107,33 @@
 #!   #SET(%pSingleCaseOut,UPPER(%pMixedCaseIn))
 #ENDIF
 #!---------------------------------------------------------------------
+#! RA.2020.07.10.FRI: Make me lower case (simple functionality)
+#GROUP(%MakeLowerCase,*%pSingleCaseOut,%pMixedCaseIn,%pLowerCase)
+#IF(%pLowerCase)
+  #SET(%pSingleCaseOut,LOWER(%pMixedCaseIn))
+#ENDIF
+#!---------------------------------------------------------------------
+#! RA.2020.07.10.FRI: Make me upper case (simple functionality)
+#GROUP(%MakeUpperCase,*%pSingleCaseOut,%pMixedCaseIn,%pUpperCase)
+#IF(%pUpperCase)
+  #SET(%pSingleCaseOut,UPPER(%pMixedCaseIn))
+#ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.07.11.SAT: Add table prefix to the item name
+#GROUP(%DoPrefixToName,*%pCombinedName,%pTablePrefix,%pItemName,%pSeparator,%pDoThePrefix)
+#IF(%pDoThePrefix)
+  #IF(%pSeparator)
+    #SET(%pCombinedName, %pTablePrefix & %pSeparator & %pItemName)
+  #ELSE
+    #SET(%pCombinedName, %pTablePrefix & %pItemName)
+  #ENDIF
+#ELSE
+  #SET(%pCombinedName, %pItemName)
+#ENDIF
+#!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
