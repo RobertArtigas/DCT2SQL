@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.07.11.SAT       Roberto Artigas
+#!  *   Add table prefix to the item name. Generic change, multiple places.
 #! 2020.07.03.FRI       Roberto Artigas
 #!  *   Make me lower case (with posible additional functionality)
 #! 2020.06.11           Roberto Artigas

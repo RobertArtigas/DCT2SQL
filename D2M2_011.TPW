@@ -7,6 +7,9 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.07.12.SUN       Roberto Artigas
+#!  *   Add table prefix to the item name. Generic change, multiple places.
+#!  *   Implement lower case option. Very useful for some backends.
 #! 2020.06.11.THU:    Roberto Artigas
 #!  *   QUOTE option implemented [tested and goes thru without errors on postgres]
 #! 2020.04.22.WED:    Roberto Artigas
@@ -72,15 +75,22 @@
   #FIX(%File,%NFilesName)
   #INSERT(%TableNameComments,%pBaseName)                                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
-  #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #!CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%SetupTheTable2,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
   #!SET(%TheTableTrigger , %TheTable & '_Trigger')                                              #! RA.2020.06.11: Add quotes
   #SET(%TheTableTrigger , %TheTable & '_trigger')                                               #! RA.2020.06.11: Add quotes
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)                      #! RA.2020.06.11: Add quotes
   #CALL(%QuoteThisThing,%TheTableTrigger,%TheTableTrigger,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)                             #! RA.2020.07.12: Make lower case
+  #CALL(%MakeSingleCase,%TheTableTrigger,%TheTableTrigger,%optLowerCaseAllThings)               #! RA.2020.07.12: Make lower case
   #SET(%TheTriggerBefore, 'trigger_before_' & %NFilesName)                                      #! RA.2020.06.11: Add quotes
   #SET(%TheTriggerAfter , 'trigger_after_'  & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #CALL(%DoPrefixToName,%TheTriggerBefore,%FilePrefix,%TheTriggerBefore,'_',%optPrefixAllNames) #! RA.2020.07.12: Add table prefix
+  #CALL(%DoPrefixToName,%TheTriggerAfter,%FilePrefix,%TheTriggerAfter,'_',%optPrefixAllNames)   #! RA.2020.07.12: Add table prefix
   #CALL(%QuoteThisThing,%TheTriggerBefore,%TheTriggerBefore,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes  
   #CALL(%QuoteThisThing,%TheTriggerAfter,%TheTriggerAfter,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #CALL(%MakeSingleCase,%TheTriggerBefore,%TheTriggerBefore,%optLowerCaseAllThings)             #! RA.2020.07.12: Make lower case
+  #CALL(%MakeSingleCase,%TheTriggerAfter,%TheTriggerAfter,%optLowerCaseAllThings)               #! RA.2020.07.12: Make lower case
   #CASE(%pBaseName)
   #OF  ('POSTGRESQL')
 #INSERT(%PostgreSQLCreateTrigger)
@@ -109,15 +119,22 @@
   #FIX(%File,%NFilesName)
   #INSERT(%TableNameComments,%pBaseName)                                                        #! OPTION: Table name comments
   #SET(%TheTable,'')
-  #CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #!CALL(%SetupTheTable,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase)
+  #CALL(%SetupTheTable2,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
   #!SET(%TheTableTrigger, %TheTable & '_Trigger')                                               #! RA.2020.06.11: Add quotes
   #SET(%TheTableTrigger, %TheTable & '_trigger')                                                #! RA.2020.06.11: Add quotes
   #CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)                      #! RA.2020.06.11: Add quotes
   #CALL(%QuoteThisThing,%TheTableTrigger,%TheTableTrigger,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)                             #! RA.2020.07.12: Make lower case
+  #CALL(%MakeSingleCase,%TheTableTrigger,%TheTableTrigger,%optLowerCaseAllThings)               #! RA.2020.07.12: Make lower case
   #SET(%TheTriggerBefore, 'trigger_before_' & %NFilesName)                                      #! RA.2020.06.11: Add quotes
   #SET(%TheTriggerAfter , 'trigger_after_'  & %NFilesName)                                      #! RA.2020.06.11: Add quotes
+  #CALL(%DoPrefixToName,%TheTriggerBefore,%FilePrefix,%TheTriggerBefore,'_',%optPrefixAllNames) #! RA.2020.07.12: Add table prefix
+  #CALL(%DoPrefixToName,%TheTriggerAfter,%FilePrefix,%TheTriggerAfter,'_',%optPrefixAllNames)   #! RA.2020.07.12: Add table prefix
   #CALL(%QuoteThisThing,%TheTriggerBefore,%TheTriggerBefore,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes  
   #CALL(%QuoteThisThing,%TheTriggerAfter,%TheTriggerAfter,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes  
+  #CALL(%MakeSingleCase,%TheTriggerBefore,%TheTriggerBefore,%optLowerCaseAllThings)             #! RA.2020.07.12: Make lower case
+  #CALL(%MakeSingleCase,%TheTriggerAfter,%TheTriggerAfter,%optLowerCaseAllThings)               #! RA.2020.07.12: Make lower case
   #CASE(%pBaseName)
   #OF  ('POSTGRESQL')
 #INSERT(%PostgreSQLDropItTrigger)
