@@ -391,6 +391,7 @@ List of Badly Named Files, Fields and Keys
   #IF(%FileDriver = 'TOPSPEED' AND %BoTPSs)
     #CYCLE
   #ENDIF
+  #!
   #IF(~%BoFiles)
     #SET(%SqlWordItem, UPPER(%File))
     #FIND(%SqlWordList, %SqlWordItem)
@@ -605,9 +606,9 @@ List of Badly Named Files, Fields and Keys
     #CYCLE
   #ENDIF
 #!
-  #IF(~%BoFiles)
     #SET(%SqlWordItem, UPPER(%File))
     #FIND(%SqlWordList, %SqlWordItem)
+  #IF(~%BoFiles)
     #IF(%SqlWordList)
 _FILE_  %[30]File %[30]File %[30]NFileOpt2 %FileDriver
         #SET(%BoCNT,%BoCNT + 1)
