@@ -1,0 +1,277 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_UTL004.tpw
+#! Purpose:     UTILITY: Check for RESERVED words
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2020.07.17   Roberto Artigas
+#!  *   Template utility creation.
+#!
+#UTILITY(D2M2_UTIL_RESERVED, '2020.07.17: [UTIL] Check for RESERVED words')
+#!-----------------------------------------------------------------------------
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
+#SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???
+#SET(%BaseName, 'PERVASIVE')                                                    #! PERVASIVE: ???
+#SET(%BaseName, 'FIREBIRD')                                                     #! FIREBIRD: ???
+#SET(%BaseName, 'SYBASE')                                                       #! SYBASE: ???
+#SET(%BaseName, 'DB2')                                                          #! DB2: ???
+#SET(%BaseName, 'ORACLE')                                                       #! ORACLE: ???
+#SET(%BaseName, 'MYSQL')                                                        #! MYSQL:         RAYS.2018.09.03: Tested. 
+#SET(%BaseName, 'SQLANYWHERE')                                                  #! SQLANYWHERE:   RAYS.2018.06.12: Tested.
+#SET(%BaseName, 'MSSQL')                                                        #! MSSQL:         RAYS.2018.06.03: Tested.
+#SET(%BaseName, 'MIMER')                                                        #! MIMER:         RAYS.2018.04.07: Tested.
+#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
+#SET(%BaseName, 'METABASE')                                                     #! METABASE:      Generic-Skeleton. NO backend.
+#DECLARE(%pBaseName)                                                            #! RA.2020.07.16: Needs Definion. WTH! [???]
+#SET(%pBaseName,'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#INSERT(%PreambleUtility)                                                       #! Basic copyright message
+#INSERT(%VariablesUtility004)                                                   #! RA.2019.07.25.THU: Added 
+#!---------------------------------------------------------------------
+#INSERT(%SqlReservedWords)
+#IF(%opt004AddClarion) 
+  #INSERT(%ClarionReservedWords)
+  #FOR(%ClarionWordList)
+    #ADD(%SqlWordList,%ClarionWordList)
+  #ENDFOR
+#ENDIF #!IF(%opt004AddClarion) 
+#!---------------------------------------------------------------------
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%MITLicenseD2M2UTL004)
+  #INSERT(%ShowExplainUtilRESERVED)
+  #INSERT(%ShowExplainUtilRESERVED2)
+  #INSERT(%MetabaseTabSelection)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#SET(%UtilityChekTable                    , %TRUE)
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseUtil & '_RESERVED_WORDS.TXT')  #! RA.2020.03.24: Changed
+#SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
+#!
+#CALL(%UtilityPrefix                      , %BaseUtil)                                            #! RA.2020.03.24: Changed
+#CALL(%BuildQualifiedFiles)
+#IF(%TRUE)
+#SET(%AuditLines, 0)
+#!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
+-- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+--
+  #FOR(%NFiles)
+    #FIX(%File, %NFilesName)
+    #!
+    #IF(UPPER(%FileDriver) = 'CLARION'  AND %opt004UseDriverClarion)
+      #CYCLE
+    #ENDIF
+    #IF(UPPER(%FileDriver) = 'TOPSPEED' AND %opt004UseDriverTopspeed)
+      #CYCLE
+    #ENDIF
+    #!
+    #IF(~%opt004IgnoreNamesTable)
+      #SET(%ItemType,'_FILE_')
+      #SET(%SqlWordItem, UPPER(%File))
+      #FIND(%SqlWordList, %SqlWordItem)
+      #!
+      #IF(%SqlWordList)
+-- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]NFilesName %[0]NULL %[40]FileName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+        #SET(%AuditLines, %AuditLines + 1)
+        #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+--
+        #ENDIF
+      #ENDIF      
+    #ENDIF #!IF(~%opt004IgnoreNamesTable)
+    #!
+    #IF(~%opt004IgnoreNamesKey)
+      #SET(%ItemType,'_KEY_')
+      #FOR(%Key)
+        #!-----------------------------------------!
+        #! RA.2010.09.13 - Processing key options. !
+        #!-----------------------------------------!
+        #SET(%nLoc1,INSTRING('RASQL(',%KeyUserOptions,1,1))
+        #SET(%nLoc2,INSTRING(')',%KeyUserOptions,1,%nLoc1))
+        #SET(%nKeyUser,UPPER(SUB(%KeyUserOptions,%nLoc1,%nLoc2)))
+        #!SET(%NKeyUser,UPPER(EXTRACT(%KeyUserOptions,'RASQL')))
+        #SET(%NKeyOpt1,EXTRACT(%NKeyUser,'RASQL',1))
+        #SET(%NKeyOpt2,EXTRACT(%NKeyUser,'RASQL',2))
+        #SET(%NKeyOpt3,EXTRACT(%NKeyUser,'RASQL',3))
+        #SET(%NKeyOpt4,EXTRACT(%NKeyUser,'RASQL',4))
+        #!%NKeyUser, %NKeyOpt1, %NKeyOpt2, %NKeyOpt3, %NKeyOpt4
+        #!------------------------------------------------------------!
+        #! The first option RASQL(NO) controls if a key is processed. !
+        #!------------------------------------------------------------!
+        #IF(SUB(%NKeyOpt1,1,1)='N')
+          #CYCLE
+        #ENDIF
+        #SET(%SqlWordItem, UPPER(%KeyID))
+        #FIND(%SqlWordList, %SqlWordItem)
+        #!
+        #IF(%SqlWordList)
+-- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]KeyID %[0]NULL %[40]KeyName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+          #SET(%AuditLines, %AuditLines + 1)
+          #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+--
+          #ENDIF
+        #ENDIF
+      #ENDFOR
+    #ENDIF #!IF(~%opt004IgnoreNamesKey)
+    #!
+    #!
+      #SET(%ItemType,'_FIELD_')
+      #FOR(%Field)
+        #SET(%SqlWordItem, UPPER(%FieldID))
+        #FIND(%SqlWordList, %SqlWordItem)
+        #IF(%SqlWordList)
+-- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]FieldID %[0]NULL %[40]FieldName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+          #SET(%AuditLines, %AuditLines + 1)
+          #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+--
+          #ENDIF
+        #ENDIF
+      #ENDFOR
+    #!
+    #!
+  #ENDFOR
+--
+-- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+#ENDIF
+#CALL(%UtilitySuffix                      , %BaseUtil)      #! RA.2020.03.24: Changed
+#!
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2UTL004)
+#TAB('UTIL_RESERVED'),PROP(PROP:FontStyle,700)
+  #INSERT(%MITLicense)
+  #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('OFF: Do NOT add Clarion reserved words. ON: Add Clarion reserved words.'     , CHECK), %opt004AddClarion, AT(10)
+    #!DISPLAY('')
+    #PROMPT('OFF: Ignore CLARION driver. ON: Use CLARION driver.'                         , CHECK), %opt004UseDriverClarion, AT(10)
+    #PROMPT('OFF: Ignore TOPSPEED driver. ON: Use TOPSPEED driver.'                       , CHECK), %opt004UseDriverTopspeed, AT(10)
+    #!DISPLAY('')
+    #PROMPT('OFF: Use table names. ON: Ignore table names.'                               , CHECK), %opt004IgnoreNamesTable, AT(10)
+    #PROMPT('OFF: Use key names. ON: Ignore key names.'                                   , CHECK), %opt004IgnoreNamesKey, AT(10)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilRESERVED)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextRESERVED))
+    #DECLARE(%ExplainTextRESERVED)
+  #ENDIF
+  #SET(%ExplainTextRESERVED, '')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'This generic utility will check file, field, and key names in the dictionary')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & ' for SQL reserved words that may give you problems in the various back ends.')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilRESERVED)
+#INSERT(%ExplainUtilRESERVED)
+#!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+#TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextRESERVED),AT(,,436,204)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RA.2019.07.25: Added
+#GROUP(%VariablesUtility004)
+#PREPARE
+#DECLARE(%NextLine)
+#DECLARE(%AuditLines)
+#DECLARE(%ItemType)
+#!DECLARE(%KeyFieldList)
+#!DECLARE(%KeyFieldID)
+#!
+#DECLARE(%opt004AddClarion                 ,LONG)
+#SET(%opt004AddClarion                     ,FALSE)
+#DECLARE(%opt004UseDriverClarion           ,LONG)
+#SET(%opt004UseDriverClarion               ,FALSE)
+#DECLARE(%opt004UseDriverTopspeed          ,LONG)
+#SET(%opt004UseDriverTopspeed              ,FALSE)
+#DECLARE(%opt004IgnoreNamesTable           ,LONG)
+#SET(%opt004IgnoreNamesTable               ,FALSE)
+#DECLARE(%opt004IgnoreNamesKey             ,LONG)
+#SET(%opt004IgnoreNamesKey                 ,FALSE)
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RA.2019.07.25: Added
+#GROUP(%ReservedFilesFieldsKeys004)
+#!     #IF(%opt003AuditGUID)
+#! #!-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
+#! -- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS
+#!     #ENDIF
+#!     #IF(ITEMS(%Field) AND %opt004UseDriverClarion)
+#! -- %[05]NULL FIELD-NAME %[20]NULL EXTERNAL-NAME %[17]NULL INITIAL-VALUE %[16]NULL FIELD-OPTIONS  
+#! -- %[05]NULL ========== %[20]NULL ============= %[17]NULL ============= %[16]NULL =============  
+#!       #FOR(%Field)
+#!         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
+#!         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
+#! -- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
+#!       #ENDFOR
+#!     #ENDIF
+#!     #!
+#!     #IF(ITEMS(%Key) AND %opt004UseDriverTopspeed)               
+#! -- %[05]NULL KEY-NAME %[17]NULL EXTERNAL-NAME %[12]NULL KEY-FIELD-LIST %[46]NULL KEY-OPTIONS  
+#! -- %[05]NULL ======== %[17]NULL ============= %[12]NULL ============== %[46]NULL ===========  
+#!       #FOR(%Key)
+#!         #SET(%NextLine, EXTRACT(%KeyStatement,'NAME'))
+#!         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
+#!         #SET(%KeyFieldList,'')
+#!         #FOR(%KeyField)
+#!           #!SET(%KeyFieldID,SUB(%KeyField, 6, LEN(%KeyField) - 5))
+#!           #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
+#!           #SET(%KeyFieldList, %KeyFieldList & SUB(%KeyFieldSequence,1,1) & ':' & %KeyFieldID & ';')
+#!         #ENDFOR
+#!         #IF(LEN(%KeyFieldList) > 80)
+#!           #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
+#!         #ENDIF
+#! -- %[05]NULL %[25]KeyID %[0]NULL %[25]NextLine %[0]NULL %[60]KeyFieldList %[0]NULL %KeyUserOptions  
+#!       #ENDFOR
+#!     #ENDIF
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
