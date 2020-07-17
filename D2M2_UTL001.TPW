@@ -24,8 +24,6 @@
 #! All the specific items related to a backend can be coded with a case statement.
 #! This will make the code easier to maintain accross all the backends.
 #PREPARE
-#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
-#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
 #DECLARE(%BaseName)                                                             #! Define the BACKEND here
 #SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
 #SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???
@@ -36,10 +34,14 @@
 #SET(%BaseName, 'ORACLE')                                                       #! ORACLE: ???
 #SET(%BaseName, 'MYSQL')                                                        #! MYSQL:         RAYS.2018.09.03: Tested. 
 #SET(%BaseName, 'SQLANYWHERE')                                                  #! SQLANYWHERE:   RAYS.2018.06.12: Tested.
-#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
 #SET(%BaseName, 'MSSQL')                                                        #! MSSQL:         RAYS.2018.06.03: Tested.
 #SET(%BaseName, 'MIMER')                                                        #! MIMER:         RAYS.2018.04.07: Tested.
+#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
 #SET(%BaseName, 'METABASE')                                                     #! METABASE:      Generic-Skeleton. NO backend.
+#DECLARE(%pBaseName)                                                            #! RA.2020.07.16: Needs Definion. WTH! [???]
+#SET(%pBaseName,'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #INSERT(%VariablesCommon)                                                       #! Need a few simple variables

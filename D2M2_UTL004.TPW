@@ -74,9 +74,10 @@
 #CALL(%UtilityPrefix                      , %BaseUtil)                                            #! RA.2020.03.24: Changed
 #CALL(%BuildQualifiedFiles)
 #IF(%TRUE)
+#SET(%LineCount , 0)
 #SET(%AuditLines, 0)
 #!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
--- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+-- SEQ# TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
 --
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
@@ -94,11 +95,12 @@
       #FIND(%SqlWordList, %SqlWordItem)
       #!
       #IF(%SqlWordList)
--- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]NFilesName %[0]NULL %[40]FileName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+        #SET(%LineCount,%LineCount+1)
+-- %@N04@(%LineCount) %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]NFilesName %[0]NULL %[40]FileName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
         #SET(%AuditLines, %AuditLines + 1)
         #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
--- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+-- SEQ# TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
 --
         #ENDIF
       #ENDIF      
@@ -129,11 +131,12 @@
         #FIND(%SqlWordList, %SqlWordItem)
         #!
         #IF(%SqlWordList)
--- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]KeyID %[0]NULL %[40]KeyName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+          #SET(%LineCount,%LineCount+1)
+-- %@N04@(%LineCount) %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]KeyID %[0]NULL %[40]KeyName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
           #SET(%AuditLines, %AuditLines + 1)
           #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
--- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+-- SEQ# TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
 --
           #ENDIF
         #ENDIF
@@ -146,11 +149,12 @@
         #SET(%SqlWordItem, UPPER(%FieldID))
         #FIND(%SqlWordList, %SqlWordItem)
         #IF(%SqlWordList)
--- %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]FieldID %[0]NULL %[40]FieldName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
+          #SET(%LineCount,%LineCount+1)
+-- %@N04@(%LineCount) %@S7@(%ItemType) %[0]NULL %[8]FilePrefix %[0]NULL %[30]NFilesName %[0]NULL %[30]FieldID %[0]NULL %[40]FieldName %[0]NULL %[10]FileDriver %[0]NULL %SqlWordList 
           #SET(%AuditLines, %AuditLines + 1)
           #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
 --
--- TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
+-- SEQ# TYPE %[3]NULL PREFIX %[2]NULL FILENAME %[22]NULL TYPENAME %[22]NULL EXTERNALNAME %[28]NULL DRIVERTYPE %[0]NULL RESERVED-WORD
 --
           #ENDIF
         #ENDIF
@@ -222,6 +226,7 @@
 #DECLARE(%NextLine)
 #DECLARE(%AuditLines)
 #DECLARE(%ItemType)
+#DECLARE(%LineCount)
 #!DECLARE(%KeyFieldList)
 #!DECLARE(%KeyFieldID)
 #!
