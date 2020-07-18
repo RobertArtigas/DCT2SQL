@@ -155,6 +155,7 @@
 #INCLUDE('D2M2_UTL003.TPW')         #! 42) [UTIL] FILE related AUDIT            verify [UTIL] (Roberto Artigas y Soler)
 #INCLUDE('D2M2_012.TPW')            #! 43) Do QUOTING generation                INTERNAL CODE (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL004.TPW')         #! 44) [UTIL] Show RESERVED words           verify [UTIL] (Roberto Artigas y Soler)
+#INCLUDE('D2M2_UTL005.TPW')         #! 45) [UTIL] Show DUPLICATE keys           verify [UTIL] (Roberto Artigas y Soler)
 #!
 #INCLUDE('D2M1_POSTGRESQL.TPW')     #! ??) DCT -> [COMBINED] POSTGRESQL         generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MYSQL.TPW')          #! ??) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)
