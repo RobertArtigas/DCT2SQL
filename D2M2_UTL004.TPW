@@ -8,7 +8,11 @@
 #!              All rights reserved world wide.
 #! Changes:
 #! 2020.07.17   Roberto Artigas
-#!  *   Template utility creation.
+#!  *   Rework template, reformat lines, add DCT2SQL infrastructure.
+#! 2007.04.27   Roberto Artigas
+#!  *   Re-arranged output line to align all the fields neatly
+#! 2007.04.21   Bo Schmitz
+#!  *   Begin creation of this template (specific requirements)
 #!
 #UTILITY(D2M2_UTIL_RESERVED, '2020.07.17: [UTIL] Check for RESERVED words')
 #!-----------------------------------------------------------------------------

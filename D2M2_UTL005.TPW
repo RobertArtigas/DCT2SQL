@@ -8,7 +8,12 @@
 #!              All rights reserved world wide.
 #! Changes:
 #! 2020.07.17   Roberto Artigas
-#!  *   Template utility creation.
+#!  *   Rework template, reformat lines, add DCT2SQL infrastructure.
+#! 2005.12.08   Bo Schmitz
+#!  *   Added Code to only print duplicates
+#!  *   Added Code to enhance looks and count duplicates.
+#! 2005.12.01   Bo Schmitz
+#!  *   Begin creation of this template (specific requirements)
 #!
 #UTILITY(D2M2_UTIL_DUPKEYS, '2020.07.17: [UTIL] Check for DUPLICATE table keys')
 #!-----------------------------------------------------------------------------
@@ -232,11 +237,7 @@
 #PREPARE
 #DECLARE(%AuditLines)
 #DECLARE(%LineCount)
-#!DECLARE(%ItemType)
-#!DECLARE(%NextLine)
-#!DECLARE(%ItemType)
-#!DECLARE(%KeyFieldList)
-#!DECLARE(%KeyFieldID)
+#!
 #DECLARE(%KeysSorted) ,UNIQUE
 #DECLARE(%MyKey       ,%KeysSorted)
 #DECLARE(%MyFile      ,%KeysSorted)
@@ -252,16 +253,6 @@
 #DECLARE(%LastPrefix)
 #DECLARE(%LastDriver)
 #!
-#!DECLARE(%opt004AddClarion                 ,LONG)
-#!SET(%opt004AddClarion                     ,FALSE)
-#!DECLARE(%opt004UseDriverClarion           ,LONG)
-#!SET(%opt004UseDriverClarion               ,FALSE)
-#!DECLARE(%opt004UseDriverTopspeed          ,LONG)
-#!SET(%opt004UseDriverTopspeed              ,FALSE)
-#!DECLARE(%opt004IgnoreNamesTable           ,LONG)
-#!SET(%opt004IgnoreNamesTable               ,FALSE)
-#!DECLARE(%opt004IgnoreNamesKey             ,LONG)
-#!SET(%opt004IgnoreNamesKey                 ,FALSE)
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
