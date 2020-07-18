@@ -1,0 +1,269 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_UTL005.tpw
+#! Purpose:     UTILITY: Check for DUPLICATE table keys
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2020.07.17   Roberto Artigas
+#!  *   Template utility creation.
+#!
+#UTILITY(D2M2_UTIL_DUPKEYS, '2020.07.17: [UTIL] Check for DUPLICATE table keys')
+#!-----------------------------------------------------------------------------
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
+#SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???
+#SET(%BaseName, 'PERVASIVE')                                                    #! PERVASIVE: ???
+#SET(%BaseName, 'FIREBIRD')                                                     #! FIREBIRD: ???
+#SET(%BaseName, 'SYBASE')                                                       #! SYBASE: ???
+#SET(%BaseName, 'DB2')                                                          #! DB2: ???
+#SET(%BaseName, 'ORACLE')                                                       #! ORACLE: ???
+#SET(%BaseName, 'MYSQL')                                                        #! MYSQL:         RAYS.2018.09.03: Tested. 
+#SET(%BaseName, 'SQLANYWHERE')                                                  #! SQLANYWHERE:   RAYS.2018.06.12: Tested.
+#SET(%BaseName, 'MSSQL')                                                        #! MSSQL:         RAYS.2018.06.03: Tested.
+#SET(%BaseName, 'MIMER')                                                        #! MIMER:         RAYS.2018.04.07: Tested.
+#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
+#SET(%BaseName, 'METABASE')                                                     #! METABASE:      Generic-Skeleton. NO backend.
+#DECLARE(%pBaseName)                                                            #! RA.2020.07.16: Needs Definion. WTH! [???]
+#SET(%pBaseName,'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#INSERT(%PreambleUtility)                                                       #! Basic copyright message
+#INSERT(%VariablesUtility005)                                                   #! RA.2019.07.25.THU: Added 
+#!---------------------------------------------------------------------
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%MITLicenseD2M2UTL005)
+  #INSERT(%ShowExplainUtilDUPKEYS)
+  #INSERT(%MetabaseTabSelection)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#SET(%UtilityChekTable                    , %TRUE)
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseUtil & '_DUPLICATE_KEYS.TXT')  #! RA.2020.03.24: Changed
+#SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
+#!
+#CALL(%UtilityPrefix                      , %BaseUtil)                                            #! RA.2020.03.24: Changed
+#CALL(%BuildQualifiedFiles)
+#IF(%TRUE)
+#SET(%LineCount , 0)
+#SET(%AuditLines, 0)
+#!
+  #FOR(%NFiles)
+    #FIX(%File, %NFilesName)
+    #!
+    #FOR(%Key)
+      #!-----------------------------------------!
+      #! RA.2010.09.13 - Processing key options. !
+      #!-----------------------------------------!
+      #SET(%nLoc1,INSTRING('RASQL(',%KeyUserOptions,1,1))
+      #SET(%nLoc2,INSTRING(')',%KeyUserOptions,1,%nLoc1))
+      #SET(%nKeyUser,SUB(%KeyUserOptions,%nLoc1,%nLoc2))
+      #!SET(%NKeyUser,EXTRACT(%KeyUserOptions,'RASQL'))
+      #SET(%NKeyOpt1,EXTRACT(%NKeyUser,'RASQL',1))
+      #SET(%NKeyOpt2,EXTRACT(%NKeyUser,'RASQL',2))
+      #SET(%NKeyOpt3,EXTRACT(%NKeyUser,'RASQL',3))
+      #SET(%NKeyOpt4,EXTRACT(%NKeyUser,'RASQL',4))
+      #!%NKeyUser, %NKeyOpt1, %NKeyOpt2, %NKeyOpt3, %NKeyOpt4
+      #!------------------------------------------------------------!
+      #! The first option RASQL(NO) controls if a key is processed. !
+      #!------------------------------------------------------------!
+      #IF(SUB(%NKeyOpt1,1,1)='N')
+        #CYCLE
+      #ENDIF
+      #ADD(%KeysSorted, %KeyID & '  -  ' & %File & '  -  ' & %KeyName & '  -  ' & %MyExtFile)
+      #SET(%MyKey       ,%KeyID)
+      #SET(%MyFile      ,%File)
+      #SET(%MyExtKey    ,%KeyName)
+      #SET(%MyExtFile   ,%FileName)
+      #SET(%MyPrefix    ,%FilePrefix)
+      #SET(%MyDriver    ,UPPER(%FileDriver))
+    #ENDFOR #!(%Key)
+    #!
+  #ENDFOR
+    #!
+    #IF(%FALSE)
+      #FOR(%KeysSorted)
+#!%KeysSorted
+%[40]MyKey - %[40]MyFile - %[40]MyExtFile - %[40]MyExtKey - %[10]MyPrefix - %[10]MyDriver
+      #ENDFOR
+
+    #ENDIF
+  #!
+  #SET(%LastKey       ,'')
+  #SET(%LastFile      ,'')
+  #SET(%LastExtKey    ,'')
+  #SET(%LastExtFile   ,'')
+  #SET(%LastPrefix    ,'')
+  #SET(%LastDriver    ,'')
+-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+--
+  #FOR(%KeysSorted)
+    #!
+    #IF(%MyKey = %LastKey)
+      #IF(%MatchCount = 0) #!NEW MATCH
+#!%[30]LastKey  %[30]LastFile %[30]LastExtFile %LastExtKey
+#!%[30]MyKey  %[30]MyFile %[30]MyExtFile %MyExtKey
+        #SET(%LineCount,%LineCount+1)
+-- %@N04@(%LineCount) %[10]LastDriver %[0]NULL %[8]LastPrefix %[0]NULL %[30]LastFile %[0]NULL %[40]LastExtFile %[0]NULL %[30]LastKey %[0]NULL %[30]LastExtKey
+        #SET(%AuditLines, %AuditLines + 1)
+        #SET(%LineCount,%LineCount+1)
+        #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+--
+        #ENDIF
+-- %@N04@(%LineCount) %[10]MyDriver %[0]NULL %[8]MyPrefix %[0]NULL %[30]MyFile %[0]NULL %[40]MyExtFile %[0]NULL %[30]MyKey %[0]NULL %[30]MyExtKey
+        #SET(%AuditLines, %AuditLines + 1)
+        #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+--
+        #ENDIF
+        #SET(%LastKey,%MyKey)
+        #SET(%LastFile,%MyFile)
+        #SET(%LastExtKey,%MyExtKey)
+        #SET(%LastExtFile,%MyExtFile)
+        #SET(%LastPrefix,%MyPrefix)
+        #SET(%LastDriver,%MyDriver)
+        #SET(%MatchCount,1)
+      #ELSE #!(%MatchCount = 0)  ANOTHER MATCH
+#!%[30]MyKey  %[30]MyFile %[30]MyExtFile %MyExtKey
+        #SET(%LineCount,%LineCount+1)
+-- %@N04@(%LineCount) %[10]MyDriver %[0]NULL %[8]MyPrefix %[0]NULL %[30]MyFile %[0]NULL %[40]MyExtFile %[0]NULL %[30]MyKey %[0]NULL %[30]MyExtKey
+        #SET(%AuditLines, %AuditLines + 1)
+        #IF(%AuditLines % 20 = 0 AND ITEMS(%NFiles) <> %AuditLines)
+--
+-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+--
+        #ENDIF
+      #ENDIF #!(%MatchCount = 0)
+    #ELSE #!(%MyKey = %LastKey)  NO MATCH
+        #SET(%LastKey,%MyKey)
+        #SET(%LastFile,%MyFile)
+        #SET(%LastExtKey,%MyExtKey)
+        #SET(%LastExtFile,%MyExtFile)
+        #SET(%LastPrefix,%MyPrefix)
+        #SET(%LastDriver,%MyDriver)
+        #SET(%MatchCount,0)
+    #ENDIF #!(%MyKey = %LastKey)
+    #!
+  #ENDFOR
+--
+-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+#ENDIF
+#CALL(%UtilitySuffix                      , %BaseUtil)      #! RA.2020.03.24: Changed
+#!
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2UTL005)
+#TAB('UTIL_DUPKEYS'),PROP(PROP:FontStyle,700)
+  #INSERT(%MITLicense)
+  #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY('No options needed. Just press the okay button to go.')
+    #!PROMPT('OFF: Do NOT add Clarion reserved words. ON: Add Clarion reserved words.'     , CHECK), %opt004AddClarion, AT(10)
+    #!DISPLAY('')
+    #!PROMPT('OFF: Ignore CLARION driver. ON: Use CLARION driver.'                         , CHECK), %opt004UseDriverClarion, AT(10)
+    #!PROMPT('OFF: Ignore TOPSPEED driver. ON: Use TOPSPEED driver.'                       , CHECK), %opt004UseDriverTopspeed, AT(10)
+    #!DISPLAY('')
+    #!PROMPT('OFF: Use table names. ON: Ignore table names.'                               , CHECK), %opt004IgnoreNamesTable, AT(10)
+    #!PROMPT('OFF: Use key names. ON: Ignore key names.'                                   , CHECK), %opt004IgnoreNamesKey, AT(10)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilDUPKEYS)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextDUPKEYS))
+    #DECLARE(%ExplainTextDUPKEYS)
+  #ENDIF
+  #SET(%ExplainTextDUPKEYS, '')
+  #!SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & '<13,10><13,10>')
+  #SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & 'This generic utility will check duplicate key names in the dictionary')
+  #SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & ' that may give you problems in the various back ends.')
+  #!SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & '<13,10><13,10>')
+  #!SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & '<13,10><13,10>')
+  #!SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextDUPKEYS, %ExplainTextDUPKEYS & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilDUPKEYS)
+#INSERT(%ExplainUtilDUPKEYS)
+#!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+#TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextDUPKEYS),AT(,,436,204)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RA.2019.07.25: Added
+#GROUP(%VariablesUtility005)
+#PREPARE
+#DECLARE(%AuditLines)
+#DECLARE(%LineCount)
+#!DECLARE(%ItemType)
+#!DECLARE(%NextLine)
+#!DECLARE(%ItemType)
+#!DECLARE(%KeyFieldList)
+#!DECLARE(%KeyFieldID)
+#DECLARE(%KeysSorted) ,UNIQUE
+#DECLARE(%MyKey       ,%KeysSorted)
+#DECLARE(%MyFile      ,%KeysSorted)
+#DECLARE(%MyExtKey    ,%KeysSorted)
+#DECLARE(%MyExtFile   ,%KeysSorted)
+#DECLARE(%MyPrefix    ,%KeysSorted)
+#DECLARE(%MyDriver    ,%KeysSorted)
+#DECLARE(%MatchCount)
+#DECLARE(%LastKey)
+#DECLARE(%LastFile)
+#DECLARE(%LastExtKey)
+#DECLARE(%LastExtFile)
+#DECLARE(%LastPrefix)
+#DECLARE(%LastDriver)
+#!
+#!DECLARE(%opt004AddClarion                 ,LONG)
+#!SET(%opt004AddClarion                     ,FALSE)
+#!DECLARE(%opt004UseDriverClarion           ,LONG)
+#!SET(%opt004UseDriverClarion               ,FALSE)
+#!DECLARE(%opt004UseDriverTopspeed          ,LONG)
+#!SET(%opt004UseDriverTopspeed              ,FALSE)
+#!DECLARE(%opt004IgnoreNamesTable           ,LONG)
+#!SET(%opt004IgnoreNamesTable               ,FALSE)
+#!DECLARE(%opt004IgnoreNamesKey             ,LONG)
+#!SET(%opt004IgnoreNamesKey                 ,FALSE)
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
