@@ -1,0 +1,200 @@
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! File Name:   D2M2_UTL006.tpw
+#! Purpose:     UTILITY: XREF for fields and keys
+#! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
+#!              All rights reserved world wide.
+#! Changes:
+#! 2020.07.18   Roberto Artigas
+#!  *   Rework template, reformat lines, add DCT2SQL infrastructure.
+#! 2002.10.27   Roberto Artigas Jr
+#!  *   Now outputing field picture and field type.
+#!  *   Set in between divider between columns prompt now suported.
+#! 2002.08.27   Roberto Artigas Jr
+#!  *   Added the field picture to the field name to make it easier to deal
+#!      with checking dictionary fields matching for types.
+#!
+#UTILITY(D2M2_XREF_FIELDS, '2020.07.18: [XREF] Check field names for consistency.')
+#!-----------------------------------------------------------------------------
+#! RA.2017.12.17 - The %BaseName determines what backend you are processing.
+#! All the specific items related to a backend can be coded with a case statement.
+#! This will make the code easier to maintain accross all the backends.
+#PREPARE
+#DECLARE(%BaseName)                                                             #! Define the BACKEND here
+#SET(%BaseName, 'PSQL')                                                         #! PSQL: ???
+#SET(%BaseName, 'INTERBASE')                                                    #! INTERBASE: ???
+#SET(%BaseName, 'PERVASIVE')                                                    #! PERVASIVE: ???
+#SET(%BaseName, 'FIREBIRD')                                                     #! FIREBIRD: ???
+#SET(%BaseName, 'SYBASE')                                                       #! SYBASE: ???
+#SET(%BaseName, 'DB2')                                                          #! DB2: ???
+#SET(%BaseName, 'ORACLE')                                                       #! ORACLE: ???
+#SET(%BaseName, 'MYSQL')                                                        #! MYSQL:         RAYS.2018.09.03: Tested. 
+#SET(%BaseName, 'SQLANYWHERE')                                                  #! SQLANYWHERE:   RAYS.2018.06.12: Tested.
+#SET(%BaseName, 'MSSQL')                                                        #! MSSQL:         RAYS.2018.06.03: Tested.
+#SET(%BaseName, 'MIMER')                                                        #! MIMER:         RAYS.2018.04.07: Tested.
+#SET(%BaseName, 'POSTGRESQL')                                                   #! POSTGRESQL:    RAYS.2018.06.10: Tested.
+#SET(%BaseName, 'METABASE')                                                     #! METABASE:      Generic-Skeleton. NO backend.
+#DECLARE(%pBaseName)                                                            #! RA.2020.07.16: Needs Definion. WTH! [???]
+#SET(%pBaseName,'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#DECLARE(%BaseUtil)                                                             #! Define the UTILITY here
+#SET(%BaseUtil, 'TPLUTILITY')                                                   #! TPLUTILITY: NOT A BACKEND
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#INSERT(%VariablesCommon)                                                       #! Need a few simple variables
+#INSERT(%GetDictionaryPath)                                                     #! Get dictionary path and names
+#INSERT(%VariablesDeclare)                                                      #! Option checks and output file names
+#INSERT(%VariablesSetup)                                                        #! Setup output file names
+#INSERT(%VariablesOptions)                                                      #! All option variables setup here
+#INSERT(%DefineAreasOptions)                                                    #! File,Field,Keys,Relations
+#INSERT(%ReserveWordDefines)                                                    #! Reserved Words Defines
+#INSERT(%PreambleUtility)                                                       #! Basic copyright message
+#INSERT(%VariablesUtility006)                                                   #! RA.2019.07.25.THU: Added 
+#!---------------------------------------------------------------------
+#SHEET,HSCROLL,AT(,,464)
+  #INSERT(%MITLicenseD2M2UTL006)
+  #INSERT(%ShowExplainUtilXREFFIELDS)
+  #INSERT(%MetabaseTabSelection)
+#ENDSHEET
+#!---------------------------------------------------------------------
+#! START EXECUTION HERE
+#!---------------------------------------------------------------------
+#!#DECLARE(%DebugSet,LONG)
+#!#SET(%DebugSet,1)
+#!#DEBUG(%DebugSet)
+#!
+#SET(%UtilityChekTable                    , %TRUE)
+#SET(%UtilityNameTable                    , %DictName & '_' & %BaseUtil & '_XREF_FIELDS.TXT')  #! RA.2020.03.24: Changed
+#SET(%UtilityNameTableOut                 , %DictPath & %UtilityNameTable)
+#!
+#CALL(%UtilityPrefix                      , %BaseUtil)                                            #! RA.2020.03.24: Changed
+#CALL(%BuildQualifiedFiles)
+#IF(%TRUE)
+  #SET(%LineCount , 0)
+  #SET(%AuditLines, 0)
+  #!
+  #FOR(%NFiles)
+    #FIX(%File, %NFilesName)
+    #!
+    #FOR(%Field)
+      #SET(%nLoc1,INSTRING('RASQL(',%FieldUserOptions,1,1))
+      #SET(%nLoc2,INSTRING(')',%FieldUserOptions,1,%nLoc1))
+      #SET(%nFieldUser,UPPER(SUB(%FieldUserOptions,%nLoc1,%nLoc2)))
+      #SET(%NFieldOpt1,EXTRACT(%NFieldUser,'RASQL',1))
+      #SET(%NFieldOpt2,EXTRACT(%NFieldUser,'RASQL',2))
+      #SET(%NFieldOpt3,EXTRACT(%NFieldUser,'RASQL',3))
+      #SET(%NFieldOpt4,EXTRACT(%NFieldUser,'RASQL',4))
+      #IF(SUB(%NFieldOpt1,1,1)='N')
+        #CYCLE
+      #ENDIF
+      #!
+      #IF(%FieldType='GROUP')
+        #CYCLE
+      #ENDIF
+      #!
+      #IF(%FieldType='END')
+        #CYCLE
+      #ENDIF
+      #!
+      #SET(%NFieldName, %FieldID)
+      #SET(%NFieldName, %NFieldName & ' (' & %FieldPicture & ',' & %FieldType & ')')
+      #SET(%NextLine, %File       & ALL(' ', %AtColPos2 - LEN(%File)) & ' ' & %FilePrefix)
+      #SET(%WorkLine, %NFieldName & ALL(' ', %AtColPos1 - LEN(%NFieldName)) & ' ==> ' & %NextLine)
+      #ADD(%FieldTableList, %WorkLine)
+    #ENDFOR
+    #!
+  #ENDFOR
+  #!
+  #SET(%LineCount,0)
+  #SET(%AuditLines,0)
+--
+  #FOR(%FieldTableList)
+    #SET(%LineCount,%LineCount+1)
+-- %@N_06@(%LineCount) %FieldTableList
+    #SET(%AuditLines, %AuditLines + 1)
+    #IF(%AuditLines % 20 = 0 AND ITEMS(%FieldTableList) <> %AuditLines)
+--
+    #ENDIF
+  #ENDFOR
+--
+#!-- SEQ# DRIVERTYPE %[0]NULL PREFIX %[2]NULL FILENAME %[22]NULL EXTERNALFILE %[28]NULL KEYNAME %[23]NULL EXTERNALKEY
+#ENDIF
+#CALL(%UtilitySuffix                      , %BaseUtil)      #! RA.2020.03.24: Changed
+#!
+#!
+#!#SET(%DebugSet,0)
+#!#DEBUG(%DebugSet)
+#!---------------------------------------------------------------------
+#! END EXECUTION HERE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%MITLicenseD2M2UTL006)
+#TAB('XREF_FIELDS'),PROP(PROP:FontStyle,700)
+  #INSERT(%MITLicense)
+  #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+    #DISPLAY(''),AT(,,,1)
+    #PROMPT('Set in between field column divider at: ',@n4),%AtColPos1,AT(150,,30),DEFAULT(50)
+    #PROMPT('Set in between table column divider at: ',@n4),%AtColPos2,AT(150,,30),DEFAULT(50)
+    #DISPLAY('')
+    #DISPLAY('If you have large table names and field names, then enter 120 in both values above.')
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilXREFFIELDS)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextXREFFIELDS))
+    #DECLARE(%ExplainTextXREFFIELDS)
+  #ENDIF
+  #SET(%ExplainTextXREFFIELDS, '')
+  #!SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & 'This is one of the METABASE templates.')
+  #!SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & '<13,10><13,10>')
+  #SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & 'This generic utility will check duplicate field names in the dictionary')
+  #SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & ' that may give you problems in the various back ends.')
+  #!SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & '<13,10><13,10>')
+  #!SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & '<13,10><13,10>')
+  #!SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextXREFFIELDS, %ExplainTextXREFFIELDS & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilXREFFIELDS)
+#INSERT(%ExplainUtilXREFFIELDS)
+#!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+#TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextXREFFIELDS),AT(,,436,204)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------         #! RA.2019.07.25: Added
+#GROUP(%VariablesUtility006)
+#PREPARE
+#!
+#IF(VAREXISTS(%AuditLines)=0)
+#DECLARE(%AuditLines)
+#ENDIF
+#IF(VAREXISTS(%LineCount)=0)
+#DECLARE(%LineCount)
+#ENDIF
+#!
+#IF(VAREXISTS(%FieldTableList)=0)
+#DECLARE(%FieldTableList),MULTI,UNIQUE
+#ENDIF
+#IF(VAREXISTS(%NextLine)=0)
+#DECLARE(%NextLine)
+#ENDIF
+#IF(VAREXISTS(%WorkLine)=0)
+#DECLARE(%WorkLine)
+#ENDIF
+#!
+#ENDPREPARE
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
