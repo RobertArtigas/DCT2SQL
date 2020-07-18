@@ -156,6 +156,8 @@
 #INCLUDE('D2M2_012.TPW')            #! 43) Do QUOTING generation                INTERNAL CODE (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL004.TPW')         #! 44) [UTIL] Show RESERVED words           verify [UTIL] (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL005.TPW')         #! 45) [UTIL] Show DUPLICATE keys           verify [UTIL] (Roberto Artigas y Soler)
+#INCLUDE('D2M2_UTL006.TPW')         #! 46) [XREF] FIELDS and TABLES             verify [XREF] (Roberto Artigas y Soler)
+#INCLUDE('D2M2_UTL007.TPW')         #! 47) [XREF] KEYS and TABLES               verify [XREF] (Roberto Artigas y Soler)
 #!
 #INCLUDE('D2M1_POSTGRESQL.TPW')     #! ??) DCT -> [COMBINED] POSTGRESQL         generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MYSQL.TPW')          #! ??) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)
