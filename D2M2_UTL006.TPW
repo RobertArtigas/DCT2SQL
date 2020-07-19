@@ -98,7 +98,9 @@
       #ENDIF
       #!
       #SET(%NFieldName, %FieldID)
-      #SET(%NFieldName, %NFieldName & ' (' & %FieldPicture & ',' & %FieldType & ')')
+      #!SET(%NFieldName, %NFieldName & ' (' & %FieldPicture & ',' & %FieldType & ')')
+      #CALL(%GetFieldType,%WorkType,%FieldType,%FieldMemoSize,%FieldPlaces)
+      #SET(%NFieldName, %NFieldName & ' [ ' & %FieldPicture & ',' & %WorkType & ' ]')
       #SET(%NextLine, %File       & ALL(' ', %AtColPos2 - LEN(%File)) & ' ' & %FilePrefix)
       #SET(%WorkLine, %NFieldName & ALL(' ', %AtColPos1 - LEN(%NFieldName)) & ' ==> ' & %NextLine)
       #ADD(%FieldTableList, %WorkLine)
@@ -136,8 +138,8 @@
   #INSERT(%MITLicense)
   #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Set in between field column divider at: ',@n4),%AtColPos1,AT(150,,30),DEFAULT(50)
-    #PROMPT('Set in between table column divider at: ',@n4),%AtColPos2,AT(150,,30),DEFAULT(50)
+    #PROMPT('Set in between field column divider at: ',@n4),%AtColPos1,AT(150,,30),DEFAULT(60)
+    #PROMPT('Set in between table column divider at: ',@n4),%AtColPos2,AT(150,,30),DEFAULT(60)
     #DISPLAY('')
     #DISPLAY('If you have large table names and field names, then enter 120 in both values above.')
   #ENDBOXED
@@ -171,6 +173,22 @@
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! #GROUP(%GetFieldType,*%ThisType,%pType,%pMemo,%pPlaces)
+#! #CASE(%pType)
+#! #OF  ('DECIMAL')
+#! #OROF('PDECIMAL')
+#!   #SET(%ThisType , %pType & '(' & %pMemo & ',' & %pPlaces & ')')
+#! #OF  ('STRING')
+#! #OROF('MEMO')
+#! #OROF('BLOB')
+#! #OROF('PSTRING')
+#! #OROF('USTRING')
+#!   #SET(%ThisType , %pType & '(' & %pMemo & ')')
+#! #OF  ('CSTRING')
+#!   #SET(%ThisType , %pType & '(' & %pMemo-1 & ')')
+#! #ELSE
+#!   #SET(%ThisType , %pType)
+#! #ENDCASE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%VariablesUtility006)
@@ -191,6 +209,9 @@
 #ENDIF
 #IF(VAREXISTS(%WorkLine)=0)
 #DECLARE(%WorkLine)
+#ENDIF
+#IF(VAREXISTS(%WorkType)=0)
+#DECLARE(%WorkType)
 #ENDIF
 #!
 #ENDPREPARE

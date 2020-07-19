@@ -7,6 +7,8 @@
 #! Author:      Copyright ? 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.07.19.SUN:      Roberto Artigas
+#!  * Added something simple: #GROUP(%GetFieldType,*%ThisType,%pType,%pMemo,%pPlaces)
 #! 2020.05.21.THU:      Roberto Artigas
 #!  *   Enhancements to the field width calculation for list boxes (Clarion, Noyantis)
 #! 2020.02.26.WED:      Roberto Artigas
@@ -1406,6 +1408,27 @@
 !   %BuildPart1
   #SET(%CountFields,%CountFields+2) 
 #ENDFOR
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#! RA.2020.07.19.SUN: #GROUP(%GetFieldType,*%ThisType,%pType,%pMemo,%pPlaces)
+#GROUP(%GetFieldType,*%ThisType,%pType,%pMemo,%pPlaces)
+#CASE(%pType)
+#OF  ('DECIMAL')
+#OROF('PDECIMAL')
+  #SET(%ThisType , %pType & '(' & %pMemo & ',' & %pPlaces & ')')
+#OF  ('STRING')
+#OROF('MEMO')
+#OROF('BLOB')
+#OROF('PSTRING')
+#OROF('USTRING')
+  #SET(%ThisType , %pType & '(' & %pMemo & ')')
+#OF  ('CSTRING')
+  #SET(%ThisType , %pType & '(' & %pMemo-1 & ')')
+#ELSE
+  #SET(%ThisType , %pType)
+#ENDCASE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
