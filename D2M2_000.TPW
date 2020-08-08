@@ -3710,13 +3710,19 @@ CREATE TABLE %TheTable (
 #CALL(%BuildQualifiedIndexes)                                                   #! Just use Indexes you need
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2020.07.17: Consider checking options for generating this NON-EXISTING auto-increment.
+#!                File:   Options:  STRING:       EMULATEAUTONUMKEY (TRUE)
+#!                Field:  Options:  Predefined:   SoftVelocity.ABC and Clarion.IsIdentity  IsIdentity (TRUE)
+#!---------------------------------------------------------------------
 #! RA.2019.08.10: Handle [???] External in the fields for indexes [GUID and Time Stamp fields]
+#!---------------------------------------------------------------------
 #! RA.2018.11.09: No AUTO-INCREMENT flag found (And you need to generate a ROW level AUTO-INCREMENT)
 #! Mr. Michael Gorman removed all the auto-increment flags from his primary keys (SURPRISE!).
 #! He is having the BACKEND generate the auto-increment so the DCT does not have any definition.
 #! That caused the ROW level auto-increment generation to fail for MSSQL (and SQLANYWHERE) since that
 #! generation is based out of the AUTO-INCREMENT field that is filled when you set the auto-increment flag.
 #! Figured out a way to build the items in the correct tables since there are rules for auto-incrementing.
+#! First field, LONG; First Key, 1 field, LONG; implied auto-increment. 
 #! Tested by generating the IDENTITY (1, 1) in the create table for MSSQL.
 #! Verified that MIMER sequence was being generated correctly.
 #! The %TraceDetail flag shows WARNING statements that will come out when the AUTO-INCREMENT flag is missing.
