@@ -7,8 +7,8 @@ Clarion dictionary to SQL DDL back end code generation templates.
 
 This will take a clarion dictionary (DCT) and create SQL DDL code for several back ends.
 
-## The current SQL back ends can have DDL template generated code are: 
-*POSTGRESQL, MYSQL, MSSQL, SQLANYWHERE, and MIMER.*
+### The current SQL back ends can have DDL template generated code are: 
+**POSTGRESQL, MYSQL, MSSQL, SQLANYWHERE, and MIMER.**
 
 The dictionaries should be SQL ready to be generated correctly and there are a number of audit templates to help you check and correct your dictionary.
 
@@ -16,7 +16,7 @@ The UTILITY templates have documentation built in that shows on the screen. Docu
 
 ### Conversion of DATA from ISAM to SQL task
 The DCT2SQL templates do not handle conversion of the data in your ISAM files.
- The additional task where you have to create procedures to output all your table's data as a CSV file is done by the _DUMPLOAD_ backup code generator.
+ The additional task where you have to create procedures to output all your table's data as a CSV file is done by the **DUMPLOAD** backup code generator.
  You will still have to create the SQL backend table LOAD query script. That is dependent on your SQL
  backend and you will have to build that QUERY yourself.
 
