@@ -2,10 +2,10 @@
 IF you want me to continue improving this SQL DDL code generator, THEN send me an e-mail that you are using it.
  It might be useful to include your use case scenario and a description of why you want this improvement and how it helps the business you are involved in working.
  
-# DCT2SQL (SQL DDL Generator)
-Clarion dictionary to SQL DDL back end templates.
+# DCT2SQL (SQL DDL Code Generator)
+Clarion dictionary to SQL DDL back end code generation templates.
 
-This will take a clarion dictionary (DCT) and create SQL DDL for several back ends.
+This will take a clarion dictionary (DCT) and create SQL DDL code for several back ends.
 
 ## The current SQL back ends can have DDL template generated code are: 
 *POSTGRESQL, MYSQL, MSSQL, SQLANYWHERE, and MIMER.*
@@ -15,8 +15,8 @@ The dictionaries should be SQL ready to be generated correctly and there are a n
 The UTILITY templates have documentation built in that shows on the screen. Documentation is updated and improved on a regular basis. And since these templates only create output text files, they do not cause any changes to your existing systems and operations.
 
 ### Conversion of DATA from ISAM to SQL task
- The DCT2SQL templates do not handle conversion of the data in your ISAM files.
- The additional task where you have to create procedures to output all your table's data as a CSV file is done by the DUMPLOAD code generator.
+The DCT2SQL templates do not handle conversion of the data in your ISAM files.
+ The additional task where you have to create procedures to output all your table's data as a CSV file is done by the _DUMPLOAD_ backup code generator.
  You will still have to create the SQL backend table LOAD query script. That is dependent on your SQL
  backend and you will have to build that QUERY yourself.
 
