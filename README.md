@@ -1,6 +1,8 @@
 ## Development
-IF you want me to continue improving this SQL DDL code generator, THEN send me an e-mail that you are using it.
- It might be useful to include your use case scenario and a description of why you want this improvement and how it helps the business you are involved in working.
+IF you want me to continue improving this SQL DLL code generator, THEN send me an e-mail that you are using **DCT2SQL**.
+ It might be useful to include your use case scenario for **DCT2SQL** and a description of how it helps the ROI of the business you are involved in working.
+ After all is said and done, information technology is there to support the business goals. 
+ And the translation of business goals to automation with information technology is our job.
  
 # DCT2SQL (SQL DDL Code Generator)
 Clarion dictionary to SQL DDL back end code generation templates.
