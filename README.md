@@ -25,7 +25,7 @@ The DCT2SQL templates do not handle conversion of the data in your ISAM files.
  backend and you will have to build that QUERY yourself.
 
 
-# Clarion Live Webinars explaining how to use the DCT2SQL templates
+# Webinars explaining how to use the DCT2SQL templates
 
 474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
 
