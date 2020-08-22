@@ -27,9 +27,9 @@ The DCT2SQL templates do not handle conversion of the data in your ISAM files.
 
 # Webinars explaining how to use the DCT2SQL templates
 
-474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
+ClarionLive: 474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
 
-560 : May 01, 2020 : https://www.youtube.com/watch?v=bAolfvrz2oE&feature=youtu.be
+ClarionLive: 560 : May 01, 2020 : https://www.youtube.com/watch?v=bAolfvrz2oE&feature=youtu.be
 
 ## Let me know about your conversion
 Please, if you use the DCT2SQL for your conversion project, then send me an email just letting me know what type of conversion you did, and how you have used them.
