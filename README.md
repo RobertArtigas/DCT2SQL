@@ -25,13 +25,18 @@ The dictionaries should be SQL ready to be generated correctly and there are a n
 
 The UTILITY templates have documentation built in that shows on the screen. Documentation is updated and improved on a regular basis. And since these templates only create output text files, they do not cause any changes to your existing systems and operations.
 
-### Conversion of DATA from ISAM to SQL task
-The DCT2SQL templates do not handle conversion of the data in your ISAM files.
+### Conversion of DATA from ISAM to SQL (Conversión de datos de ISAM a SQL)
+
+The **DCT2SQL** templates do not handle conversion of the data in your ISAM files.
  The additional task where you have to create procedures to output all your table's data as a CSV file is done by the [**DUMPLOAD**](https://github.com/RobertArtigas/DumpLoad) backup code generator.
- You will still have to create the SQL backend table LOAD query script. That is dependent on your SQL
- backend and you will have to build that QUERY yourself.
+ You will still have to create the SQL server table LOAD query script. That is dependent on your SQL
+ server and you will have to build that QUERY yourself.
 
-
+Las plantillas **DCT2SQL** no controlan la conversión de los datos en sus archivos ISAM.
+  La tarea adicional en la que tienes que crear procedimientos para generar todos los datos de tu tabla como un archivo CSV 
+  la realiza el generador de código de reserva [** DUMPLOAD **] (https://github.com/RobertArtigas/DumpLoad).
+  Aún tendrá que crear el script de consulta LOAD de la tabla del servidor SQL. Eso depende de tu SQL
+  servidor y tendrá que construir esa CONSULTA usted mismo.
 # Webinars explaining how to use the DCT2SQL templates
 
 ClarionLive: 474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
@@ -42,4 +47,4 @@ ClarionLive: 560 : May 01, 2020 : https://www.youtube.com/watch?v=bAolfvrz2oE&fe
 Please, if you use the DCT2SQL for your conversion project, then send me an email just letting me know what type of conversion you did, and how you have used them.
  It would be appreciated. Thank you in advance.
 
-[Main](https://github.com/RobertArtigas)
+[Main](https://github.com/RobertArtigas) [Repositories](https://github.com/RobertArtigas?tab=repositories)
