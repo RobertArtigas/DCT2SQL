@@ -34,9 +34,10 @@ The **DCT2SQL** templates do not handle conversion of the data in your ISAM file
 
 Las plantillas **DCT2SQL** no controlan la conversión de los datos en sus archivos ISAM.
   La tarea adicional en la que tienes que crear procedimientos para generar todos los datos de tu tabla como un archivo CSV 
-  la realiza el generador de código de reserva [** DUMPLOAD **] (https://github.com/RobertArtigas/DumpLoad).
+  la realiza el generador de código de reserva [**DUMPLOAD**](https://github.com/RobertArtigas/DumpLoad).
   Aún tendrá que crear el script de consulta LOAD de la tabla del servidor SQL. Eso depende de tu SQL
   servidor y tendrá que construir esa CONSULTA usted mismo.
+
 # Webinars explaining how to use the DCT2SQL templates
 
 ClarionLive: 474 : Aug 03, 2018 : http://www.mediafire.com/file/pm53isb5f3lcquc/DCT2SQL_20180714_A1109.zip
