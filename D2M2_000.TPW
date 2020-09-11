@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.09.11.FRI         Roberto Artigas     (REQUEST: Mr. Hickey)
+#!  *   Convert REAL to BIGINT for TimeStamp [???] ts,sts,dts (GUID)
 #! 2020.06.11.WED:        Roberto Artigas
 #!  *   Let's add quoting. Need to deal with Postgres "MixedCase" names.
 #! 2020.05.25.MON:        Roberto Artigas     (Mr. John Hickey found bug.)         
@@ -363,7 +365,10 @@
   #BOXED('Tables, Fields, Sequences, Indexes, Relations'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
     #PROMPT('Add "_" to the end of reserved SQL words? (ON=Add "_". OFF=Do not add "_".)',CHECK),%optUnderReservedWords,AT(10)
-    #PROMPT('Add table prefix to SQL names? (ON=Add prefix. OFF=Do not add prefix.)',CHECK),%optPrefixAllNames,AT(10)
+    #!-------------------------------------------------------------------------------------------!
+    #! RA.2020.09.08: Needs FURTHER testing or removal. Or just indexes to avoid the duplicates. !
+    #!-------------------------------------------------------------------------------------------!
+    #!PROMPT('Add table prefix to SQL names? (ON=Add prefix. OFF=Do not add prefix.)',CHECK),%optPrefixAllNames,AT(10)
     #PROMPT('Add "quotes" around SQL names? (ON=Add quotes. OFF=Do not add quotes.)',CHECK),%optQuoteAllThings,AT(10)
     #PROMPT('Make SQL names lower case? (ON=Make lower case. OFF=Leave case alone.)',CHECK),%optLowerCaseAllThings,AT(10)
   #ENDBOXED
@@ -944,7 +949,7 @@
   #SET (%NFilesDatabase, %NameDatabase)                                                     #! RA.2020.06.18: From TPL options
   #SET (%NFilesOwner   , %NameOwner)                                                        #! RA.2020.06.18: From TPL options
   #SET (%NFilesSeqName , %NFilesName & '_seq')                                              #! Table Sequence Name - RA.2017.12.21
-  #CALL(%DoPrefixToName,%NFilesSeqName,%FilePrefix,%NFilesSeqName,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
+  #CALL(%DoPrefixToName,%NFilesSeqName,%FilePrefix,%NFilesSeqName,'_',%optPrefixAllNames)   #! RA.2020.07.11: Add table prefix
   #!CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)       #! RA.2020.06.18: Add quotes
   #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
   #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
@@ -1055,7 +1060,7 @@
   #SET (%NFilesDatabase, %NameDatabase)                                                     #! RA.2020.06.18: From TPL options
   #SET (%NFilesOwner   , %NameOwner)                                                        #! RA.2020.06.18: From TPL options
   #SET (%NFilesSeqName , %NFilesName & '_seq')                                              #! Table Sequence Name - RA.2017.12.21
-  #CALL(%DoPrefixToName,%NFilesSeqName,%FilePrefix,%NFilesSeqName,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
+  #CALL(%DoPrefixToName,%NFilesSeqName,%FilePrefix,%NFilesSeqName,'_',%optPrefixAllNames)   #! RA.2020.07.11: Add table prefix
   #!CALL(%QuoteThisThing,%NFilesSeqName,%NFilesSeqName,%pBaseName,%optQuoteAllThings)       #! RA.2020.06.18: Add quotes
   #SET (%NFilesSeqWhere, %NFilesOwner & '.' & %NFilesSeqName)                               #! RA.2020.06.18: Sequence Location
   #CALL(%QuoteThisThing,%NFilesSeqWhere,%NFilesSeqWhere,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.18: Add quotes
@@ -1974,17 +1979,26 @@ DROP INDEX %TheKey
 #!
 #! RA.2018.06.03.SUN: This is a simple fix. No combinatorial changes OR extreme exceptions considered.
 #! RA.2018.06.03.SUN: ALTER TABLE %NRelasFileLink to ALTER TABLE %TheTable2
+#!
 #!CALL(%SetupTheTable,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NRelasFileLink,%optNameOwnerUse,%NameOwner,%NameDatabase)
 #!CALL(%DoPrefixToName,%TheTable2,%FilePrefix,%TheTable2,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
-#CALL(%SetupTheTable2,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
+#!
+#!CALL(%SetupTheTable2,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
+#CALL(%SetupTheTable2,%TheTable2,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NFilesName,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
 #CALL(%QuoteThisThing,%TheTable2,%TheTable2,%pBaseName,%optQuoteAllThings)      #! RA.2020.06.11: Add quotes
 #CALL(%MakeSingleCase,%TheTable2,%TheTable2,%optLowerCaseAllThings)             #! RA.2020.07.03: Make lower case
 #!
-ALTER TABLE %TheTable2
+#! RA.2020.09.10: PROBLEMS WITH REFERENTIAL INTEGRITY IS HERE: DO WE NEED TO SWITCH THE TABLES?
+#! RA.2020.09.10: Added all of the bellow code. Missing Table. (SWITCH: %NFilesName :: %NRelasFileLink)
+#CALL(%SetupTheTable2,%TheTable,%pBaseName,%NFilesCount,%optDefineNamesEnable,%optDefineNames,%NRelasFileLink,%NFilesFullPath,%optNameOwnerUse,%NameOwner,%NameDatabase,%FilePrefix,%optPrefixAllNames,'_')
+#CALL(%QuoteThisThing,%TheTable,%TheTable,%pBaseName,%optQuoteAllThings)        #! RA.2020.09.10: Add quotes
+#CALL(%MakeSingleCase,%TheTable,%TheTable,%optLowerCaseAllThings)               #! RA.2020.09.10: Make lower case
+#!
+ALTER TABLE %TheTable
       #!ADD CONSTRAINT FROM_%NRelasFileFrom_TO_%NRelasKeyLink
       ADD CONSTRAINT %NRelasKeyLink
       FOREIGN KEY %NRelaFieldsChild
-      REFERENCES %TheTable
+      REFERENCES %TheTable2
                   %NRelaFieldsParent
         #!-------------------------------------------------------------------!
         #! RA.2018.06.03: Not valid keywords are taken out earlier.          !
@@ -2295,10 +2309,11 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #SET(%NFieldsCount      ,ITEMS(%NFields))
   #SET(%NFieldsKey        ,%Field)                                              #! Prefix:FieldName
   #SET(%NFieldsName       ,%FieldID)                                            #! FieldName
-  #CALL(%SetupTheField,%NFieldsName,%pBaseName,%FieldID,%FieldName)             #! RA.2019.08.10: Handle EXTERNAL name
-  #CALL(%QuoteThisThing,%NFieldsName,%NFieldsName,%pBaseName,%optQuoteAllThings)#! RA.2020.06.11: Add quotes
-  #CALL(%DoPrefixToName,%NFieldsName,%FilePrefix,%NFieldsName,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
-  #CALL(%MakeSingleCase,%NFieldsName,%NFieldsName,%optLowerCaseAllThings)       #! RA.2020.07.03: Make lower case
+  #CALL(%SetupTheField,%NFieldsName,%pBaseName,%FieldID,%FieldName)                     #! RA.2019.08.10: Handle EXTERNAL name
+  #! RA.2020.09.10: Order corrected: PREFIX, QUOTE, CASE
+  #CALL(%DoPrefixToName,%NFieldsName,%FilePrefix,%NFieldsName,'_',%optPrefixAllNames)   #! RA.2020.07.11: Add table prefix
+  #CALL(%QuoteThisThing,%NFieldsName,%NFieldsName,%pBaseName,%optQuoteAllThings)        #! RA.2020.06.11: Add quotes
+  #CALL(%MakeSingleCase,%NFieldsName,%NFieldsName,%optLowerCaseAllThings)               #! RA.2020.07.03: Make lower case
   #SET(%NFieldsType       ,%FieldType)
   #SET(%NFieldsFormat     ,UPPER(%FieldDisplayPicture))
   #SET(%NFieldsOpts       ,%FieldUserOptions)                                   #! RA.2019.04.30.TUE
@@ -3653,7 +3668,7 @@ CREATE TABLE %TheTable (
       #IF(ITEMS(%KeyField)=1)                                                                         #! [?=1]
         #SET(%NFilesPKeyName,%KeyID)                                      #! [Table Primary Key Name] #! RA.2020.05.25.MON: ERROR reported by John Hickey 
         #CALL(%SetupTheKey,%NFilesPKeyName,%BaseName,%KeyID,%KeyName)                                 #! RA.2020.05.25.MON: Handle EXTERNAL key name
-        #CALL(%DoPrefixToName,%NFilesPKeyName,%FilePrefix,%NFilesPKeyName,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
+        #CALL(%DoPrefixToName,%NFilesPKeyName,%FilePrefix,%NFilesPKeyName,'_',%optPrefixAllNames)     #! RA.2020.07.11: Add table prefix
         #CALL(%QuoteThisThing,%NFilesPKeyName,%NFilesPKeyName,%BaseName,%optQuoteAllThings)           #! RA.2020.06.11: Add quotes
         #CALL(%MakeSingleCase,%NFilesPKeyName,%NFilesPKeyName,%optLowerCaseAllThings)                 #! RA.2020.07.03: Make lower case
         #FOR(%KeyField)                                                                               #! Beginning FOR(%KeyField)
@@ -3773,10 +3788,10 @@ CREATE TABLE %TheTable (
     #SET(%NKeysCount          , ITEMS(%NKeys))                                  #! Key ID number
     #SET(%NKeysKey            , %Key)                                           #! Key Prefix:Name
     #SET(%NKeysName           , %KeyID)                                         #! Key Name
-    #CALL(%SetupTheKey,%NKeysName,%BaseName,%KeyID,%KeyName)                    #! RA.2019.08.10: Handle External Key Name
-    #CALL(%DoPrefixToName,%NKeysName,%FilePrefix,%NKeysName,'_',%optPrefixAllNames) #! RA.2020.07.11: Add table prefix
-    #CALL(%QuoteThisThing,%NKeysName,%NKeysName,%BaseName,%optQuoteAllThings)   #! RA.2020.06.11: Add quotes
-    #CALL(%MakeSingleCase,%NKeysName,%NKeysName,%optLowerCaseAllThings)         #! RA.2020.07.03: Make lower case
+    #CALL(%SetupTheKey,%NKeysName,%BaseName,%KeyID,%KeyName)                          #! RA.2019.08.10: Handle External Key Name
+    #CALL(%DoPrefixToName,%NKeysName,%FilePrefix,%NKeysName,'_',%optPrefixAllNames)   #! RA.2020.07.11: Add table prefix
+    #CALL(%QuoteThisThing,%NKeysName,%NKeysName,%BaseName,%optQuoteAllThings)         #! RA.2020.06.11: Add quotes
+    #CALL(%MakeSingleCase,%NKeysName,%NKeysName,%optLowerCaseAllThings)               #! RA.2020.07.03: Make lower case
     #SET(%NKeysType           , %KeyIndex)                                      #! Key Type
     #SET(%NKeysFlagPri        , 'N')                                            #! Key is: Primary
     #SET(%NKeysFlagSeq        , 'N')                                            #! Key is: Sequence
