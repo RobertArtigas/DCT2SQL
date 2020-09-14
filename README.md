@@ -46,6 +46,8 @@ ClarionLive: 560 : May 01, 2020 : https://www.youtube.com/watch?v=bAolfvrz2oE&fe
 
 ClarionLive: 579 : Sep 11, 2020 : https://www.youtube.com/watch?v=ZK4p6CGoOBo&feature=youtu.be
 
+Clarioneros : 164 : 2020-09-12 : https://clarionlive.com/clarioneros.htm (**OneDrive** link)
+
 ## Let me know about your conversion
 Please, if you use the DCT2SQL for your conversion project, then send me an email just letting me know what type of conversion you did, and how you have used them.
  It would be appreciated. Thank you in advance.
