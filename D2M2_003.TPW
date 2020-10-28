@@ -10,7 +10,7 @@
 #! 2020.07.03.FRI:  Roberto Artigas Jr
 #!  *   Make Clarion MixedCase names ALL lower case (PostgreSQL). 
 #! 2019.11.30.SAT:  Roberto Artigas Jr
-#!  *   Added %tplVer and %tplRel used for temmplate generation.
+#!  *   Added %tplVer and %tplRel used for template generation.
 #! 2019.07.28:      Roberto Artigas
 #!  *   Separated variable related #GROUPs to their own source file.
 #!      Set up the TRIGGER named variables and options.
