@@ -2063,60 +2063,168 @@
   #ADD(%ClarionWordList,'FUNCTION')
   #ADD(%ClarionWordList,'POINTER')
   #ADD(%ClarionWordList,'SHARE')
-  #ADD(%ClarionWordList,'#TEMPLATE')                        #! Template Sections
-  #ADD(%ClarionWordList,'#SYSTEM')
-  #ADD(%ClarionWordList,'#APPLICATION')
-  #ADD(%ClarionWordList,'#PROGRAM')
-  #ADD(%ClarionWordList,'#MODULE')
-  #ADD(%ClarionWordList,'#PROCEDURE')
-  #ADD(%ClarionWordList,'#GROUP')
-  #ADD(%ClarionWordList,'#UTILITY')
-  #ADD(%ClarionWordList,'#CODE')
-  #ADD(%ClarionWordList,'#CONTROL')
-  #ADD(%ClarionWordList,'#EXTENSION')
-  #ADD(%ClarionWordList,'#EMBED')                           #! Embed points
-  #ADD(%ClarionWordList,'#AT')
-  #ADD(%ClarionWordList,'#ENDAT')
-  #ADD(%ClarionWordList,'#PRIORITY')
-  #ADD(%ClarionWordList,'#ATSTART')
-  #ADD(%ClarionWordList,'#ATEND')
-  #ADD(%ClarionWordList,'#CONTEXT')
-  #ADD(%ClarionWordList,'#ENDCONTEXT')
-  #ADD(%ClarionWordList,'#EMPTYEMBED')
-  #ADD(%ClarionWordList,'#POSTEMBED')
-  #ADD(%ClarionWordList,'#PREEMBED')
-  #ADD(%ClarionWordList,'#WHERE')                           #! Section constraints
-  #ADD(%ClarionWordList,'#RESTRICT')
-  #ADD(%ClarionWordList,'#ACCEPT')
-  #ADD(%ClarionWordList,'#REJECT')
-  #ADD(%ClarionWordList,'#WINDOWS')                         #! Default Data/Code
-  #ADD(%ClarionWordList,'#REPORTS')
-  #ADD(%ClarionWordList,'#LOCALDATA')
-  #ADD(%ClarionWordList,'#GLOBALDATA')
-  #ADD(%ClarionWordList,'#DEFAULT')
-  #ADD(%ClarionWordList,'#DECLARE')                         #! Symbol management
-  #ADD(%ClarionWordList,'#ALIAS')
-  #ADD(%ClarionWordList,'#EQUATE')
-  #ADD(%ClarionWordList,'#ADD')
-  #ADD(%ClarionWordList,'#DELETE')
-  #ADD(%ClarionWordList,'#DELETEALL')
-  #ADD(%ClarionWordList,'#PURGE')
-  #ADD(%ClarionWordList,'#CLEAR')
-  #ADD(%ClarionWordList,'#FREE')
-  #ADD(%ClarionWordList,'#FIX')
-  #ADD(%ClarionWordList,'#FIND')
-  #ADD(%ClarionWordList,'#SELECT')
-  #ADD(%ClarionWordList,'#POP')
-  #ADD(%ClarionWordList,'#SET')
-  #ADD(%ClarionWordList,'#UNFIX')
-  #ADD(%ClarionWordList,'#PROMPT')                          #! Prompt and Validation
-  #ADD(%ClarionWordList,'#VALIDATE')
-  #ADD(%ClarionWordList,'#ENABLE')
-  #ADD(%ClarionWordList,'#BUTTON')
-  #ADD(%ClarionWordList,'#WITH')
-  #ADD(%ClarionWordList,'#FIELD')
-  #ADD(%ClarionWordList,'#PREPARE')
-  #ADD(%ClarionWordList,'#ENDPREPARE')
+#!
+#! RA.2020.11.31: START: Rework of template keywords
+#! -------------------------------------------------
+  #ADD(%ClarionWordList,'#ABORT')                           #! #ABORT;Immediately terminates source generation by the previous #GENERATE statement.
+  #ADD(%ClarionWordList,'#ACCEPT')                          #! #ACCEPT;Terminates #RESTRICT processing.
+  #ADD(%ClarionWordList,'#ADD')                             #! #ADD;Adds a new instance to a multi-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#ALIAS')                           #! #ALIAS;Declares a synonym for a user-defined symbol.
+  #ADD(%ClarionWordList,'#AND')                             #!
+  #ADD(%ClarionWordList,'#APPEND')                          #! #APPEND;Adds the file contents to the end of the current source output destination file.
+  #ADD(%ClarionWordList,'#APPLICATION')                     #! #APPLICATION;Begins source generation control section.
+  #ADD(%ClarionWordList,'#ASSERT')                          #! #ASSERT;Evaluates assumptions to detect unexpected errors.
+  #ADD(%ClarionWordList,'#AT')                              #! #AT;Specifies a location to generate statements.
+  #ADD(%ClarionWordList,'#ATEND')                           #! #ATEND;Specifies template code to execute after the #PROCEDURE, #CODE, #CONTROL, or #EXTENSION generates.
+  #ADD(%ClarionWordList,'#ATSTART')                         #! #ATSTART;Specifies template code to execute before the #PROCEDURE, #CODE, #CONTROL, or #EXTENSION generates.
+  #ADD(%ClarionWordList,'#AUTOCOMPILE')                     #!
+  #ADD(%ClarionWordList,'#COMPILE')                         #!
+  #ADD(%ClarionWordList,'#DECLARE_COMPILER')                #!
+  #ADD(%ClarionWordList,'#BOXED')                           #! #BOXED;Creates a group box of prompts.
+  #ADD(%ClarionWordList,'#BREAK')                           #! #BREAK;Immediately breaks out of the #FOR or #LOOP structure in which it is enclosed. 
+  #ADD(%ClarionWordList,'#BUTTON')                          #! #BUTTON;Creates a command button to call another page of prompts.
+  #ADD(%ClarionWordList,'#CALL')                            #! #CALL;Inserts code from a #GROUP, retaining the indention in its #GROUP.
+  #ADD(%ClarionWordList,'#CASE')                            #! #CASE;Initiates a selective execution structure.
+  #ADD(%ClarionWordList,'#CLASS')                           #! #CLASS;Defines a formula class.
+  #ADD(%ClarionWordList,'#CLEAR')                           #! #CLEAR;Removes the value from a single-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#CLOSE')                           #! #CLOSE;Closes an open generated source code disk file.
+  #ADD(%ClarionWordList,'#CODE')                            #! #CODE;Begins a code template that generates source into an embedded source code point.
+  #ADD(%ClarionWordList,'#COMMENT')                         #! #COMMENT;Sets the default column number for aligned comments.
+  #ADD(%ClarionWordList,'#CONTEXT')                         #! #CONTEXT;Sets the code generation context to emulate generating the named section.
+  #ADD(%ClarionWordList,'#CONTROL')                         #! #CONTROL;Begins a code template that generates a set of controls into a window and the source code required to manipulate them into embedded source code points.
+  #ADD(%ClarionWordList,'#CREATE')                          #! #CREATE;Creates a disk file to receive generated source code.
+  #ADD(%ClarionWordList,'#CYCLE')                           #! #CYCLE;Immediately passes control back to the top of the #FOR or #LOOP structure in which it is enclosed to begin the next iteration.
+  #ADD(%ClarionWordList,'#DEBUG')                           #! #DEBUG;Toggles debug generation on and off.
+  #ADD(%ClarionWordList,'#DECLARE')                         #! #DECLARE;Explicitly declares a user-defined symbol.
+  #ADD(%ClarionWordList,'#DEFAULT')                         #! #DEFAULT;Begins a default procedure declaration section.
+  #ADD(%ClarionWordList,'#DEFINE')                          #! #DEFINE;Defines a user defined macro that can be expanded using #EXPAND.
+  #ADD(%ClarionWordList,'#DELETE')                          #! #DELETE;Deletes the value from one instance of a multi-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#DELETEALL')                       #! #DELETEALL;Deletes the values from specified instances of a multi-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#DISPLAY')                         #! #DISPLAY;Displays a string constant on a properties window.
+  #ADD(%ClarionWordList,'#DOLINK')                          #!
+  #ADD(%ClarionWordList,'#ELSE')                            #! #ELSE;Provides alternate statements to execute when all preceding #IF and #ELSIF expressions are false.
+  #ADD(%ClarionWordList,'#ELSIF')                           #! #ELSIF;Provides an alternate expression to evaluate when preceding #IF and #ELSIF expressions are false.
+  #ADD(%ClarionWordList,'#EMBED')                           #! #EMBED;Identifies an explicit position in the Template where the programmer may place their own source code.
+  #ADD(%ClarionWordList,'#EMPTYEMBED')                      #! #EMPTYEMBED;Generates comments into empty embed points.
+  #ADD(%ClarionWordList,'#ENABLE')                          #! #ENABLE;Begins a group of prompts which may be enabled or disabled based upon the evaluation of the expression.
+  #ADD(%ClarionWordList,'#ENDAT')                           #! #ENDAT
+  #ADD(%ClarionWordList,'#ENDBOXED')                        #! #ENDBOXED
+  #ADD(%ClarionWordList,'#ENDBUTTON')                       #! #ENDBUTTON
+  #ADD(%ClarionWordList,'#ENDCASE')                         #! #ENDCASE
+  #ADD(%ClarionWordList,'#ENDCONTEXT')                      #! #ENDCONTEXT
+  #ADD(%ClarionWordList,'#ENDDEFAULT')                      #! #ENDDEFAULT
+  #ADD(%ClarionWordList,'#ENDENABLE')                       #! #ENDENABLE
+  #ADD(%ClarionWordList,'#ENDFIELD')                        #! #ENDFIELD
+  #ADD(%ClarionWordList,'#ENDFOR')                          #! #ENDFOR
+  #ADD(%ClarionWordList,'#ENDGLOBALDATA')                   #! #ENDGLOBALDATA
+  #ADD(%ClarionWordList,'#ENDIF')                           #! #ENDIF
+  #ADD(%ClarionWordList,'#ENDLOCALDATA')                    #! #ENDLOCALDATA
+  #ADD(%ClarionWordList,'#ENDLOOP')                         #! #ENDLOOP
+  #ADD(%ClarionWordList,'#ENDPREPARE')                      #! #ENDPREPARE
+  #ADD(%ClarionWordList,'#ENDREPORTS')                      #! #ENDREPORTS
+  #ADD(%ClarionWordList,'#ENDRESTRICT')                     #! #ENDRESTRICT
+  #ADD(%ClarionWordList,'#ENDSECTION')                      #! #ENDSECTION
+  #ADD(%ClarionWordList,'#ENDSHEET')                        #! #ENDSHEET
+  #ADD(%ClarionWordList,'#ENDTAB')                          #! #ENDTAB
+  #ADD(%ClarionWordList,'#ENDWINDOWS')                      #! #ENDWINDOWS
+  #ADD(%ClarionWordList,'#ENDWITH')                         #! #ENDWITH
+  #ADD(%ClarionWordList,'#EQUATE')                          #! #EQUATE;Declares and assigns a value to a single-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#ERROR')                           #! #ERROR;Displays a source generation error.
+  #ADD(%ClarionWordList,'#EXEMOD')                          #!
+  #ADD(%ClarionWordList,'#EXISTS')                          #!
+  #ADD(%ClarionWordList,'#EXPAND')                          #! #EXPAND;Expands a user defined macro.
+  #ADD(%ClarionWordList,'#EXPORT')                          #! #EXPORT;Creates a .TXA or .TXD text file from a symbol.
+  #ADD(%ClarionWordList,'#EXTENSION')                       #! #EXTENSION;Begins an extension template that generates code into embedded source code points to add some functionality not associated with specific controls.
+  #ADD(%ClarionWordList,'#FIELD')                           #! #FIELD;Begins a control prompts section.
+  #ADD(%ClarionWordList,'#FIELDS')                          #! #FIELDS
+  #ADD(%ClarionWordList,'#FILE')                            #!
+  #ADD(%ClarionWordList,'#FIND')                            #! #FIND;FIXes all multi-valued parent symbols to values that point to a single child instance.
+  #ADD(%ClarionWordList,'#FIX')                             #! #FIX;FIXes a multi-valued symbol to the value of a single instance.
+  #ADD(%ClarionWordList,'#FOR')                             #! #FOR;Loops through all instances of a multi-valued symbol.
+  #ADD(%ClarionWordList,'#FREE')                            #! #FREE;Clears all instances of a multi-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#GENERATE')                        #! #GENERATE;Generates a section of the application.
+  #ADD(%ClarionWordList,'#GLOBALDATA')                      #! #GLOBALDATA;Begins a default global data declaration section.
+  #ADD(%ClarionWordList,'#GROUP')                           #! #GROUP;Begins a section of template code that may be inserted into another portion of the template.
+  #ADD(%ClarionWordList,'#HELP')                            #! #HELP;Specifies the template's help file.
+  #ADD(%ClarionWordList,'#IF')                              #! #IF;A conditional execution structure.
+  #ADD(%ClarionWordList,'#IGNORE')                          #!
+  #ADD(%ClarionWordList,'#IMAGE')                           #! #IMAGE;Displays a graphic image on a properties window.
+  #ADD(%ClarionWordList,'#IMPLIB')                          #!
+  #ADD(%ClarionWordList,'#IMPORT')                          #! #IMPORT;Creates an .APP for Clarion for Windows from a .TXA script source file.
+  #ADD(%ClarionWordList,'#INCLUDE')                         #! #INCLUDE;Adds a template file to the Template file chain.
+  #ADD(%ClarionWordList,'#INDENT')                          #! #INDENT;Changes the indentation level of generated code.
+  #ADD(%ClarionWordList,'#INSERT')                          #! #INSERT;Inserts code from a #GROUP.s
+  #ADD(%ClarionWordList,'#INVOKE')                          #! #INVOKE;Inserts code from a named #GROUP.
+  #ADD(%ClarionWordList,'#LINK')                            #! #LINK
+  #ADD(%ClarionWordList,'#LOCALDATA')                       #! #LOCALDATA;Begins a default local data declaration section.
+  #ADD(%ClarionWordList,'#LOOP')                            #! #LOOP;Initiates an iterative statement execution structure.
+  #ADD(%ClarionWordList,'#MESSAGE')                         #! #MESSAGE;Displays a source generation message.
+  #ADD(%ClarionWordList,'#MODEL')                           #!
+  #ADD(%ClarionWordList,'#MODULE')                          #! #MODULE;Begins the module section.
+  #ADD(%ClarionWordList,'#NOEDIT')                          #!
+  #ADD(%ClarionWordList,'#NOT')                             #!
+  #ADD(%ClarionWordList,'#OF')                              #! #OF
+  #ADD(%ClarionWordList,'#OLDER')                           #!
+  #ADD(%ClarionWordList,'#OPEN')                            #! #OPEN;Opens a disk file to receive generated source code.
+  #ADD(%ClarionWordList,'#OR')                              #!
+  #ADD(%ClarionWordList,'#ORDINAL')                         #! #ORDINAL
+  #ADD(%ClarionWordList,'#ORIG')                            #! #ORIG
+  #ADD(%ClarionWordList,'#OROF')                            #! #OROF
+  #ADD(%ClarionWordList,'#PDEFINE')                         #! #PDEFINE;Adds a #pragma statement to the project system.
+  #ADD(%ClarionWordList,'#POP')                             #! #POP;Deletes the last instance of a multi-valued symbol and re-fiXEs to the new last instance.
+  #ADD(%ClarionWordList,'#POSTEMBED')                       #! #POSTEMBED;Generates comments at the end of embed point code.
+  #ADD(%ClarionWordList,'#PRAGMA')                          #!
+  #ADD(%ClarionWordList,'#PREEMBED')                        #! #PREEMBED;Generates comments at the beginning of embed point code.
+  #ADD(%ClarionWordList,'#PREPARE')                         #! #PREPARE;Begins a prompts symbol setup section.
+  #ADD(%ClarionWordList,'#PRINT')                           #! #PRINT;Prints a file to the current Windows printer.
+  #ADD(%ClarionWordList,'#PRIORITY')                        #! #PRIORITY;Specifies a new priority level for the code following the #PRIORITY statement.
+  #ADD(%ClarionWordList,'#PROCEDURE')                       #! #PROCEDURE;Begins a procedure template.
+  #ADD(%ClarionWordList,'#PROGRAM')                         #! #PROGRAM;Defines the beginning of the main program module.
+  #ADD(%ClarionWordList,'#PROJECT')                         #! #PROJECT;Includes a source or object code library, or Project file, in the application's Project file.
+  #ADD(%ClarionWordList,'#PROMPT')                          #! #PROMPT;Asks the programmer for input.
+  #ADD(%ClarionWordList,'#PROTOTYPE')                       #! #PROTOTYPE;Assigns the parameter list to the Prototype entry field.
+  #ADD(%ClarionWordList,'#PURGE')                           #! #PURGE;Deletes the values from all instances of a user-defined symbol.
+  #ADD(%ClarionWordList,'#QUERY')                           #! #QUERY;Generates source if the named #SUSPEND section has been released.
+  #ADD(%ClarionWordList,'#READ')                            #! #READ;Reads the next record from the opened read-only file.
+  #ADD(%ClarionWordList,'#REDIRECT')                        #! #REDIRECT;Changes the current generated source destination file.
+  #ADD(%ClarionWordList,'#REJECT')                          #! #REJECT;Terminates #RESTRICT processing, indicating that the Template Code Section is invalid.
+  #ADD(%ClarionWordList,'#RELEASE')                         #! #RELEASE;Enables source generation in a #SUSPEND section. 
+  #ADD(%ClarionWordList,'#REMOVE')                          #! #REMOVE;Deletes a source output file.
+  #ADD(%ClarionWordList,'#REPLACE')                         #! #REPLACE;Performs "intelligent" file replacement.
+  #ADD(%ClarionWordList,'#REPORTS')                         #! #REPORTS;Begins a default report data structure section.
+  #ADD(%ClarionWordList,'#REQ')                             #! #REQ
+  #ADD(%ClarionWordList,'#RESTRICT')                        #! #RESTRICT;Specifies conditions where a Template Code Section (#CODE, #CONTROL, #EXTENSION, #PROCEDURE, #PROGRAM, or #MODULE) can be used.
+  #ADD(%ClarionWordList,'#RESUME')                          #! #RESUME;Marks the end of a section of source that is generated only if a #RELEASE statement is encountered.
+  #ADD(%ClarionWordList,'#RETURN')                          #! #RETURN;Immediately returns from the #GROUP.
+  #ADD(%ClarionWordList,'#RUN')                             #! #RUN;Launches the named program.
+  #ADD(%ClarionWordList,'#RUNDLL')                          #! #RUNDLL;Executes a procedure from any Windows-standard Dynamic Link Library (.DLL).
+  #ADD(%ClarionWordList,'#SECTION')                         #! #SECTION;Marks the beginning of a section of generated code.
+  #ADD(%ClarionWordList,'#SELECT')                          #! #SELECT;Fixes a multi-valued symbol to a particular instance number.
+  #ADD(%ClarionWordList,'#SEQ')                             #!
+  #ADD(%ClarionWordList,'#SERVICE')                         #! #SERVICE
+  #ADD(%ClarionWordList,'#SET')                             #! #SET;Assigns a value to a single-valued user-defined symbol.
+  #ADD(%ClarionWordList,'#SHEET')                           #! #SHEET;Declares a group of #TAB controls.
+  #ADD(%ClarionWordList,'#SPLIT')                           #!
+  #ADD(%ClarionWordList,'#SUSPEND')                         #! #SUSPEND;Identifiy the start of a conditionally generated source section
+  #ADD(%ClarionWordList,'#SYSTEM')                          #! #SYSTEM;Marks the beginning of a section of Template code which executes when the Template set is registered or loaded from the template registry.
+  #ADD(%ClarionWordList,'#TAB')                             #! #TAB;Declares a group of prompts that constitute one of the multiple "pages" within a #SHEET structure.
+  #ADD(%ClarionWordList,'#TEMPLATE')                        #! #!TEMPLATE;Begins the Template set.
+  #ADD(%ClarionWordList,'#THEN')                            #!
+  #ADD(%ClarionWordList,'#TO')                              #!
+  #ADD(%ClarionWordList,'#TRYALIAS')                        #! #TRYALIAS;Declares a synonym for a user-defined symbol.
+  #ADD(%ClarionWordList,'#TYPEMAP')                         #! #TYPEMAP;Maps an EQUATE data type to a true data type based on the target operating system.
+  #ADD(%ClarionWordList,'#UNFIX')                           #! #UNFIX;Unfixes a multi-valued symbol.
+  #ADD(%ClarionWordList,'#UTILITY')                         #! #UTILITY;Begins a utility generation control.
+  #ADD(%ClarionWordList,'#VALIDATE')                        #! #VALIDATE;Validates the data entered into the immediately preceding #PROMPT field.
+  #ADD(%ClarionWordList,'#WHERE')                           #! #WHERE;Limits the availability of a #CODE to only those specific embedded source code points where the generated code would be appropriate.
+  #ADD(%ClarionWordList,'#WINDOWS')                         #! #WINDOWS;Begins a default window data structure section.
+  #ADD(%ClarionWordList,'#WITH')                            #! #WITH;Allows a set of prompts to be associated with a single instance of a symbol (as specified by the value expression).
+  #ADD(%ClarionWordList,'#?')                               #!
+  #ADD(%ClarionWordList,'#!')                               #! #!;Starts a template comment until the end-of-line
+  #ADD(%ClarionWordList,'#<')                               #! #<;Starts placing text at the designated location defined by #COMMENT()
+#! -------------------------------------------------
+#! RA.2020.11.31: ENDED: Rework of template keywords
+#!
   #ADD(%ClarionWordList,'CHECK')                            #! #PROMPT Entry Types
   #ADD(%ClarionWordList,'COLOR')
   #ADD(%ClarionWordList,'COMPONENT')
@@ -2139,61 +2247,7 @@
   #ADD(%ClarionWordList,'SAVEDIALOG')
   #ADD(%ClarionWordList,'SPIN')
   #ADD(%ClarionWordList,'TEXT')
-  #ADD(%ClarionWordList,'#BOXED')                           #! Display and Formating
-  #ADD(%ClarionWordList,'#ENDBOXED')
-  #ADD(%ClarionWordList,'#DISPLAY')
-  #ADD(%ClarionWordList,'#IMAGE')
-  #ADD(%ClarionWordList,'#SHEET')
-  #ADD(%ClarionWordList,'#ENDSHEET')
-  #ADD(%ClarionWordList,'#TAB')
-  #ADD(%ClarionWordList,'#ENDTAB')
-  #ADD(%ClarionWordList,'#FOR')                             #! Logic control
-  #ADD(%ClarionWordList,'#ENDFOR')
-  #ADD(%ClarionWordList,'#LOOP')
-  #ADD(%ClarionWordList,'#ENDLOOP')
-  #ADD(%ClarionWordList,'#BREAK')
-  #ADD(%ClarionWordList,'#CYCLE')
-  #ADD(%ClarionWordList,'#CASE')
-  #ADD(%ClarionWordList,'#ENDCASE')
-  #ADD(%ClarionWordList,'#INDENT')
-  #ADD(%ClarionWordList,'#INSERT')
-  #ADD(%ClarionWordList,'#CALL')
-  #ADD(%ClarionWordList,'#INVOKE')
-  #ADD(%ClarionWordList,'#RETURN')
-  #ADD(%ClarionWordList,'#CREATE')                          #! File Management
-  #ADD(%ClarionWordList,'#OPEN')
-  #ADD(%ClarionWordList,'#CLOSE')
-  #ADD(%ClarionWordList,'#READ')
-  #ADD(%ClarionWordList,'#REDIRECT')
-  #ADD(%ClarionWordList,'#APPEND')
-  #ADD(%ClarionWordList,'#SECTION')
-  #ADD(%ClarionWordList,'#REMOVE')
-  #ADD(%ClarionWordList,'#REPLACE')
-  #ADD(%ClarionWordList,'#PRINT')
-  #ADD(%ClarionWordList,'#GENERATE')                        #! Generation
-  #ADD(%ClarionWordList,'#ABORT')
-  #ADD(%ClarionWordList,'#SUSPEND')
-  #ADD(%ClarionWordList,'#RELEASE')
-  #ADD(%ClarionWordList,'#RESUME')
-  #ADD(%ClarionWordList,'#?')
-  #ADD(%ClarionWordList,'#QUERY')
-  #ADD(%ClarionWordList,'#RUN')                             #! External Execution
-  #ADD(%ClarionWordList,'#SERVICE')
-  #ADD(%ClarionWordList,'#RUNDLL')
-  #ADD(%ClarionWordList,'#!')                               #! Miscellaneous
-  #ADD(%ClarionWordList,'#<')
-  #ADD(%ClarionWordList,'#ASSERT')
-  #ADD(%ClarionWordList,'#CLASS')
-  #ADD(%ClarionWordList,'#COMMENT')
-  #ADD(%ClarionWordList,'#DEBUG')
-  #ADD(%ClarionWordList,'#ERROR')
-  #ADD(%ClarionWordList,'#EXPORT')
-  #ADD(%ClarionWordList,'#HELP')
-  #ADD(%ClarionWordList,'#INCLUDE')
-  #ADD(%ClarionWordList,'#IMPORT')
-  #ADD(%ClarionWordList,'#MESSAGE')
-  #ADD(%ClarionWordList,'#PROTOTYPE')
-  #ADD(%ClarionWordList,'#PROJECT')
+#!
   #ADD(%ClarionWordList,'CALL')                             #! Built in procedures
   #ADD(%ClarionWordList,'EXTRACT')
   #ADD(%ClarionWordList,'EXISTS')
@@ -2211,6 +2265,7 @@
   #ADD(%ClarionWordList,'SLICE')
   #ADD(%ClarionWordList,'UNQUOTE')
   #ADD(%ClarionWordList,'VAREXISTS')
+#!
   #ADD(%ClarionWordList,'%APPLICATION')                     #! %APPLICATION
   #ADD(%ClarionWordList,'%APPLICATIONDEBUG')
   #ADD(%ClarionWordList,'%APPLICATIONLOCALLIBRARY')
@@ -2410,11 +2465,23 @@
   #ADD(%ClarionWordList,'%PROCEDUREREADONLY')
   #ADD(%ClarionWordList,'%PROCEDUREISGLOBAL')
   #ADD(%ClarionWordList,'%PROTOTYPE')
+  #ADD(%ClarionWordList,'%PARAMETERS')                      #! RA.2020.11.01.SUN: Added
   #ADD(%ClarionWordList,'%PROCEDURETEMPLATE')
   #ADD(%ClarionWordList,'%PROCEDUREDESCRIPTION')
   #ADD(%ClarionWordList,'%PROCEDUREEXPORTED')
   #ADD(%ClarionWordList,'%PROCEDURELONGDESCRIPTION')
   #ADD(%ClarionWordList,'%PROCEDURECALLED')
+#!------------------------------------------------------------ RA.2020.11.01.SUN: Added
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERS')             #! #FOR(%ProcedureParameters)  is MULTI dependent on %Procedure
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERNAME')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERORIGNAME')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERTYPE')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERDEFAULT')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETEROMITTED')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERBYREFERENCE')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERCONSTANT')
+  #ADD(%ClarionWordList,'%PROCEDUREPARAMETERDIMS')
+#!------------------------------------------------------------ RA.2020.11.01.SUN: Added
   #ADD(%ClarionWordList,'%LOCALDATA')
   #ADD(%ClarionWordList,'%LOCALDATASTATEMENT')
   #ADD(%ClarionWordList,'%LOCALDATADESCRIPTION')
@@ -2618,10 +2685,6 @@
   #ADD(%ClarionWordList,'FROM')
   #ADD(%ClarionWordList,'NAME')
   #ADD(%ClarionWordList,'INCLUDE')
-  #ADD(%ClarionWordList,'#SEQ')
-  #ADD(%ClarionWordList,'#ORIG')
-  #ADD(%ClarionWordList,'#FIELDS')
-  #ADD(%ClarionWordList,'#LINK')
   #ADD(%ClarionWordList,'DEFINE')
   #ADD(%ClarionWordList,'ASSIGN')
   #ADD(%ClarionWordList,'CLASS')
@@ -2641,40 +2704,7 @@
   #ADD(%ClarionWordList,'INSTANCE')
   #ADD(%ClarionWordList,'PARENT')
   #ADD(%ClarionWordList,'PROCPROP')
-  #ADD(%ClarionWordList,'#ABORT')                           #! Project System
-  #ADD(%ClarionWordList,'#AND')
-  #ADD(%ClarionWordList,'#AUTOCOMPILE')
-  #ADD(%ClarionWordList,'#COMPILE')
-  #ADD(%ClarionWordList,'#DECLARE_COMPILER')
-  #ADD(%ClarionWordList,'#DOLINK')
-  #ADD(%ClarionWordList,'#ELSE')
-  #ADD(%ClarionWordList,'#ELSIF')
-  #ADD(%ClarionWordList,'#ENDIF')
-  #ADD(%ClarionWordList,'#ERROR')
-  #ADD(%ClarionWordList,'#EXEMOD')
-  #ADD(%ClarionWordList,'#EXISTS')
-  #ADD(%ClarionWordList,'#EXPAND')
-  #ADD(%ClarionWordList,'#FILE')
-  #ADD(%ClarionWordList,'#IF')
-  #ADD(%ClarionWordList,'#IGNORE')
-  #ADD(%ClarionWordList,'#IMPLIB')
-  #ADD(%ClarionWordList,'#INCLUDE')
-  #ADD(%ClarionWordList,'#LINK')
-  #ADD(%ClarionWordList,'#MESSAGE')
-  #ADD(%ClarionWordList,'#MODEL')
-  #ADD(%ClarionWordList,'#NOEDIT')
-  #ADD(%ClarionWordList,'#NOT')
-  #ADD(%ClarionWordList,'#OLDER')
-  #ADD(%ClarionWordList,'#OR')
-  #ADD(%ClarionWordList,'#PRAGMA')
-  #ADD(%ClarionWordList,'#PROMPT')
-  #ADD(%ClarionWordList,'#RUN')
-  #ADD(%ClarionWordList,'#RUNDLL')
-  #ADD(%ClarionWordList,'#SET')
-  #ADD(%ClarionWordList,'#SPLIT')
-  #ADD(%ClarionWordList,'#SYSTEM')
-  #ADD(%ClarionWordList,'#THEN')
-  #ADD(%ClarionWordList,'#TO')
+#!
   #ADD(%ClarionWordList,'EVENT:ACCEPTED')                   #! Event Equates
   #ADD(%ClarionWordList,'EVENT:NEWSELECTION')
   #ADD(%ClarionWordList,'EVENT:SCROLLUP')
@@ -3583,6 +3613,10 @@
   #ADD(%ClarionWordList,'FONTMODE:BITMAP')
   #ADD(%ClarionWordList,'FONTMODE:DOWNLOAD')
   #ADD(%ClarionWordList,'FONTMODE:SUBDEV')
+
+
+
+
   #SET(%ClarionWordCount,ITEMS(%ClarionWordList))           #! How many are there?
 #GROUP(%ClarionReservedWordsEnd)
 
