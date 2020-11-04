@@ -7,6 +7,9 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2020.11.01   Roberto Artigas
+#!  *   Refactured and corrected the template/project keywords that begin with a #SOMETHING
+#!  *   Added they keywords associated with 1) %Prototype, 2) %Parameters, 5) %ProcedureParameters
 #! 2020.04.12   Roberto Artigas
 #!  *   Additional reserved words for SQL-2016 (Mimer Document)
 #! 2017.10.29   Roberto Artigas
@@ -2064,8 +2067,11 @@
   #ADD(%ClarionWordList,'POINTER')
   #ADD(%ClarionWordList,'SHARE')
 #!
-#! RA.2020.11.31: START: Rework of template keywords
-#! -------------------------------------------------
+#! RA.2020.10.31: START: Rework of template/project keywords
+#! ---------------------------------------------------------
+  #ADD(%ClarionWordList,'#<')                               #! #<;Starts placing text at the designated location defined by #COMMENT()
+  #ADD(%ClarionWordList,'#?')                               #!
+  #ADD(%ClarionWordList,'#!')                               #! #!;Starts a template comment until the end-of-line
   #ADD(%ClarionWordList,'#ABORT')                           #! #ABORT;Immediately terminates source generation by the previous #GENERATE statement.
   #ADD(%ClarionWordList,'#ACCEPT')                          #! #ACCEPT;Terminates #RESTRICT processing.
   #ADD(%ClarionWordList,'#ADD')                             #! #ADD;Adds a new instance to a multi-valued user-defined symbol.
@@ -2219,11 +2225,8 @@
   #ADD(%ClarionWordList,'#WHERE')                           #! #WHERE;Limits the availability of a #CODE to only those specific embedded source code points where the generated code would be appropriate.
   #ADD(%ClarionWordList,'#WINDOWS')                         #! #WINDOWS;Begins a default window data structure section.
   #ADD(%ClarionWordList,'#WITH')                            #! #WITH;Allows a set of prompts to be associated with a single instance of a symbol (as specified by the value expression).
-  #ADD(%ClarionWordList,'#?')                               #!
-  #ADD(%ClarionWordList,'#!')                               #! #!;Starts a template comment until the end-of-line
-  #ADD(%ClarionWordList,'#<')                               #! #<;Starts placing text at the designated location defined by #COMMENT()
-#! -------------------------------------------------
-#! RA.2020.11.31: ENDED: Rework of template keywords
+#! ---------------------------------------------------------
+#! RA.2020.11.01: ENDED: Rework of template/project keywords
 #!
   #ADD(%ClarionWordList,'CHECK')                            #! #PROMPT Entry Types
   #ADD(%ClarionWordList,'COLOR')
@@ -2380,7 +2383,7 @@
   #ADD(%ClarionWordList,'%FIELDREPORTCONTROL')
   #ADD(%ClarionWordList,'%FIELDREPORTCONTROLWIDTH')
   #ADD(%ClarionWordList,'%FIELDREPORTCONTROLHEIGHT')
-  #ADD(%ClarionWordList,'%FIELDVALIDATION')         #! NONZERO,INRANGE,BOOLEAN,INFILE,INLIST
+  #ADD(%ClarionWordList,'%FIELDVALIDATION')                 #! NONZERO,INRANGE,BOOLEAN,INFILE,INLIST
   #ADD(%ClarionWordList,'%FIELDCHOICES')
   #ADD(%ClarionWordList,'%FIELDVALUES')
   #ADD(%ClarionWordList,'%FIELDTRUEVALUE')
@@ -2851,7 +2854,6 @@
   #ADD(%ClarionWordList,'REJECT:RANGE')
   #ADD(%ClarionWordList,'REJECT:INVALID')
   #ADD(%ClarionWordList,'COLOR:NONE')                       #! Color Equates
-  #ADD(%ClarionWordList,'COLOR:NONE')
   #ADD(%ClarionWordList,'COLOR:SCROLLBAR')
   #ADD(%ClarionWordList,'COLOR:BACKGROUND')
   #ADD(%ClarionWordList,'COLOR:ACTIVECAPTION')
@@ -2873,6 +2875,7 @@
   #ADD(%ClarionWordList,'COLOR:BTNTEXT')
   #ADD(%ClarionWordList,'COLOR:INACTIVECAPTIONTEXT')
   #ADD(%ClarionWordList,'COLOR:BTNHIGHLIGHT')
+#! RA.2020.11.01: 16 Colors
   #ADD(%ClarionWordList,'COLOR:BLACK')
   #ADD(%ClarionWordList,'COLOR:MAROON')
   #ADD(%ClarionWordList,'COLOR:GREEN')
@@ -2889,6 +2892,8 @@
   #ADD(%ClarionWordList,'COLOR:FUSCHIA')
   #ADD(%ClarionWordList,'COLOR:AQUA')
   #ADD(%ClarionWordList,'COLOR:WHITE')
+#! RA.2020.11.01: There are a lot more color equates to be added.
+#! But these need further investigation as to the name literals.
   #ADD(%ClarionWordList,'CREATE:SSTRING')                   #! Control Type Equates
   #ADD(%ClarionWordList,'CREATE:STRING')
   #ADD(%ClarionWordList,'CREATE:IMAGE')
