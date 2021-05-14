@@ -560,17 +560,21 @@
 #!
 #!  #SET(%TheName   , %TheName & ' | ' & EXTRACT(%FieldQuickOptions,'TAB'))
 #!
+#! RA.2021.04.10: Remove the ALT-& marker from text. Add back if needed.
 #! RA.2020.05.06: Checkboxes do not have a PROMPT. So fake a prompt to allow for editing.
 #! RA.2020.02.05: Add the field display prompt that way we can set the field edit prompt.
   #FOR(%FieldScreenControl)
     #IF(INSTRING('CHECK(',%FieldScreenControl,1,1) > 0)                 #! RA.2020.05.06: Added for checkboxes
       #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'CHECK',1))
+      #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
       #SET(%TheFieldName, 'PROMPT(' & %TheFieldName & ')')
     #ENDIF
     #IF(INSTRING('PROMPT(',%FieldScreenControl,1,1) > 0)
       #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'PROMPT'))
+      #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
     #ENDIF
   #ENDFOR
+  #CALL(%ReplaceSubString,%TheFieldName,'&','')                         #! RA.2021.04.10: Remove the ALT-& from text.
   #CALL(%ReplaceSubString,%TheFieldName,'''','''''')
   #SET(%TheName , %TheName & ' | ' & %TheFieldName)
 #!
@@ -904,6 +908,8 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2021.08.20.FRI: Need to handle masks: LONG=@P##-####P, LONG=@P###-##-####P [???]
+#!
 #! RA.2020.05.13.WED: Changed so it should handle all the Clarion types.
 #! RA.2020.05.13.WED: Need to implement all the types as I get some testing fields.
 #! RA.2020.05.12.TUE: Get the decimal length and digits from the mask.
@@ -972,10 +978,30 @@
 #OF  ('TIME')
   #SET(%zLength,6)
   #SET(%zDigits,0)
+#ELSE
+! ---- DATA TYPE UNKNOWN ----  
+! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
 #ENDCASE
 #!
-#IF(NOT (%zLength=0 AND %zDigits=0))
-#! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S10@(%pFieldPicture) %%zLenDec=%@S10@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+#! RA.2021.08.10.FRI: Check from @P, @K. Use the length of the mask itself.
+#! -00- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+#IF(%zLength=0 AND %zDigits=0)
+  #SET(%zLenDec,SUB(UPPER(%pFieldPicture),1,2))
+#! -01- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+  #CASE(%zLenDec)
+  #OF  ('@P')
+  #OROF('@K')
+    #SET(%zLength,LEN(%pFieldPicture))
+    #SET(%zDigits,0)  
+#! -02- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+  #ELSE
+! ---- MASK TYPE UNKNOWN ----  
+! ---- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
+  #ENDCASE
+#ENDIF
+#!
+#IF(%zLength=0 AND %zDigits=0)
+! -03- %%pFieldType=%@S10@(%pFieldType) %%pFieldPicture=%@S20@(%pFieldPicture) %%zLenDec=%@S20@(%zLenDec), %%zLength=%@N04@(%zLength), %%zDigits=%@N02@(%zDigits) %%pFieldType=%@S10@(%pFieldType)
 #ENDIF
 #!
 #SET(%pLength, %zLength)
@@ -1019,6 +1045,8 @@
 #DECLARE(%d2c2aFDP       ,%d2c2aTabsFields)     #! Field display picture
 #DECLARE(%d2c2aLen       ,%d2c2aTabsFields)     #! Length of display picture
 #DECLARE(%d2c2aDig       ,%d2c2aTabsFields)     #! Digits of display picture
+#!DECLARE(%d2c2aDSL1     ,%d2c2aTabsFields)     #! Length of the sort header (RA.2021.09.07.MON: Added Clarion)
+#!DECLARE(%d2c2aDSL2     ,%d2c2aTabsFields)     #! Length of the sort header (RA.2021.09.07.MON: Added Noyantis)
 #DECLARE(%d2c2aCalc1     ,%d2c2aTabsFields)     #! Calculation 1: Clarion
 #DECLARE(%d2c2aCalc2     ,%d2c2aTabsFields)     #! Calculation 2: Noyantis
 #!                                              #! Calculation 3: <next list field width calculation>
@@ -1058,20 +1086,32 @@
   #SET(%d2c2aDHL            , LEN(%FieldHeader))                            #! Length of the column header
   #SET(%d2c2aFDP            , %FieldDisplayPicture)                         #! Display Width: DCT original
   #CALL(%CalcLenDig         , %d2c2aLen, %d2c2aDig, %d2c2aType, %d2c2aFDP)  #! Calculate width length and decimal digits
+  #!SET(%d2c2aDSL1          , 30)                                           #! Length of the sort header (RA.2021.09.07.MON: Added Clarion)
+  #!SET(%d2c2aDSL2          , 30)                                           #! Length of the sort header (RA.2021.09.07.MON: Added Noyantis)
   #SET(%d2c2aCalc1          , %d2c2aDSP)                                    #! Display Width: Clarion
   #SET(%d2c2aCalc2          , %d2c2aDSP)                                    #! Display Width: Noyantis
+#!
+#! RA.2021.09.29.WED: Add pSortSize parameter for the additional size for the sort constant (Sort size constant inside #GROUP)
+  #!CALL(%CalcWidthClarion2  , %d2c2aCalc1, %d2c2aDSL1, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
+  #!CALL(%CalcWidthNoyantis2 , %d2c2aCalc2, %d2c2aDSL2, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
   #CALL(%CalcWidthClarion   , %d2c2aCalc1, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
   #CALL(%CalcWidthNoyantis  , %d2c2aCalc2, %d2c2aDSP, %d2c2aFMS, %d2c2aType, %d2c2aDHL, %d2c2aFDP, %Field, %FieldHeader)
 #!
   #SET(%NumberFields        , %NumberFields + 1)                            #! Field number since this can sort
   #SET(%CountFields         , %CountFields + 2)                             #! There is a style LONG marker in between fields
 #ENDFOR
+#!---------!
+#! TESTING !
+#!---------!
 #FOR(%d2c2aTabsFields)
-! %%d2c2aTabsFields = %[50]d2c2aTabsFields ( %[10]d2c2aTab, %@N03@(%d2c2aNum), %@N03@(%d2c2aSeq), %[50]d2c2aFld, %@N04@(%d2c2aDSP), %@N04@(%d2c2aCalc1), %@N04@(%d2c2aCalc2) )
+#! %%d2c2aTabsFields = %[50]d2c2aTabsFields ( %[10]d2c2aTab, %@N03@(%d2c2aNum), %@N03@(%d2c2aSeq), %[50]d2c2aFld, %@N04@(%d2c2aDSP), %@N04@(%d2c2aCalc1), %@N04@(%d2c2aCalc2) )
 #ENDFOR
 #!---------------------------------------------------------------------
-#!--------------------------------------------------------------------- 
+#!---------------------------------------------------------------------
+#! RA.2021.09.29.WED: Backed off the additional parameter for the sort constant. Constraint for building Clarion LIST control.
+#! RA.2021.09.29.WED: Add pSortSize parameter for the additional size for the sort constant.
 #! RA.2020.05.28: NOTE to SELF: Consider taking out the %pFieldMemoSize and just using the %pFieldPicture by itself.
+#!GROUP(%CalcWidthClarion2,*%pDspSize, *%pSortSize,  %pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
 #GROUP(%CalcWidthClarion,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
 #IF(NOT VAREXISTS(%zLength))
   #DECLARE(%zFixit04)
@@ -1080,7 +1120,14 @@
   #DECLARE(%zLenDec)
   #DECLARE(%zDspSize)
   #DECLARE(%zAdjusts)
+  #DECLARE(%zHdrSize)
+  #DECLARE(%zFldSize)
+  #DECLARE(%zSortSize)
 #ENDIF
+#SET(%zFixit04  , 04)
+#SET(%zSortSize , 03)                         #! RA.2021.09.29.WED: HARD CODED!
+#SET(%zSortSize , %zSortSize * %zFixit04)     #! RA.2021.09.29.WED: Calculate!
+#!
 #CASE(UPPER(%pFieldType))
 #OF  ('CSTRING')
   #SET(%pFieldMemoSize , %pFieldMemoSize - 1)
@@ -1090,12 +1137,19 @@
   #SET(%pHeaderLength , %pHeaderLength + 2)
 #! --997-- CLA: %pHeaderLength >= %pFieldMemoSize [%pFieldID , %pFieldHeader (%pHeaderLength)]
 #ENDIF
-#SET(%zFixit04, 04)
+#!
 #SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
 #!SET(%zDspSize, %pFieldFormatWidth)
 #! --002--- (%%pFieldMemoSize=%pFieldMemoSize > %%pHeaderLength=%pHeaderLength) = %%zAdjusts = %zAdjusts
 #SET(%zDspSize, (%zAdjusts * %zFixit04))
 #CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#!
+#SET(%zHdrSize  , LEN(%pFieldHeader))         #! RA.2021.09.29.WED: Calculate!
+#SET(%zFldSize  , LEN(%pFieldPicture))        #! RA.2021.09.29.WED: Calculate!
+#SET(%zFldSize  , %zLength)                   #! RA.2021.09.29.WED: Calculate!
+#SET(%zHdrSize  , %zHdrSize  * %zFixit04)     #! RA.2021.09.29.WED: Calculate!
+#SET(%zFldSize  , %zFldSize  * %zFixit04)     #! RA.2021.09.29.WED: Calculate!
+#!
 #! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
 #! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
 #! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
@@ -1197,11 +1251,14 @@
   #SET(%zDspSize,     INT(22.0 * %zFixit04))
 #ENDIF
 #!
-#! --111-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
-#SET(%pDspSize, %zDspSize)
+#! --111-- %@N03@(%zDspSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize  , %zDspSize)
 #!---------------------------------------------------------------------
 #!--------------------------------------------------------------------- 
+#! RA.2021.09.29.WED: Backed off the additional parameter for the sort constant. Constraint for building Clarion LIST control.
+#! RA.2021.09.29.WED: Add pSortSize parameter for the additional size for the sort constant.
 #! RA.2020.05.28: NOTE to SELF: Consider taking out the %pFieldMemoSize and just using the %pFieldPicture by itself.
+#!GROUP(%CalcWidthNoyantis2,*%pDspSize, *%pSortSize,  %pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
 #GROUP(%CalcWidthNoyantis,*%pDspSize,%pFieldFormatWidth,%pFieldMemoSize,%pFieldType,%pHeaderLength,%pFieldPicture,%pFieldID,%pFieldHeader)
 #IF(NOT VAREXISTS(%zLength))
   #DECLARE(%zFixit10)
@@ -1210,7 +1267,14 @@
   #DECLARE(%zLenDec)
   #DECLARE(%zDspSize)
   #DECLARE(%zAdjusts)
+  #DECLARE(%zHdrSize)
+  #DECLARE(%zFldSize)
+  #DECLARE(%zSortSize)
 #ENDIF
+#SET(%zFixit10  , 10)
+#SET(%zSortSize , 03)                         #! RA.2021.09.29.WED: HARD CODED!
+#SET(%zSortSize , %zSortSize * %zFixit10)     #! RA.2021.09.29.WED: Calculate!
+#!
 #CASE(UPPER(%pFieldType))
 #OF  ('CSTRING')
   #SET(%pFieldMemoSize , %pFieldMemoSize - 1)
@@ -1220,10 +1284,17 @@
   #SET(%pHeaderLength , %pHeaderLength + 1)
 #! --997-- NYS: %pHeaderLength >= %pFieldMemoSize [%pFieldID , %pFieldHeader (%pHeaderLength)]
 #ENDIF
-#SET(%zFixit10, 10)
+#!
 #SET(%zAdjusts, CHOOSE((%pFieldMemoSize > %pHeaderLength),%pFieldMemoSize,%pHeaderLength))
 #SET(%zDspSize, (%zAdjusts * %zFixit10))
 #CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
+#!
+#SET(%zHdrSize  , LEN(%pFieldHeader))         #! RA.2021.09.29.WED: Calculate!
+#SET(%zFldSize  , LEN(%pFieldPicture))        #! RA.2021.09.29.WED: Calculate! 
+#SET(%zFldSize  , %zLength)                   #! RA.2021.09.29.WED: Calculate!
+#SET(%zHdrSize  , %zHdrSize  * %zFixit10)     #! RA.2021.09.29.WED: Calculate!
+#SET(%zFldSize  , %zFldSize  * %zFixit10)     #! RA.2021.09.29.WED: Calculate!
+#!
 #! ANY, MEMO, BLOB, GROUP, BYTE, BOOL, BFLOAT4, BFLOAT8,
 #! DATE, TIME, SHORT, USHORT, LONG, ULONG, SIGNED, UNSIGNED, 
 #! REAL, SREAL, DECIMAL, PDECIMAL, STRING, PSTRING, ASTRING,
@@ -1327,8 +1398,8 @@
   #SET(%zDspSize,     INT(14.0 * %zFixit10))
 #ENDIF
 #!
-#! --222-- %@N03@(%zDspSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S10@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
-#SET(%pDspSize, %zDspSize)
+! --222-- %@N03@(%zDspSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%pDspSize  , %zDspSize)
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! RA.2020.05.22.FRI: Implemented. See the commented items below.
@@ -1356,6 +1427,10 @@
   #SET(%IndexFields,%IndexFields+1)
   #SET(%BuildPart1, '')
   #IF(%IndexFields=1)
+!-------------------------------------------------------------------------------------------------!
+! This LIST structure is created to replace the one generated by the ABC templates.               !
+! Save your generated window structure first, then cut and paste replacing your LIST structure.   !
+!-------------------------------------------------------------------------------------------------!
 #! ! LIST,AT(4,40,400,40),USE(?%FilePrefix_oList),HVSCROLL, |
 ! LIST,AT(4,40,400,40),USE(%pScreenID),HVSCROLL, |
     #SET(%BuildPart1, 'FORMAT(')
