@@ -560,17 +560,21 @@
 #!
 #!  #SET(%TheName   , %TheName & ' | ' & EXTRACT(%FieldQuickOptions,'TAB'))
 #!
+#! RA.2021.04.10: Remove the ALT-& marker from text. Add back if needed.
 #! RA.2020.05.06: Checkboxes do not have a PROMPT. So fake a prompt to allow for editing.
 #! RA.2020.02.05: Add the field display prompt that way we can set the field edit prompt.
   #FOR(%FieldScreenControl)
     #IF(INSTRING('CHECK(',%FieldScreenControl,1,1) > 0)                 #! RA.2020.05.06: Added for checkboxes
       #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'CHECK',1))
+      #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
       #SET(%TheFieldName, 'PROMPT(' & %TheFieldName & ')')
     #ENDIF
     #IF(INSTRING('PROMPT(',%FieldScreenControl,1,1) > 0)
       #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'PROMPT'))
+      #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
     #ENDIF
   #ENDFOR
+  #CALL(%ReplaceSubString,%TheFieldName,'&','')                         #! RA.2021.04.10: Remove the ALT-& from text.
   #CALL(%ReplaceSubString,%TheFieldName,'''','''''')
   #SET(%TheName , %TheName & ' | ' & %TheFieldName)
 #!
@@ -1066,8 +1070,11 @@
   #SET(%NumberFields        , %NumberFields + 1)                            #! Field number since this can sort
   #SET(%CountFields         , %CountFields + 2)                             #! There is a style LONG marker in between fields
 #ENDFOR
+#!---------!
+#! TESTING !
+#!---------!
 #FOR(%d2c2aTabsFields)
-! %%d2c2aTabsFields = %[50]d2c2aTabsFields ( %[10]d2c2aTab, %@N03@(%d2c2aNum), %@N03@(%d2c2aSeq), %[50]d2c2aFld, %@N04@(%d2c2aDSP), %@N04@(%d2c2aCalc1), %@N04@(%d2c2aCalc2) )
+#! %%d2c2aTabsFields = %[50]d2c2aTabsFields ( %[10]d2c2aTab, %@N03@(%d2c2aNum), %@N03@(%d2c2aSeq), %[50]d2c2aFld, %@N04@(%d2c2aDSP), %@N04@(%d2c2aCalc1), %@N04@(%d2c2aCalc2) )
 #ENDFOR
 #!---------------------------------------------------------------------
 #!--------------------------------------------------------------------- 
