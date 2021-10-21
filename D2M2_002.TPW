@@ -230,11 +230,14 @@
 #!---- #GROUP(%%IsFieldTypeNumeric, %pResult, "%pFieldType")
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2021.10.21: Per Michael Gorman: Change the terminator for Mimer to ;<13,10>GO
 #! RA.2018.04.21: Terminating with the terminator.
 #GROUP(%TerminatorTerminates,%pBaseName)
   #CASE(%pBaseName)                                                             #! BACKEND EXCEPTIONS
-  #OF  ('MIMER')
-  #OROF('MSSQL')
+  #OF  ('MIMER')                                                                #! RA.2021.10.21: Per Michael Gorman: Changed
+;
+GO
+  #OF  ('MSSQL')
 GO
   #OF  ('METABASE')
   #OROF('POSTGRESQL')
