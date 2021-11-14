@@ -5,13 +5,13 @@ IF you want me to continue improving this SQL DLL code generator, THEN e-mail me
   After all is said and done, information technology is there to support the business goals. 
   And the translation of business goals to automation with information technology is our job.
   
-SI desea que continúe mejorando este generador de código DLL SQL, ENTONCES envíeme un correo electrónico 
-  indicando que está utilizando **DCT2SQL**. Podría ser útil incluir el escenario de su caso de uso para **DCT2SQL** 
-  y una descripción de cómo ayuda al retorno de la inversión (ROI) de la empresa en la que está involucrado. 
-  Después de todo lo dicho y hecho, la tecnología de la información está ahí para respaldar los objetivos comerciales. 
-  Y la traducción de los objetivos comerciales a la automatización con tecnología de la información es nuestro trabajo.
+SI desea que continÃºe mejorando este generador de cÃ³digo DLL SQL, ENTONCES envÃ­eme un correo electrÃ³nico 
+  indicando que estÃ¡ utilizando **DCT2SQL**. PodrÃ­a ser Ãºtil incluir el escenario de su caso de uso para **DCT2SQL** 
+  y una descripciÃ³n de cÃ³mo ayuda al retorno de la inversiÃ³n (ROI) de la empresa en la que estÃ¡ involucrado. 
+  DespuÃ©s de todo lo dicho y hecho, la tecnologÃ­a de la informaciÃ³n estÃ¡ ahÃ­ para respaldar los objetivos comerciales. 
+  Y la traducciÃ³n de los objetivos comerciales a la automatizaciÃ³n con tecnologÃ­a de la informaciÃ³n es nuestro trabajo.
  
-# DCT2SQL: SQL DDL Code Generator (Generador de código SQL DDL)
+# DCT2SQL: SQL DDL Code Generator (Generador de cÃ³digo SQL DDL)
 Clarion dictionary to SQL DDL back end code generation templates.
 
 This will take a clarion dictionary (DCT) and create SQL DDL code for several SQL back ends.
@@ -25,18 +25,18 @@ The dictionaries should be SQL ready to be generated correctly and there are a n
 
 The UTILITY templates have documentation built in that shows on the screen. Documentation is updated and improved on a regular basis. And since these templates only create output text files, they do not cause any changes to your existing systems and operations.
 
-### Conversion of DATA from ISAM to SQL (Conversión de datos de ISAM a SQL)
+### Conversion of DATA from ISAM to SQL (ConversiÃ³n de datos de ISAM a SQL)
 
 The **DCT2SQL** templates do not handle conversion of the data in your ISAM files.
  The additional task where you have to create procedures to output all your table's data as a CSV file is done by the [**DUMPLOAD**](https://github.com/RobertArtigas/DumpLoad) backup code generator.
  You will still have to create the SQL server table LOAD query script. That is dependent on your SQL
  server and you will have to build that QUERY yourself.
 
-Las plantillas **DCT2SQL** no controlan la conversión de los datos en sus archivos ISAM.
+Las plantillas **DCT2SQL** no controlan la conversiÃ³n de los datos en sus archivos ISAM.
   La tarea adicional en la que tienes que crear procedimientos para generar todos los datos de tu tabla como un archivo CSV 
-  la realiza el generador de código de reserva [**DUMPLOAD**](https://github.com/RobertArtigas/DumpLoad).
-  Aún tendrá que crear el script de consulta LOAD de la tabla del servidor SQL. Eso depende de tu SQL
-  servidor y tendrá que construir esa CONSULTA usted mismo.
+  la realiza el generador de cÃ³digo de reserva [**DUMPLOAD**](https://github.com/RobertArtigas/DumpLoad).
+  AÃºn tendrÃ¡ que crear el script de consulta LOAD de la tabla del servidor SQL. Eso depende de tu SQL
+  servidor y tendrÃ¡ que construir esa CONSULTA usted mismo.
 
 # Webinars explaining how to use the DCT2SQL templates
 
@@ -52,6 +52,10 @@ Clarioneros: 164 : 2020-09-12 : https://clarionlive.com/clarioneros.htm (**OneDr
 Please, if you use the DCT2SQL for your conversion project, then send me an email just letting me know what type of conversion you did, and how you have used them.
  It would be appreciated. Thank you in advance.
 
+###
+##
+When a place gets crowded enough to require ID's, social collapse is not far away. It is time to go elsewhere. The best thing about space travel is that it made it possible to go elsewhere.<BR/>
+_Robert A. Heinlein_
 
 [Code](https://github.com/RobertArtigas/DCT2SQL) 
 [Wiki](https://github.com/RobertArtigas/DCT2SQL/wiki) 
