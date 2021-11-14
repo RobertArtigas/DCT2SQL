@@ -57,6 +57,11 @@ Please, if you use the DCT2SQL for your conversion project, then send me an emai
 When a place gets crowded enough to require ID's, social collapse is not far away. It is time to go elsewhere. The best thing about space travel is that it made it possible to go elsewhere.<BR/>
 _Robert A. Heinlein_
 
+A dying culture invariably exhibits personal rudeness. Bad manners. Lack of consideration for others in minor matters. A loss of politeness, of gentle manners, is more significant than is a riot...<BR/>
+_Robert A. Heinlein_
+
+##
+
 [Code](https://github.com/RobertArtigas/DCT2SQL) 
 [Wiki](https://github.com/RobertArtigas/DCT2SQL/wiki) 
 [Main](https://github.com/RobertArtigas) 
