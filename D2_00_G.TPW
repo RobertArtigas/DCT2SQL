@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2021.10.10   Roberto Artigas
+#!  *   Additional 'NONUNIQUE' (Mimer specific) Used in key. From Michael Gorman using to generate SQL
 #! 2020.11.01   Roberto Artigas
 #!  *   Refactured and corrected the template/project keywords that begin with a #SOMETHING
 #!  *   Added they keywords associated with 1) %Prototype, 2) %Parameters, 5) %ProcedureParameters
@@ -882,6 +884,7 @@
   #ADD(%SqlWordList,'NOMINVALUE')                           #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NONCLUSTERED')
   #ADD(%SqlWordList,'NONE')
+  #ADD(%SqlWordList,'NONUNIQUE')                            #! RAYS.2021.10.10 - Mimer (keys)
   #ADD(%SqlWordList,'NOORDER')                              #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NORESETLOGS')                          #! RAYS.2007.04.27 - Oracle
   #ADD(%SqlWordList,'NORMAL')                               #! RAYS.2007.04.27 - Oracle

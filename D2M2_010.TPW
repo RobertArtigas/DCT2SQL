@@ -1123,6 +1123,10 @@
   #DECLARE(%zHdrSize)
   #DECLARE(%zFldSize)
   #DECLARE(%zSortSize)
+  #DECLARE(%zResSizeHdr)
+  #DECLARE(%zResSizeFld)
+  #DECLARE(%zResSize)
+  #DECLARE(%zResCase)
 #ENDIF
 #SET(%zFixit04  , 04)
 #SET(%zSortSize , 03)                         #! RA.2021.09.29.WED: HARD CODED!
@@ -1144,6 +1148,7 @@
 #SET(%zDspSize, (%zAdjusts * %zFixit04))
 #CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
 #!
+#SET(%zResSize  , %zDspSize)                  #! RA.2021.10.02.SAT: Calculate!
 #SET(%zHdrSize  , LEN(%pFieldHeader))         #! RA.2021.09.29.WED: Calculate!
 #SET(%zFldSize  , LEN(%pFieldPicture))        #! RA.2021.09.29.WED: Calculate!
 #SET(%zFldSize  , %zLength)                   #! RA.2021.09.29.WED: Calculate!
@@ -1251,7 +1256,35 @@
   #SET(%zDspSize,     INT(22.0 * %zFixit04))
 #ENDIF
 #!
-#! --111-- %@N03@(%zDspSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#! RA.2021.010.10.SUN: While the calculations also happen for Clarion they do to get used at this time.
+#! Clarion used the sort key and is normally not adjusted as to the order of the fields and the size of the fields.
+#! -------
+#! --111--  %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%zResSizeHdr , %zHdrSize + %zSortSize)
+#SET(%zResSizeFld , %zFldSize + %zSortSize)
+#! --111--A %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#!+++ RA.2021.10.07.THU: Adjust the header to accomodate for the sort literal. (^,v)
+#!+++ Add sort size to the current display size. We have calculated a correcr size for the field vs header.
+#SET(%zResCase    , 'A')
+#!SET(%zResSize   , %zDspSize + %zSortSize)         
+#! --111--B %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#IF(%zResSizeHdr  <= %zFldSize)
+  #SET(%zResCase  , 'B')       
+#ENDIF
+#IF(%zResSize     <= %zResSizeHdr)
+  #SET(%zResCase  , 'A')       
+#ENDIF
+#!
+#CASE(%zResCase)
+#OF('A')
+  #SET(%zResSize  , %zDspSize + %zSortSize)
+#OF('B')
+  #SET(%zResSize  , %zFldSize)  
+#ENDCASE
+#! --111--C %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#!SET(%zDspSize    , %zResSize)   #! RA.2021.10.10.SUN: DO NOT ADJUST CLARION.
+#! --111--  %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#! -------
 #SET(%pDspSize  , %zDspSize)
 #!---------------------------------------------------------------------
 #!--------------------------------------------------------------------- 
@@ -1270,6 +1303,10 @@
   #DECLARE(%zHdrSize)
   #DECLARE(%zFldSize)
   #DECLARE(%zSortSize)
+  #DECLARE(%zResSizeHdr)
+  #DECLARE(%zResSizeFld)
+  #DECLARE(%zResSize)
+  #DECLARE(%zResCase)
 #ENDIF
 #SET(%zFixit10  , 10)
 #SET(%zSortSize , 03)                         #! RA.2021.09.29.WED: HARD CODED!
@@ -1289,6 +1326,7 @@
 #SET(%zDspSize, (%zAdjusts * %zFixit10))
 #CALL(%CalcLenDig,%zLength,%zDigits,%pFieldType,%pFieldPicture)
 #!
+#SET(%zResSize  , %zDspSize)                  #! RA.2021.10.02.SAT: Calculate!
 #SET(%zHdrSize  , LEN(%pFieldHeader))         #! RA.2021.09.29.WED: Calculate!
 #SET(%zFldSize  , LEN(%pFieldPicture))        #! RA.2021.09.29.WED: Calculate! 
 #SET(%zFldSize  , %zLength)                   #! RA.2021.09.29.WED: Calculate!
@@ -1398,8 +1436,34 @@
   #SET(%zDspSize,     INT(14.0 * %zFixit10))
 #ENDIF
 #!
-! --222-- %@N03@(%zDspSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
-#SET(%pDspSize  , %zDspSize)
+#! -------
+#! --222--  %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#SET(%zResSizeHdr , %zHdrSize + %zSortSize)
+#SET(%zResSizeFld , %zFldSize + %zSortSize)
+#! --222--A %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#!+++ RA.2021.10.07.THU: Adjust the header to accomodate for the sort literal. (^,v)
+#!+++ Add sort size to the current display size. We have calculated a correct size for the field vs header.
+#SET(%zResCase    , 'A')
+#!SET(%zResSize   , %zDspSize + %zSortSize)         
+#! --222--B %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#IF(%zResSizeHdr  <= %zFldSize)
+  #SET(%zResCase  , 'B')       
+#ENDIF
+#IF(%zResSize     <= %zResSizeHdr)
+  #SET(%zResCase  , 'A')       
+#ENDIF
+#!
+#CASE(%zResCase)
+#OF('A')
+  #SET(%zResSize  , %zDspSize + %zSortSize)
+#OF('B')
+  #SET(%zResSize  , %zFldSize)  
+#ENDCASE
+#! --222--C %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N04@(%zResSizeHdr)-%@N04@(%zHdrSize)-%@N04@(%zResSizeFld)-%@N04@(%zFldSize)
+#SET(%zDspSize    , %zResSize)
+#! --222--  %@N03@(%zDspSize)-%@N03@(%zResSize)-%@N03@(%zSortSize)-%@N03@(%zHdrSize)-%@N03@(%zFldSize)=( %@N03@(%pFieldFormatWidth) , %@N03@(%pFieldMemoSize) , %@S10@(%pFieldType) , %@N03@(%pHeaderLength) , %@S20@(%pFieldPicture) , %@N04@(%zLength) , %@N02@(%zDigits) , %@S40@(%pFieldID) , %@S20@(%pFieldHeader) )
+#! -------
+#SET(%pDspSize    , %zDspSize )
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! RA.2020.05.22.FRI: Implemented. See the commented items below.

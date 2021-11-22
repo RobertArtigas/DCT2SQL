@@ -1797,6 +1797,11 @@ DROP INDEX %TheKey
       #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
       #OF  ('METABASE')
       #OROF('MIMER')
+#! RA.2021.10.10: Mimer has a NONUNIQUE keyword for INDEX creation
+#! Mr. Michael Gorman decided to start using it his re-generation and said nothing about it. (Is it even needed?)
+#! I saw it on one of his generated SQL statements and asked about not being told about posible changes.
+#! The keyword in not standard to SQL but might have meaning for Mimer. Not making changes
+#! This area might have to be reworked. Making a note here.
       #OROF('MSSQL')
       #OROF('POSTGRESQL')
       #OROF('SQLANYWHERE')
@@ -1832,7 +1837,7 @@ CREATE INDEX %TheKey
       #ELSE
 -- [GENERATE UNIQUE INDEX CREATE]
       #ENDCASE                                                                  #! BACKEND EXCEPTIONS
-    #ELSE
+    #ELSE    
     #ENDIF
   #ENDFOR                                                                       #! Ending FOR(%NKeys)
   #IF(~%NKeyDidIndex)
