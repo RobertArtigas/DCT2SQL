@@ -577,6 +577,9 @@
   #CALL(%ReplaceSubString,%TheFieldName,'&','')                         #! RA.2021.04.10: Remove the ALT-& from text.
   #CALL(%ReplaceSubString,%TheFieldName,'''','''''')
   #SET(%TheName , %TheName & ' | ' & %TheFieldName)
+#! RA.2021.11.20.SAT: Add column header to the extended name attribute
+  #SET(%TheFieldName, 'COLUMN(''''' & %FieldHeader &  ''''')')
+  #SET(%TheName , %TheName & ' | ' & %TheFieldName)
 #!
 #! RA.2019.11.21: This contains the original name external attributes in the dictionary.
 #! There might be a need to parse what currently exists there in the old external name attributes  
@@ -677,7 +680,17 @@
     #SET(%NFilesOptionDTS         , %NFilesOptionDTS + 1)
   #ENDIF
 #ENDFOR
-#!---------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#!-----------------------------------------------------------------------------
+#GROUP(%CalculatePosition,*%FldFrom,*%FldTo,*%FldSize,%pFieldType,%pFieldMemoSize)
+#! %%FldFrom=%FldFrom, %%FldTo=%FldTo, %%FldSize=%FldSize, %%pFieldType=%pFieldType, %%pFieldMemoSize=%pFieldMemoSize 
+  #SET(%FldSize, %pFieldMemoSize)
+#CASE(%pFieldType)
+#OF  ('CSTRING')
+  #SET(%FldSize, %pFieldMemoSize - 1)
+#ENDCASE
+  #SET(%FldTo  , %FldFrom + %FldSize)
+  #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
