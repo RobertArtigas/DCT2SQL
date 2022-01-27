@@ -57,10 +57,20 @@ Please, if you use the DCT2SQL for your conversion project, then send me an emai
 When a place gets crowded enough to require ID's, social collapse is not far away. It is time to go elsewhere. The best thing about space travel is that it made it possible to go elsewhere.<BR/>
 _Robert A. Heinlein_
 
+##
+
 A dying culture invariably exhibits personal rudeness. Bad manners. Lack of consideration for others in minor matters. A loss of politeness, of gentle manners, is more significant than is a riot...<BR/>
 _Robert A. Heinlein_
 
 ##
+
+A fact is information minus emotion;<br/>
+An opinion is information plus experience;<br/>
+Ignorance is an opinion lacking information;<br/> 
+Stupidity is an opinion that ignores fact.
+
+##
+
 
 [Code](https://github.com/RobertArtigas/DCT2SQL) 
 [Wiki](https://github.com/RobertArtigas/DCT2SQL/wiki) 
