@@ -16,7 +16,7 @@ Clarion dictionary to SQL DDL back end code generation templates.
 
 This will take a clarion dictionary (DCT) and create SQL DDL code for several SQL back ends.
 
-The [**WIKI**](https://github.com/RobertArtigas/DCT2SQL/wiki) for this repository has a **DCT2SQL** documentation area. There is a [**ToDo**](https://github.com/RobertArtigas/DCT2SQL/wiki/ToDoList) list for conversion that might come in handy when you do this task.
+The [**WIKI**](https://github.com/RobertArtigas/DCT2SQL/wiki) for this repository has a **DCT2SQL** documentation area. There is a [**ToDo**](https://github.com/RobertArtigas/DCT2SQL/wiki/To-Do-List) list for conversion that might come in handy when you do this task.
 
 ### The current SQL back ends can have DDL template generated code are: 
 **POSTGRESQL, MYSQL, MSSQL, SQLANYWHERE, and MIMER.**
