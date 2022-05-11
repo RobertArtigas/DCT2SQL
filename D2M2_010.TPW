@@ -520,6 +520,7 @@
   #DECLARE(%TheFieldName)
 #ENDIF
 #!
+#! RA.2022.04.10: Remove sorounding spaces on both sides of the vertical bar 
   #SET(%TheName     , '')
   #SET(%TheName     , %TheName & ',NAME(<39>')
   #CASE(UPPER(%FieldID))
@@ -549,37 +550,41 @@
     #!SET(%TheFieldType , %FieldType)
   #!ENDCASE
   #CALL(%BuildFieldType,%TheFieldType)
-  #SET(%TheName     , %TheName & ' | ' & %TheFieldType)
+  #SET(%TheName     , %TheName & '|' & %TheFieldType)
 #!
-  #SET(%TheName     , %TheName & ' | ' & UPPER(%FieldDisplayPicture))
-#!  
-  #CASE(UPPER(%FieldID))
-  #OF  ('GUID')
-    #SET(%TheName   , %TheName & ' | Salt')
-  #ENDCASE
-#!
-#!  #SET(%TheName   , %TheName & ' | ' & EXTRACT(%FieldQuickOptions,'TAB'))
+  #SET(%TheName     , %TheName & '|' & UPPER(%FieldDisplayPicture))
 #!
 #! RA.2021.04.10: Remove the ALT-& marker from text. Add back if needed.
-#! RA.2020.05.06: Checkboxes do not have a PROMPT. So fake a prompt to allow for editing.
+#! RA.2020.05.06: Checkboxes do not have a 'PROMPT'. So fake a 'PROMPT' to allow for editing.
 #! RA.2020.02.05: Add the field display prompt that way we can set the field edit prompt.
   #FOR(%FieldScreenControl)
     #IF(INSTRING('CHECK(',%FieldScreenControl,1,1) > 0)                 #! RA.2020.05.06: Added for checkboxes
       #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'CHECK',1))
       #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
-      #SET(%TheFieldName, 'PROMPT(' & %TheFieldName & ')')
+      #!SET(%TheFieldName, 'PROMPT(' & %TheFieldName & ')')
+      #SET(%TheFieldName, 'PR(' & %TheFieldName & ')')                  #! RA.2022.04.10: PROMPT -> PR
     #ENDIF
     #IF(INSTRING('PROMPT(',%FieldScreenControl,1,1) > 0)
-      #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'PROMPT'))
+      #SET(%TheFieldName, EXTRACT(%FieldScreenControl,'PROMPT',1))
       #CALL(%ReplaceSubString,%TheFieldName,'&','')                     #! RA.2021.04.10: Remove the ALT-& from text.
+      #SET(%TheFieldName, 'PR(' & %TheFieldName & ')')                  #! RA.2022.04.10: PROMPT -> PR
     #ENDIF
   #ENDFOR
   #CALL(%ReplaceSubString,%TheFieldName,'&','')                         #! RA.2021.04.10: Remove the ALT-& from text.
   #CALL(%ReplaceSubString,%TheFieldName,'''','''''')
-  #SET(%TheName , %TheName & ' | ' & %TheFieldName)
-#! RA.2021.11.20.SAT: Add column header to the extended name attribute
-  #SET(%TheFieldName, 'COLUMN(''''' & %FieldHeader &  ''''')')
-  #SET(%TheName , %TheName & ' | ' & %TheFieldName)
+  #SET(%TheName , %TheName & '|' & %TheFieldName)
+#! RA.2021.11.20.SAT: Add 'COLUMN' header to the extended name attribute
+  #!SET(%TheFieldName, 'COLUMN(''''' & %FieldHeader &  ''''')')
+  #SET(%TheFieldName, 'CO(''''' & %FieldHeader &  ''''')')              #! RA.2022.04.10: COLUMN -> CO
+  #SET(%TheName , %TheName & '|' & %TheFieldName)
+#!  
+#! RA.2022.02.19.SAT: Move 'Salt' to the back. Let's keep the first 5 consistant.
+  #CASE(UPPER(%FieldID))
+  #OF  ('GUID')
+    #SET(%TheName   , %TheName & '|Salt')
+  #ENDCASE
+#!
+#!  #SET(%TheName   , %TheName & '|' & EXTRACT(%FieldQuickOptions,'TAB'))
 #!
 #! RA.2019.11.21: This contains the original name external attributes in the dictionary.
 #! There might be a need to parse what currently exists there in the old external name attributes  
@@ -594,6 +599,8 @@
 #! ---- %TheFieldName
 #! ---- %TheName
 #SET(%pTheName      , %TheName)
+#!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #! BUILD QUALIFIED FIELDS (Audit GUID consistentancy)

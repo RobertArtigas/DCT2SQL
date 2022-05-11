@@ -2680,8 +2680,10 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
       #ENDCASE                                                                  #! BACKEND EXCEPTIONS
       #!
   #OF  ('UINT8')
+  #OROF('UINT64')                                                               #! RA.2022.05.10: Clarion type
       #SET(%NFieldsTSql,            'BIGINT')
   #OF  ('INT8')
+  #OROF('INT64')                                                                #! RA.2022.05.10: Clarion type
       #SET(%NFieldsTSql,            'BIGINT')
       #!
   #OF  ('DATE')
