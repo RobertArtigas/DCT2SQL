@@ -1969,6 +1969,12 @@ GO
       #SET(%NFieldTSql, 'INT')                                  #! RBE changed to use int data types
       #SET(%NFieldDef,  '')
       #SET(%NFieldNN,   '')
+  #OF  ('INT64')
+  #OROF('UINT64')
+      #SET(%NFieldTDef, 'NUMBER')                               #! RA.2022.05.10: Clarion NEW types
+      #SET(%NFieldTSql, 'BIGINT')                               #! RBE changed to use int data types
+      #SET(%NFieldDef,  '')
+      #SET(%NFieldNN,   '')
   #OF  ('DECIMAL')
   #OROF('PDECIMAL')
   #OROF('DEC')
