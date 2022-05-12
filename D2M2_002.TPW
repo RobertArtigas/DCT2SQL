@@ -220,6 +220,8 @@
   #OROF('DOUBLE')
   #OROF('FLOAT8')
   #OROF('BIGINT')                         #! RA.2019.07.04: Added
+  #OROF('INT64')                          #! RA.2022.05.12: Added
+  #OROF('UINT64')                         #! RA.2022.05.12: Added
   #!
   #OROF('DECIMAL')        #! ?? bytes
   #OROF('PDECIMAL')
