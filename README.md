@@ -52,6 +52,15 @@ Clarioneros: 164 : 2020-09-12 : https://clarionlive.com/clarioneros.htm (**OneDr
 Please, if you use the DCT2SQL for your conversion project, then send me an email just letting me know what type of conversion you did, and how you have used them.
  It would be appreciated. Thank you in advance.
 
+##
+###
+
+[Code](https://github.com/RobertArtigas/DCT2SQL) 
+[Wiki](https://github.com/RobertArtigas/DCT2SQL/wiki) 
+[Main](https://github.com/RobertArtigas) 
+[Repositories](https://github.com/RobertArtigas?tab=repositories)
+
+
 ###
 ##
 When a place gets crowded enough to require ID's, social collapse is not far away. It is time to go elsewhere. The best thing about space travel is that it made it possible to go elsewhere.<BR/>
@@ -70,11 +79,4 @@ Ignorance is an opinion lacking information;<br/>
 Stupidity is an opinion that ignores fact.
 
 ##
-
-
-[Code](https://github.com/RobertArtigas/DCT2SQL) 
-[Wiki](https://github.com/RobertArtigas/DCT2SQL/wiki) 
-[Main](https://github.com/RobertArtigas) 
-[Repositories](https://github.com/RobertArtigas?tab=repositories)
-
 
