@@ -1,11 +1,25 @@
 *.sublime-workspace
+_archive_
+_feedback_
+_build_
+
+# Directories generated during compile
+Working
+source
+lib
+
+#setup
+SetupDCT2SQL.sb~
+SetupDCT2SQL.csv
+SetupDCT2SQL.htm
+
 
 ############
 ## Clarion
 ############
 *.FileList.xml
 *.MAP
-*.exe
+#*.exe
 **/Cla*.dll
 *.ini
 *.cache
@@ -18,8 +32,6 @@ obj/**
 *.ap~
 PWEE*.txt
 
-_archive_
-_feedback_
 
 ############
 ## Windows
