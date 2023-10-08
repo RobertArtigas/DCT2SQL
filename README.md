@@ -73,10 +73,10 @@ _Robert A. Heinlein_
 
 ##
 
-A fact is information minus emotion;<br/>
-An opinion is information plus experience;<br/>
-Ignorance is an opinion lacking information;<br/> 
-Stupidity is an opinion that ignores fact.
+A **fact** is information minus emotion;<br/>
+An **opinion** is information plus experience;<br/>
+**Ignorance** is an opinion lacking information;<br/> 
+**Stupidity** is an opinion that ignores fact.
 
 ##
 
