@@ -163,6 +163,7 @@
 #INCLUDE('D2M1_MYSQL.TPW')          #! ???) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MSSQL.TPW')          #! ???) DCT -> [COMBINED] MSSQL              generate [COMBINED] (Roberto Artigas y Soler)
 #!
+#! RA.2023.06.27: Now in it's own template structure.
 #!INCLUDE('D2C2_000.TPW')           #! ???) Generate: Clarion     (Roberto Artigas y Soler) NOT MIT LICENSE FOR RIGHT NOW
 #!INCLUDE('D2C2_100.TPW')           #! ???) Generate: NET         (Roberto Artigas y Soler) NOT MIT LICENSE FOR RIGHT NOW
 #!---------------------------------------------------------------------
