@@ -158,6 +158,7 @@
 #INCLUDE('D2M2_UTL005.TPW')         #! 045) [UTIL] Show DUPLICATE keys           verify [UTIL] (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL006.TPW')         #! 046) [XREF] FIELDS and TABLES             verify [XREF] (Roberto Artigas y Soler)
 #INCLUDE('D2M2_UTL007.TPW')         #! 047) [XREF] KEYS and TABLES               verify [XREF] (Roberto Artigas y Soler)
+#INCLUDE('D2M2_UTL008.TPW')         #! 048) [UTIL] LENGTH of DCT items           verify [UTIL] (Roberto Artigas y Soler)
 #!
 #INCLUDE('D2M1_POSTGRESQL.TPW')     #! ???) DCT -> [COMBINED] POSTGRESQL         generate [COMBINED] (Roberto Artigas y Soler)
 #INCLUDE('D2M1_MYSQL.TPW')          #! ???) DCT -> [COMBINED] MYSQL              generate [COMBINED] (Roberto Artigas y Soler)
