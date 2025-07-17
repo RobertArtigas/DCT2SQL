@@ -194,7 +194,7 @@
 #! RA.2019.07.04: Added option to select files to do SQL generation.
 #GROUP(%MetabaseTabSelection)
 #TAB('Selection')  #!,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('There are ' & ITEMS(%NFilesSort) & ' possible tables to select.'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED('Dictionary: ' & %DictName & '.DCT ( There are ' & ITEMS(%NFilesSort) & ' possible tables to select )'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
     #PROMPT ('Generate SQL for all files in the dictionary.', CHECK), %optUseAllFiles, DEFAULT(1), AT(10)
     #DISPLAY(''),AT(,,,1)

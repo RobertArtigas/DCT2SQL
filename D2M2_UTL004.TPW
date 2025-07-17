@@ -203,7 +203,11 @@
   #ENDIF
   #SET(%ExplainTextRESERVED, '')
   #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'This is one of the METABASE templates.')
-  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
+  #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>') 
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'Process:<9><9>Check for RESERVED words<13><10>')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'Template:<9>D2M2_UTIL_RESERVED ( D2M2_UTIL004.TPW )')
+  #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
   #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & 'This generic utility will check file, field, and key names in the dictionary')
   #SET(%ExplainTextRESERVED, %ExplainTextRESERVED & ' for SQL reserved words that may give you problems in the various back ends.')
   #!SET(%ExplainTextRESERVED, %ExplainTextRESERVED & '<13,10><13,10>')
