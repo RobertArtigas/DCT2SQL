@@ -216,7 +216,8 @@
 #INSERT(%ExplainUtilRESERVED)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
     #DISPLAY(%ExplainTextRESERVED),AT(,,436,204)
   #ENDBOXED
