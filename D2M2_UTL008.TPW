@@ -10,7 +10,7 @@
 #! 2025.04.19   Roberto Artigas y Soler
 #!  *   Begin creation of this template (specific requirements)
 #!
-#UTILITY(D2M2_UTIL_LENGTHS, '2025.04.19: [UTIL] Check for LENGTHS of DCT itemms')
+#UTILITY(D2M2_UTIL_LENGTHS, '2025.04.19: [UTIL] Check for LENGTHS of DCT items')
 #!-----------------------------------------------------------------------------
 #! RA.2017.12.17 - The %BaseName determines what backend you are processing.
 #! All the specific items related to a backend can be coded with a case statement.
@@ -88,10 +88,10 @@
   #FOR(%NFiles)
     #FIX(%File, %NFilesName)
     #!
-    #IF(UPPER(%FileDriver) = 'CLARION'  AND %opt008UseDriverClarion)
+    #IF(UPPER(%FileDriver) = 'CLARION'  AND ~%opt008UseDriverClarion)
       #CYCLE
     #ENDIF
-    #IF(UPPER(%FileDriver) = 'TOPSPEED' AND %opt008UseDriverTopspeed)
+    #IF(UPPER(%FileDriver) = 'TOPSPEED' AND ~%opt008UseDriverTopspeed)
       #CYCLE
     #ENDIF
     #IF(~%opt008IgnoreNamesTable)
@@ -278,6 +278,10 @@
   #SET(%ExplainText008, '')
   #!SET(%ExplainText008, %ExplainText008 & 'This is one of the METABASE templates.')
   #!SET(%ExplainText008, %ExplainText008 & '<13,10><13,10>')
+  #SET(%ExplainText008, %ExplainText008 & 'Process:<9><9>Check for LENGTHS of DCT items<13><10>')
+  #SET(%ExplainText008, %ExplainText008 & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainText008, %ExplainText008 & 'Template:<9>D2M2_UTIL_LENGTHS ( D2M2_UTIL008.TPW )')
+  #SET(%ExplainText008, %ExplainText008 & '<13,10><13,10>')
   #SET(%ExplainText008, %ExplainText008 & 'This generic utility will check file, field, and key names in the dictionary')
   #SET(%ExplainText008, %ExplainText008 & ' providing the lengths of these items so they can be checked against the')
   #SET(%ExplainText008, %ExplainText008 & ' Clarion language limits.')
@@ -291,7 +295,8 @@
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
   #INSERT(%ExplainUtil008)
-  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
     #DISPLAY(%ExplainText008),AT(,,436,204)
   #ENDBOXED
