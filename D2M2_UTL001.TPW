@@ -55,8 +55,8 @@
 #INSERT(%VariablesUtility001)                                                   #! RA.2019.07.07.SUN: Added 
 #!---------------------------------------------------------------------
 #SHEET,HSCROLL,AT(,,464)
-  #INSERT(%ShowExplainUtilDLO)
   #INSERT(%MITLicenseD2M2UTL001)
+  #INSERT(%ShowExplainUtilDLO)
   #INSERT(%MetabaseTabSelection)
 #ENDSHEET
 #!---------------------------------------------------------------------
@@ -128,9 +128,33 @@
   #SET(%ExplainTextDLO, '')
   #!SET(%ExplainTextDLO, %ExplainTextDLO & 'This is one of the METABASE templates.')
   #!SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'Process:<9><9>Verify Data Load Order<13><10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'Template:<9>D2M2_UTIL_DLO ( D2M2_UTIL001.TPW )')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
   #SET(%ExplainTextDLO, %ExplainTextDLO & 'This generic utility will list the tables in the order to add the default data')
-  #SET(%ExplainTextDLO, %ExplainTextDLO & ' so you do not have any constraint errors.')
-   #!SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' so you do not have any constraint errors at time of loading.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'This utility also shows the importance of having default values for your fields,')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' since it creates a default insert for all your tables.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' As a test, IF you can add the sample insert statements into the tables,')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' THEN you know that you have minimized the chances of bad data getting into your tables.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'Of course it takes a while to set up the dictionary. You pay a time price for')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' everything you do.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'Would you rather pay the price before the customer complaints,')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' or after your customer complaints about having been able to enter bad data.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' Most customers will be rather nice about it, they will let you know about the error.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' Some might even ask you nicelly to fix it, and ask about a when, specially if it is')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' critical for a project that they are working on for their customers.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' The other side of that coin, a customer not exactly acting nicelly,')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' you might not want to go there.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & 'IF you pay the price after the customer complaints, THEN you might also take a reputation')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' or due diligence hit. At least you are aware. Your choice.')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & '')
+  #!SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
   #!SET(%ExplainTextDLO, %ExplainTextDLO & 'This template has been tested with the ABC template chains.')
   #SET(%ExplainTextDLO, %ExplainTextDLO & '')
 #ENDPREPARE
@@ -138,9 +162,9 @@
 #GROUP(%ShowExplainUtilDLO)
 #INSERT(%ExplainUtilDLO)
 #TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Instructions'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED('Documentation'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextDLO),AT(,,436,144)
+    #DISPLAY(%ExplainTextDLO),AT(,,436,244)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
