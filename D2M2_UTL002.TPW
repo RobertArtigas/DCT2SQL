@@ -18,7 +18,7 @@
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
 #!
-#UTILITY(D2M2_UTIL_PREFIX, '2019.07.17: [UTIL] Table PREFIX Order')
+#UTILITY(D2M2_UTIL_PREFIX, '2019.07.17: [UTIL] Verify Table PREFIX Order')
 #!-----------------------------------------------------------------------------
 #! RA.2017.12.17 - The %BaseName determines what backend you are processing.
 #! All the specific items related to a backend can be coded with a case statement.

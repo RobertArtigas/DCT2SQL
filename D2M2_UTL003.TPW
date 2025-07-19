@@ -137,6 +137,10 @@
   #SET(%ExplainTextFILE, '')
   #!SET(%ExplainTextFILE, %ExplainTextFILE & 'This is one of the METABASE templates.')
   #!SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'Process:<9><9>Verify FILE information<13><10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & 'Template:<9>D2M2_UTIL_FILE ( D2M2_UTIL003.TPW )')
+  #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
   #SET(%ExplainTextFILE, %ExplainTextFILE & 'This generic utility will verify your database has the basic GUID and TIME STAMP components in place')
   #SET(%ExplainTextFILE, %ExplainTextFILE & ' so you can have scalable and distributed databases as large as you desire.')
   #SET(%ExplainTextFILE, %ExplainTextFILE & '<13,10><13,10>')
@@ -169,9 +173,10 @@
 #INSERT(%ExplainUtilFILE)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextFILE),AT(,,436,204)
+    #DISPLAY(%ExplainTextFILE),AT(,,436,224)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -182,6 +187,10 @@
     #DECLARE(%ExplainTextFILE2)
   #ENDIF
   #SET(%ExplainTextFILE2, '')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'Process:<9><9>Verify FILE information<13><10>')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'Template:<9>D2M2_UTIL_FILE ( D2M2_UTIL003.TPW )')
+  #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>')
   #SET(%ExplainTextFILE2, %ExplainTextFILE2 & 'After the original audit template was written a few more items were discovered that seem')
   #SET(%ExplainTextFILE2, %ExplainTextFILE2 & ' to need checking for accuracy.')
   #SET(%ExplainTextFILE2, %ExplainTextFILE2 & '<13,10><13,10>')
@@ -211,9 +220,10 @@
 #INSERT(%ExplainUtilFILE2)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextFILE2),AT(,,436,204)
+    #DISPLAY(%ExplainTextFILE2),AT(,,436,224)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
