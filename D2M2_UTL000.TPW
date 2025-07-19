@@ -126,6 +126,10 @@
   #SET(%ExplainTextGUID, '')
   #!SET(%ExplainTextGUID, %ExplainTextGUID & 'This is one of the METABASE templates.')
   #!SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
+  #SET(%ExplainTextGUID, %ExplainTextGUID & 'Process:<9><9>Verify GUID information<13><10>')
+  #SET(%ExplainTextGUID, %ExplainTextGUID & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextGUID, %ExplainTextGUID & 'Template:<9>D2M2_UTIL_GUID ( D2M2_UTIL000.TPW )')
+  #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
   #SET(%ExplainTextGUID, %ExplainTextGUID & 'This generic utility will verify your database has the basic GUID and TIME STAMP components in place')
   #SET(%ExplainTextGUID, %ExplainTextGUID & ' so you can have scalable and distributed databases as large as you desire.')
   #SET(%ExplainTextGUID, %ExplainTextGUID & '<13,10><13,10>')
@@ -158,9 +162,10 @@
 #INSERT(%ExplainUtilGUID)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextGUID),AT(,,436,204)
+    #DISPLAY(%ExplainTextGUID),AT(,,436,244)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -171,6 +176,10 @@
     #DECLARE(%ExplainTextGUID2)
   #ENDIF
   #SET(%ExplainTextGUID2, '')
+  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'Process:<9><9>Verify GUID information<13><10>')
+  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'Template:<9>D2M2_UTIL_GUID ( D2M2_UTIL000.TPW )')
+  #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>')
   #SET(%ExplainTextGUID2, %ExplainTextGUID2 & 'After the original audit template was written a few more items were discovered that seem')
   #SET(%ExplainTextGUID2, %ExplainTextGUID2 & ' to need checking for accuracy.')
   #SET(%ExplainTextGUID2, %ExplainTextGUID2 & '<13,10><13,10>')
@@ -200,9 +209,10 @@
 #INSERT(%ExplainUtilGUID2)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 2)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextGUID2),AT(,,436,204)
+    #DISPLAY(%ExplainTextGUID2),AT(,,436,244)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -213,6 +223,10 @@
     #DECLARE(%ExplainTextGUID3)
   #ENDIF
   #SET(%ExplainTextGUID3, '')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'Process:<9><9>Verify GUID information<13><10>')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'Template:<9>D2M2_UTIL_GUID ( D2M2_UTIL000.TPW )')
+  #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>')
   #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'Additional checks have been added for the security features.')
   #SET(%ExplainTextGUID3, %ExplainTextGUID3 & '<13,10><13,10>')
   #SET(%ExplainTextGUID3, %ExplainTextGUID3 & 'The following header components were added to the audit:')
@@ -241,9 +255,10 @@
 #INSERT(%ExplainUtilGUID3)
 #!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
 #TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
-  #BOXED('Documentation (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #!BOXED('Documentation (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextGUID3),AT(,,436,204)
+    #DISPLAY(%ExplainTextGUID3),AT(,,436,244)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
