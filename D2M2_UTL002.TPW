@@ -57,8 +57,8 @@
 #INSERT(%VariablesSetup002)                                                     #! RA.2019.08.04.SUN: Aliases here!
 #!---------------------------------------------------------------------
 #SHEET,HSCROLL,AT(,,464)
-  #INSERT(%ShowExplainUtilPREFIX)
   #INSERT(%MITLicenseD2M2UTL002)
+  #INSERT(%ShowExplainUtilPREFIX)
   #INSERT(%MetabaseTabSelection)
 #ENDSHEET
 #!---------------------------------------------------------------------
@@ -128,9 +128,13 @@
   #SET(%ExplainTextPREFIX, '')
   #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This is one of the METABASE templates.')
   #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'Process:<9><9>Table PREFIX Order<13><10>')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'Template:<9>D2M2_UTIL_PREFIX ( D2M2_UTIL002.TPW )')
+  #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
   #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This generic utility will list the tables in the order to add the default data')
   #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & ' so you do not have any constraint errors.')
-   #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
+  #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '<13,10><13,10>')
   #!SET(%ExplainTextPREFIX, %ExplainTextPREFIX & 'This template has been tested with the ABC template chains.')
   #SET(%ExplainTextPREFIX, %ExplainTextPREFIX & '')
 #ENDPREPARE
@@ -146,7 +150,7 @@
   #ENDBOXED
   #BOXED('Instructions'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextPREFIX),AT(,,436,44)
+    #DISPLAY(%ExplainTextPREFIX),AT(,,436,184)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
