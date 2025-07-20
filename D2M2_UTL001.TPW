@@ -148,7 +148,7 @@
   #SET(%ExplainTextDLO, %ExplainTextDLO & ' Most customers will be rather nice about it, they will let you know about the error.')
   #SET(%ExplainTextDLO, %ExplainTextDLO & ' Some might even ask you nicelly to fix it, and ask about a when, specially if it is')
   #SET(%ExplainTextDLO, %ExplainTextDLO & ' critical for a project that they are working on for their customers.')
-  #SET(%ExplainTextDLO, %ExplainTextDLO & ' The other side of that coin, a customer not exactly acting nicelly,')
+  #SET(%ExplainTextDLO, %ExplainTextDLO & ' The other side of that coin, a customer not exactly acting nice,')
   #SET(%ExplainTextDLO, %ExplainTextDLO & ' you might not want to go there.')
   #SET(%ExplainTextDLO, %ExplainTextDLO & '<13,10><13,10>')
   #SET(%ExplainTextDLO, %ExplainTextDLO & 'IF you pay the price after the customer complaints, THEN you might also take a reputation')
