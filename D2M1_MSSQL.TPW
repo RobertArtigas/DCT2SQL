@@ -22,7 +22,7 @@
 #INSERT(%MITLicense)
 #BOXED('Information'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY('Process:<9><9>Create DDL for MS-MSQL engine (Combined DDL Script)')
+    #DISPLAY('Process:<9><9>Create DDL for MS-SQL engine (Combined DDL Script)')
     #DISPLAY('Dictionary:<9>' & UPPER(%DictionaryFile) & '')
     #DISPLAY('Template:<9>D2M1_MSSQL ( D2M1_MSSQL.TPW )')
 #ENDBOXED
