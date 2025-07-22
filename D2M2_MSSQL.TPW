@@ -12,9 +12,15 @@
 #!  *   MSSQL template creation.
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%MITLicenseD2M2MSSQL)
+#GROUP(%MITLicenseD2M2MSSQL00)
 #TAB('MIT'),PROP(PROP:FontStyle,700)
 #INSERT(%MITLicense)
+#BOXED('Information'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY('Process:<9><9>Create DDL for MS-MSQL engine (Separate DDL Scripts)')
+    #DISPLAY('Dictionary:<9>' & UPPER(%DictionaryFile) & '')
+    #DISPLAY('Template:<9>D2M2_MSSQL ( D2M2_MSSQL.TPW )')
+#ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -40,8 +46,8 @@
 #!---------------------------------------------------------------------
 #!SHEET,HSCROLL,AT(,,288)
 #SHEET,HSCROLL,AT(,,464)
+  #INSERT(%MITLicenseD2M2MSSQL00)
   #INSERT(%ShowVariables)
-  #INSERT(%MITLicenseD2M2MSSQL)
   #INSERT(%MetabaseTabSelection)                                                #! RA.2019.07.04: Added FILE selection
   #INSERT(%MetabaseTabNames)
   #INSERT(%MetabaseTabCreateDropOther)
