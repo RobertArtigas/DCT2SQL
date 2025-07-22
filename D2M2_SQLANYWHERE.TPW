@@ -13,9 +13,15 @@
 #!  *   SQLANYWHERE template creation.
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
-#GROUP(%MITLicenseD2M2SQLANYWHERE)
+#GROUP(%MITLicenseD2M2SQLANYWHERE00)
 #TAB('MIT'),PROP(PROP:FontStyle,700)
 #INSERT(%MITLicense)
+#BOXED('Information'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY('Process:<9><9>Create DDL for SQLAnywhere engine (Separate DDL Scripts)')
+    #DISPLAY('Dictionary:<9>' & UPPER(%DictionaryFile) & '')
+    #DISPLAY('Template:<9>D2M2_SQLANYWHERE ( D2M2_SQLANYWHERE.TPW )')
+#ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
@@ -41,8 +47,8 @@
 #!---------------------------------------------------------------------
 #!SHEET,HSCROLL,AT(,,288)
 #SHEET,HSCROLL,AT(,,464)
+  #INSERT(%MITLicenseD2M2SQLANYWHERE00)
   #INSERT(%ShowVariables)
-  #INSERT(%MITLicenseD2M2SQLANYWHERE)
   #INSERT(%MetabaseTabSelection)                                                #! RA.2019.07.04: Added FILE selection
   #INSERT(%MetabaseTabNames)
   #INSERT(%MetabaseTabCreateDropOther)
