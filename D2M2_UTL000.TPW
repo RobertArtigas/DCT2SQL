@@ -298,6 +298,13 @@
 -- %[05]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[25]NULL FIELD-OPTIONS  
 -- %[05]NULL ========== %[40]NULL ============= %[37]NULL ============= %[25]NULL =============  
       #FOR(%Field)
+        #!
+        #CASE(%FieldType)                                                       #! 2025.08.05 RA: (NA) Added
+        #OF  ('GROUP')
+        #OROF('END')
+          #CYCLE
+        #ENDCASE
+        #!
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
 -- %[05]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[38]FieldInitial %[0]NULL %FieldUserOptions  
@@ -316,8 +323,8 @@
           #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
           #SET(%KeyFieldList, %KeyFieldList & SUB(%KeyFieldSequence,1,1) & ':' & %KeyFieldID & ';')
         #ENDFOR
-        #IF(LEN(%KeyFieldList) > 80)
-          #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
+        #IF(LEN(%KeyFieldList) > 75)
+          #SET(%KeyFieldList, SUB(%KeyFieldList,1,75) & '*')        #! 2025.08.05 RA: (NA) Mark larger than displayed
         #ENDIF
 -- %[05]NULL %[30]KeyID %[0]NULL %[30]NextLine %[0]NULL %[78]KeyFieldList %[0]NULL %KeyUserOptions  
       #ENDFOR

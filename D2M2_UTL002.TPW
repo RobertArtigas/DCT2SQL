@@ -84,7 +84,14 @@
   #FOR(%CFiles)
     #FIX(%File, %CFilesName)
 -- PROCESSED: %@N04@(%CFilesCount) %[0]NULL %@N03B@(%CFilesParCount)-%@N03B@(%CFilesChiCount) %[0]NULL %[10]FilePrefix %[0]NULL %[50]CFilesName %[0]NULL %[50]CFilesFullPath %[0]NULL %FileUserOptions
+    #!
+    #CASE(%FileType)
+    #OF  ('VIEW')
+    #OROF('ALIAS')                                                                 #! RA.2025.08.05: Added
+    #ELSE
 #INSERT(%AuditFieldsAndKeys000)
+    #ENDCASE
+    #!
     #SET(%AuditLines, %AuditLines + 1)
     #IF(%AuditLines % 20 = 0 AND ITEMS(%CFiles) <> %AuditLines)
 --    
@@ -147,6 +154,7 @@
     #PROMPT('OFF: Sort files in PREFIX order. ON: Sort files in NAME order.', CHECK), %opt002SortFileName, AT(10)
     #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.', CHECK), %opt000AuditFields, AT(10)
     #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.', CHECK), %opt000AuditKeys, AT(10)
+    #PROMPT('OFF: Do NOT audit relations. ON: Audit the relations.', CHECK), %opt000AuditRelations, AT(10)
   #ENDBOXED
   #BOXED('Instructions'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
