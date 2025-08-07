@@ -176,7 +176,7 @@
   #!BOXED('Documentation (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
   #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 1)'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #DISPLAY(%ExplainTextFILE),AT(,,436,224)
+    #DISPLAY(%ExplainTextFILE),AT(,,436,244)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
