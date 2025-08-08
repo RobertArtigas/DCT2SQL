@@ -50,6 +50,7 @@
   #INSERT(%MITLicenseD2M2UTL003)
   #INSERT(%ShowExplainUtilFILE)
   #INSERT(%ShowExplainUtilFILE2)
+  #INSERT(%ShowExplainUtilFILE3)                                                #! 2025.08.07 RAYS: (NA) Added
   #INSERT(%MetabaseTabSelection)
 #ENDSHEET
 #!---------------------------------------------------------------------
@@ -70,7 +71,7 @@
 #!-- Processed Files -- BEGIN %[41]NULL KC-PK-FLD %[1]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
 -- SEQ# %[0]NULL KC-PK-FLD %[0]NULL FILENAME %[22]NULL PREFIX %[2]NULL FULLPATH %[32]NULL FILEOPTIONS
   #IF(%opt003AuditGUID)
--- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
+-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS %[1]NULL NCRPT
   #ENDIF
 --
   #FOR(%NFiles)
@@ -122,9 +123,10 @@
   #INSERT(%MITLicense)
   #BOXED('Options'),AT(,,454),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
    #DISPLAY(''),AT(,,,1)
-    #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'     , CHECK), %opt003AuditGUID, AT(10)
-    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.' , CHECK), %opt003AuditFields, AT(10)
-    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'     , CHECK), %opt003AuditKeys, AT(10)
+    #PROMPT('OFF: Do NOT audit GUID. ON: Audit the GUID.'             , CHECK), %opt003AuditGUID, AT(10)
+    #PROMPT('OFF: Do NOT audit fields. ON: Audit the fields.'         , CHECK), %opt003AuditFields, AT(10)
+    #PROMPT('OFF: Do NOT audit keys. ON: Audit the keys.'             , CHECK), %opt003AuditKeys, AT(10)
+    #PROMPT('OFF: Do NOT audit relations. ON: Audit the relations.'   , CHECK), %opt003AuditRelations, AT(10)
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
@@ -227,6 +229,42 @@
   #ENDBOXED
 #ENDTAB
 #!---------------------------------------------------------------------
+#!---------------------------------------------------------------------
+#GROUP(%ExplainUtilFILE3)
+#PREPARE
+  #IF(NOT VAREXISTS(%ExplainTextFILE3))
+    #DECLARE(%ExplainTextFILE3)
+  #ENDIF
+  #SET(%ExplainTextFILE3, '')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'Process:<9><9>Verify FILE information<13><10>')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'Dictionary:<9>' & UPPER(%DictionaryFile) & '<13><10>')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'Template:<9>D2M2_UTIL_FILE ( D2M2_UTIL003.TPW )')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><13,10>')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'Additional checks have been added for the security features.')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><13,10>')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'The following header components were added to the audit:')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><9>NCRPT')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><9>1')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><13,10>')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'The NCRPT is a check to see if the <39>EncryptionVersion<39> field is in the table.')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '')
+  #!SET(%ExplainTextFILE3, %ExplainTextFILE3 & '<13,10><13,10>')
+  #!SET(%ExplainTextFILE3, %ExplainTextFILE3 & 'This template has been tested with the ABC template chains.')
+  #SET(%ExplainTextFILE3, %ExplainTextFILE3 & '')
+#ENDPREPARE
+#!
+#GROUP(%ShowExplainUtilFILE3)
+#INSERT(%ExplainUtilFILE3)
+#!TAB(UPPER(%Application) & '.' & UPPER(%ProgramExtension)),PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+#TAB('Documentation'),PROP(PROP:FontColor,0C79A3H) #! ,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
+  #!BOXED('Documentation (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
+  #BOXED(UPPER(%Application) & '.' & UPPER(%ProgramExtension) & ' (Screen 3)'),AT(,,454),PROP(PROP:FontStyle,700)
+    #DISPLAY(''),AT(,,,1)
+    #DISPLAY(%ExplainTextFILE3),AT(,,436,224)
+  #ENDBOXED
+#ENDTAB
+#!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%VariablesUtility003)
 #PREPARE
@@ -241,18 +279,40 @@
 #SET(%opt003AuditFields                   ,FALSE)
 #DECLARE(%opt003AuditKeys                 ,LONG)
 #SET(%opt003AuditKeys                     ,FALSE)
+#DECLARE(%opt003AuditRelations            ,LONG)      #! 2025.08.07 RA: (NA) Added
+#SET(%opt003AuditRelations                ,FALSE)     #! 2025.08.07 RA: (NA) Added
+#!
+#IF(NOT VAREXISTS(%RelSort))                          #! 2025.08.07 RA: (NA) Added
+  #DECLARE(%RelSort),MULTI,UNIQUE
+  #DECLARE(%RelFind     , %RelSort)
+  #DECLARE(%RelShow     , %RelSort)
+  #DECLARE(%RelType     , %RelSort)
+  #DECLARE(%RelPrefix   , %RelSort)
+  #DECLARE(%RelRASQL    , %RelSort)
+  #DECLARE(%RelFromId   , %RelSort)
+  #DECLARE(%RelToId     , %RelSort)
+  #DECLARE(%RelFromList , %RelSort)
+  #DECLARE(%RelToList   , %RelSort)
+#ENDIF
 #ENDPREPARE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%AuditFieldsAndKeys003)
     #IF(%opt003AuditGUID)
 #!-- %[05]NULL GUID %[1]NULL TS %[3]NULL STS %[2]NULL DTS %[2]NULL KGUID %[0]NULL KTS %[2]NULL KSTS %[1]NULL KDTS
--- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS
+-- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[0]NULL %[2]NFilesCountEncrypt
     #ENDIF
     #IF(ITEMS(%Field) AND %opt003AuditFields)
 -- %[05]NULL FIELD-NAME %[20]NULL EXTERNAL-NAME %[17]NULL INITIAL-VALUE %[16]NULL FIELD-OPTIONS  
 -- %[05]NULL ========== %[20]NULL ============= %[17]NULL ============= %[16]NULL =============  
       #FOR(%Field)
+        #!
+        #CASE(%FieldType)                                                       #! 2025.08.07 RA: (NA) Added
+        #OF  ('GROUP')
+        #OROF('END')
+          #CYCLE
+        #ENDCASE
+        #!
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
 -- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
@@ -271,10 +331,49 @@
           #SET(%KeyFieldID,SUB(%KeyField, INSTRING(':',%KeyField,1,1) + 1, LEN(%KeyField) - INSTRING(':',%KeyField,1,1)))
           #SET(%KeyFieldList, %KeyFieldList & SUB(%KeyFieldSequence,1,1) & ':' & %KeyFieldID & ';')
         #ENDFOR
-        #IF(LEN(%KeyFieldList) > 80)
-          #SET(%KeyFieldList, SUB(%KeyFieldList,1,80))
+        #IF(LEN(%KeyFieldList) > 57)
+          #SET(%KeyFieldList, SUB(%KeyFieldList,1,57) & '*')        #! 2025.08.07 RA: (NA) Mark larger than displayed
         #ENDIF
 -- %[05]NULL %[25]KeyID %[0]NULL %[25]NextLine %[0]NULL %[60]KeyFieldList %[0]NULL %KeyUserOptions  
+      #ENDFOR
+    #ENDIF
+    #!
+    #IF(ITEMS(%Relation) AND %opt003AuditRelations)               
+      #FREE(%RelSort)  
+      #FOR(%Relation)
+        #IF(CLIP(EXTRACT(%RelationUserOptions,'RASQL',4)) <> '')
+          #ADD(%RelSort     , %FileRelationType & '-' & EXTRACT(%RelationUserOptions,'RASQL',4))
+        #ELSE
+          #ADD(%RelSort     , %FileRelationType & '-' & %RelationKey)
+        #END
+        #SET(%RelPrefix     , %RelationPrefix)
+        #SET(%RelType       , %FileRelationType)
+        #SET(%RelRASQL      , %RelationUserOptions)
+        #SET(%RelFind       , %RelationKey)
+        #SET(%RelShow       , SUB(%RelationKey      , INSTRING(':',%RelationKey,1,1) + 1      , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+        #SET(%RelFromId     , SUB(%FileKey          , INSTRING(':',%FileKey,1,1) + 1          , LEN(%FileKey)     - INSTRING(':',%FileKey,1,1)))
+        #SET(%RelToId       , SUB(%RelationKey      , INSTRING(':',%RelationKey,1,1) + 1      , LEN(%RelationKey) - INSTRING(':',%RelationKey,1,1)))
+        #SET(%RelFromList   ,'')
+        #SET(%RelToList     ,'')
+        #FOR(%FileKeyField)
+          #SET(%RelFromList , %RelFromList & SUB(%FileKeyField     , INSTRING(':',%FileKeyField,1,1) + 1     , LEN(%FileKeyField)     - INSTRING(':',%FileKeyField,1,1))     & ';')
+          #SET(%RelToList   , %RelToList   & SUB(%FileKeyFieldLink , INSTRING(':',%FileKeyFieldLink,1,1) + 1 , LEN(%FileKeyFieldLink) - INSTRING(':',%FileKeyFieldLink,1,1)) & ';')
+        #ENDFOR       
+      #ENDFOR
+      #!-----------------------------------------------------------------------------------------!
+      #! RA.2020.05.23.SAT: The plain GUID is on the left side. Consistency helps with patterns. !
+      #!-----------------------------------------------------------------------------------------!
+-- %[05]NULL R-TYPE %[0]NULL FROM-HERE     %[20]NULL TO-THERE      %[21]NULL PREFIX %[6]NULL RELATION-OPTIONS  
+-- %[05]NULL ====== %[0]NULL ============= %[20]NULL ============= %[21]NULL ====== %[6]NULL ================
+      #FOR(%RelSort)
+#!---- %[60]RelSort %@S30@(%RelFind) %@S30@(%RelShow) (%[60]RelRASQL)
+        #IF(%RelType='1:MANY') 
+-- %[05]NULL %[06]RelType %[0]NULL %[33]RelFromId %[0]NULL %[33]RelToId %[0]NULL [%[12]RelPrefix] %RelRASQL 
+-- %[13]NULL %[33]RelFromList %[0]NULL %[33]RelToList
+        #ELSE
+-- %[05]NULL %[06]RelType %[0]NULL %[33]RelToId %[0]NULL %[33]RelFromId %[0]NULL [%[12]RelPrefix] %RelRASQL 
+-- %[13]NULL %[33]RelToList %[0]NULL %[33]RelFromList
+        #ENDIF
       #ENDFOR
     #ENDIF
 #!---------------------------------------------------------------------
