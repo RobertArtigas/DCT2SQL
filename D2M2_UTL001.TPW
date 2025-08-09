@@ -105,7 +105,7 @@
 #INSERT(%GenerateInsertSQL                , %BaseUtil)      #! RA.2020.03.24: Changed
     #SET(%DefaultLines, %DefaultLines + 1)
     #IF(%DefaultLines % 20 = 0)
--- @N04@(%DefaultLines)      
+#! -- @N04@(%DefaultLines)      
     #ENDIF
   #ENDFOR  
 
@@ -527,9 +527,16 @@
 #!  #ENDIF
   #SET(%CountFields,%CountFields+1)  
 #ENDFOR
-#SET(%NextLine, 'Fields Processed:')
 
 --
+#IF(%TRUE)                                                                        #! 2025.08.08 RAYS: (NA) Added
+-- PROCESSED: %@N04@(%CFilesCount) %[0]NULL (%[4]CFilesParCount) %[0]NULL (%[4]CFilesChiCount) %[0]NULL %[110]CFilesSortText %[0]NULL %[8]FilePrefix %[0]NULL %CFilesFullPath
+#SET(%NextLine, 'Table is child to:')
+-- %[27]NextLine %CFilesChiCount
+#SET(%NextLine, 'Table is parent to:')
+-- %[27]NextLine %CFilesParCount
+#ENDIF
+#SET(%NextLine, 'Fields Processed:')
 -- %[27]NextLine %CountFields
 #IF (%CountFields > 20)
 #SET(%NextLine, '')
