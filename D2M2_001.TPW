@@ -25,6 +25,8 @@
     #ELSE
 --
 -- BOF: %UtilityNameTableOut
+#!#SET(%NextLine, 'Dictionary: ' & UPPER(%DictionaryFile) & '')
+#!-- %NextLine
 -- Utility: %TheDate - %TheTime
 --
     #ENDCASE                                                                    #! BACKEND EXCEPTIONS
@@ -41,6 +43,8 @@
 
 --
 -- Utility: %TheDate - %TheTime
+#!#SET(%NextLine, 'Dictionary: ' & UPPER(%DictionaryFile) & '')
+#!-- %NextLine
 -- EOF: %UtilityNameTableOut
 --
     #ENDCASE                                                                    #! BACKEND EXCEPTIONS
