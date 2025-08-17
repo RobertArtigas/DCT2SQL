@@ -197,7 +197,7 @@
 #TAB('Selection')  #!,PROP(PROP:FontStyle,700),PROP(PROP:FontColor,0C79A3H)
   #BOXED('Dictionary: ' & %DictName & '.DCT ( There are ' & ITEMS(%NFilesSort) & ' possible tables to select )'),AT(,,454),PROP(PROP:FontStyle,700)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT ('Generate SQL for all files in the dictionary.', CHECK), %optUseAllFiles, DEFAULT(1), AT(10)
+    #PROMPT ('Generate SQL for all files in the dictionary?', CHECK), %optUseAllFiles, DEFAULT(1), AT(10)
     #DISPLAY(''),AT(,,,1)
     #ENABLE(~%optUseAllFiles)
       #!PROMPT ('File Selection', FROM (%File)), %optFileSelection, INLINE, SELECTION('File Selection')
@@ -235,7 +235,7 @@
       #PROMPT('Database: '    ,@S40 ), %NameDatabase  , AT(60,,60) , PROP(PROP:Readonly, 1)
       #PROMPT('Owner: '       ,@S40 ), %NameOwner     , AT(60,,60)
       #ENABLE(%optNameOwnerEnable)
-        #PROMPT('Use "Owner:" prefix when generating tables', CHECK), %optNameOwnerUse, AT(10)
+        #PROMPT('Use "Owner:" prefix when generating tables?', CHECK), %optNameOwnerUse, AT(10)
       #ENDENABLE
     #ENDBOXED
   #ENDENABLE
@@ -249,7 +249,7 @@
   #ENABLE(%optEnableGenerateGUID)
     #BOXED('Enable GUID/UUID Generation'),AT(,,454)
       #DISPLAY(''),AT(,,,1)
-      #PROMPT('Use backend support for GUID/UUID generation', CHECK),%optGenerateGUID,AT(10)
+      #PROMPT('Use backend support for GUID/UUID generation?', CHECK),%optGenerateGUID,AT(10)
     #ENDBOXED
   #ENDENABLE
 #ENDTAB
@@ -386,17 +386,17 @@
   #TAB('Strings/Keys/Blobs')
    #BOXED('International Strings'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Generate international strings ',CHECK),%optGenIntlString,AT(10)
+    #PROMPT('Generate international strings? ',CHECK),%optGenIntlString,AT(10)
    #ENDBOXED
    #!DISPLAY('')
    #BOXED('NOT NULL Keys'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Generate NOT NULL keys ',CHECK),%optGenNotNullKeys,AT(10)
+    #PROMPT('Generate NOT NULL keys? ',CHECK),%optGenNotNullKeys,AT(10)
    #ENDBOXED
    #!DISPLAY('')
    #BOXED('BLOB to CLOB'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
-    #PROMPT('Generate CLOB fields ',CHECK),%optGenClobFields,AT(10)
+    #PROMPT('Generate CLOB fields? ',CHECK),%optGenClobFields,AT(10)
    #ENDBOXED
  #ENDTAB
 #!---------------------------------------------------------------------
