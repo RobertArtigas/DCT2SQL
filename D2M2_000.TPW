@@ -363,6 +363,9 @@
   #BOXED('Cosmetic Options'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
     #PROMPT('Do DDL table create statement alignment for verification purposes? (ON=Align. OFF=No align.)',CHECK),%optDoSpaceAlign,AT(10)
+    #ENABLE(%optDoSpaceAlign)                                                           #! RA.2018.09.03: Added
+      #PROMPT('Pad Length: ',@S120),%optDoSpaceLength ,REQ,AT(100,,050),DEFAULT(40)     #! 2025.08.30 RA: (NA)
+    #ENDENABLE
   #ENDBOXED
   #BOXED('Tables, Fields, Sequences, Indexes, Relations'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
@@ -3200,7 +3203,8 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
 #! RA.2018.09.03: Cosmetic option created to allow the DDL statements alignment (the default)
 #! to be removed and replaced with a single space. Michael Gorman request.
 #IF(%optDoSpaceAlign)                                                           #! RA.2018.09.03: Added
-#CALL(%PadToLength,%NFieldsNSql,90)
+#!CALL(%PadToLength,%NFieldsNSql,90)
+#CALL(%PadToLength,%NFieldsNSql,%optDoSpaceLength)                              #! 2025.08.30 RA: (NA)
 #SET(%NFieldLine,   %NFieldLine & ''  & %NFieldsNSql)         #! SQL Name
 #CALL(%PadToLength,%NFieldsTSql,20)
 #ELSE                                                                           #! RA.2018.09.03: Added
