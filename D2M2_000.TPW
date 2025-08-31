@@ -7,6 +7,8 @@
 #! Author:      Copyright © 1999-2999 by Roberto Artigas Jr
 #!              All rights reserved world wide.
 #! Changes:
+#! 2025.08.30.SAT         Roberto Artigas y Soler
+#!  *   Added pading default(40) for the create DDL script.
 #! 2020.09.11.FRI         Roberto Artigas     (REQUEST: Mr. Hickey)
 #!  *   Convert REAL to BIGINT for TimeStamp [???] ts,sts,dts (GUID)
 #! 2020.06.11.WED:        Roberto Artigas
@@ -169,7 +171,10 @@
     #!DISPLAY(%ExplainTextDCT2SQL),AT(,,260,40)
     #DISPLAY(%ExplainTextDCT2SQL),AT(,,436,34)
   #ENDBOXED
-  #BOXED('Hidden Variables'),AT(,,454),HIDE
+  #!------------------------------------------------------!
+  #!+++BANANA: TESTING: Hide or show debug variables      !
+  #!------------------------------------------------------!
+  #BOXED('Hidden Variables'),AT(,,454) #!,HIDE
     #DISPLAY(''),AT(,,,1)
     #!PROMPT(''             ,@S120), %CreateNameTable   , AT(10,,266), PROP(PROP:Readonly, 1) #!, PROP(PROP:Trn, 1)
     #!PROMPT(''             ,@S120), %CreateNameTableOut, AT(10,,266), PROP(PROP:Readonly, 1) #!, PROP(PROP:Trn, 1)
@@ -2581,10 +2586,33 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
       #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
       #OF  ('MIMER')
       #!OROF('METABASE')
-      #OROF('MSSQL')                                                            #! RA.2018.11.10: Michael Gorman request
+      #!OROF('MSSQL')                                                           #! RA.2018.11.10: Michael Gorman request
         #SET(%NFieldsTSql,          'VARCHAR(' & %FieldMemoSize & ')' )
         #IF(%optGenIntlString)
           #SET(%NFieldsTSql,        'NVARCHAR(' & %FieldMemoSize & ')' )
+        #ENDIF
+        #!----------------------------------------------------!
+        #! RA.2025.08.31 - Consider making this an option.    !
+        #!----------------------------------------------------!
+      #OF  ('MSSQL')                                                            #! RA.2018.11.10: Michael Gorman request
+        #! #SET(%NFieldsTSql,          'VARCHAR(' & %FieldMemoSize & ')' )
+        #! #IF(%optGenIntlString)
+        #!   #SET(%NFieldsTSql,        'NVARCHAR(' & %FieldMemoSize & ')' )
+        #! #ENDIF
+        #!----------------------------------------------------------------------!
+        #! RA.2025.08.31 - Making this a bit smarter. Consider generalizing.    !
+        #! The less than value (128) is an arbitrary chosen limit.              !                        
+        #!----------------------------------------------------------------------!
+        #IF   (%FieldMemoSize < 128)
+          #SET(%NFieldsTSql,        'CHAR(' & %FieldMemoSize & ')')
+          #IF(%optGenIntlString)
+            #SET(%NFieldsTSql,     'NCHAR(' & %FieldMemoSize & ')' )
+          #ENDIF
+        #ELSE
+          #SET(%NFieldsTSql,        'VARCHAR(' & %FieldMemoSize & ')' )
+          #IF(%optGenIntlString)
+            #SET(%NFieldsTSql,     'NVARCHAR(' & %FieldMemoSize & ')' )
+          #ENDIF
         #ENDIF
       #OF  ('MYSQL')
         #! RA.2018.07.16.MON: TINYTEXT (255), TEXT (65,535), MEDIUMTEXT (16,777,215), LONGTEXT (4,294,967,295)
@@ -2991,7 +3019,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #!---------------------------------------------------!
   #IF(%NFieldOpt3)
     #IF(%TraceDetail)
-#!---- 01 CHECK SQL FIELD DEFAULT: [%FieldID] NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" [ Anything in NFieldsDef? ]
+---- 01 CHECK SQL FIELD DEFAULT: [%FieldID] NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" [ Anything in NFieldsDef? ]
     #ENDIF
     #!
     #! --- IMPORTANT ---
@@ -3019,7 +3047,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
       #ENDIF
     #ENDIF
     #IF(%TraceDetail)
-#!---- 02 CHECK SQL FIELD DEFAULT: NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" 
+---- 02 CHECK SQL FIELD DEFAULT: NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" 
     #ENDIF
     #! RA.2018.05.03: ??? TESTING
     #CASE(UPPER(%NFieldOpt3))
@@ -3029,6 +3057,16 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
         #SET(%NFieldOpt3, 0)
       #ENDIF
     #ENDCASE
+    #!--------------------------------------------------!
+    #! RA.2025.08.31: More logic to catch %NFieldOpt3   !
+    #! This adjusts incorrect conditon. HACK!!!!        !
+    #! The DEFAULT area needs rework to deal with the   !
+    #! Clarion side and SQL side better than this...    !
+    #!--------------------------------------------------!
+    #CASE(UPPER(%NFieldOpt3))
+    #OF  ('[GUIDPKEY]')
+        #SET(%NFieldsDef  , 'DEFAULT ''''')
+    #ENDCASE#!
     #! RA.2018.05.03: ???
     #IF(%NFieldsDef='')
       #CALL(%IsFieldTypeNumeric,%nLoc2,%FieldType)
@@ -3041,7 +3079,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
       #ENDIF
     #ENDIF
     #IF(%TraceDetail)
-#!---- 03 CHECK SQL FIELD DEFAULT: NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" 
+---- 03 CHECK SQL FIELD DEFAULT: NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" 
 ---- DEFAULT FIELD VALUE: %[3]NFields, %NFieldsKey, NFieldOpt3="%NFieldOpt3", NFieldsDef="%NFieldsDef" 
     #ENDIF
   #ENDIF

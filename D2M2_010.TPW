@@ -35,6 +35,7 @@
 #ENDCASE
 #!---------------------------------------------------------------------
 #!---------------------------------------------------------------------
+#! RA.2025.08.31: Check for [GUID],[GUIDPKEY] bleeding through
 #! RA.2018.05.01: Check for SQL functions. 
 #GROUP(%IsInitialFunctionSQL,*%pResult,%pFieldInitial)
   #SET(%pResult,FALSE)
