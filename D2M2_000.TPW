@@ -385,6 +385,10 @@
   #BOXED('Odd and Ends Options'),AT(,,454)
     #DISPLAY(''),AT(,,,1)
     #PROMPT('Do not change Clarion LONG to SQL backend DATE and TIME? (ON=Leave LONG. OFF=Make change to DATE and TIME.)',CHECK),%optDoNotChangeLongToDateAndTime,AT(10)
+    #PROMPT('Make large STRINGs into CSTRINGs (CHAR -> VARCHAR)? (ON=VARCHAR. OFF=No VARCHAR.)',CHECK),%optDoChar2VarChar,AT(10)
+    #ENABLE(%optDoChar2VarChar)                                                                     #! RA.2025.09.01: Added
+      #PROMPT('VARCHAR Length: ',@S120),%optDoChar2VarCharLength ,REQ,AT(100,,050),DEFAULT(128)     #! 2025.09.01 RA: (NA)
+    #ENDENABLE
     #!DISPLAY('')
   #ENDBOXED
 #ENDTAB
@@ -2579,41 +2583,43 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
         #ENDIF
       #ENDCASE                                                                  #! BACKEND EXCEPTIONS
       #!
+      #!----------------------------------------------------!
+      #! RA.2025.09.01 - It is now an option.               !
+      #! RA.2025.08.31 - Consider making this an option.    !
+      #!----------------------------------------------------!
   #OF  ('MEMO')
   #OROF('STRING')
       #SET(%NFieldsTSql,            'CHAR(' & %FieldMemoSize & ')')
-      #!
-      #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
-      #OF  ('MIMER')
-      #!OROF('METABASE')
-      #!OROF('MSSQL')                                                           #! RA.2018.11.10: Michael Gorman request
-        #SET(%NFieldsTSql,          'VARCHAR(' & %FieldMemoSize & ')' )
-        #IF(%optGenIntlString)
-          #SET(%NFieldsTSql,        'NVARCHAR(' & %FieldMemoSize & ')' )
-        #ENDIF
-        #!----------------------------------------------------!
-        #! RA.2025.08.31 - Consider making this an option.    !
-        #!----------------------------------------------------!
-      #OF  ('MSSQL')                                                            #! RA.2018.11.10: Michael Gorman request
-        #! #SET(%NFieldsTSql,          'VARCHAR(' & %FieldMemoSize & ')' )
-        #! #IF(%optGenIntlString)
-        #!   #SET(%NFieldsTSql,        'NVARCHAR(' & %FieldMemoSize & ')' )
-        #! #ENDIF
-        #!----------------------------------------------------------------------!
-        #! RA.2025.08.31 - Making this a bit smarter. Consider generalizing.    !
-        #! The less than value (128) is an arbitrary chosen limit.              !                        
-        #!----------------------------------------------------------------------!
-        #IF   (%FieldMemoSize < 128)
-          #SET(%NFieldsTSql,        'CHAR(' & %FieldMemoSize & ')')
+      #!----------------------------------------------------------------------!
+      #! RA.2025.09.01 - This has been generalized with a template option.    !
+      #! RA.2025.08.31 - Making this a bit smarter. Consider generalizing.    !
+      #! The less than value (128) is an arbitrary chosen limit.              !                        
+      #!----------------------------------------------------------------------!
+      #IF(%optDoChar2VarChar)                                                 #! RA.2025.09.01: Option added CHAR to VARCHAR
+        #IF   (%FieldMemoSize < %optDoChar2VarCharLength)                     #! RA.2025.09.01: Size of field for CHAR->VARCHAR
+          #SET(%NFieldsTSql,        'CHAR(' & %FieldMemoSize & ')' )
           #IF(%optGenIntlString)
             #SET(%NFieldsTSql,     'NCHAR(' & %FieldMemoSize & ')' )
           #ENDIF
         #ELSE
-          #SET(%NFieldsTSql,        'VARCHAR(' & %FieldMemoSize & ')' )
+          #SET(%NFieldsTSql,     'VARCHAR(' & %FieldMemoSize & ')' )
           #IF(%optGenIntlString)
-            #SET(%NFieldsTSql,     'NVARCHAR(' & %FieldMemoSize & ')' )
+            #SET(%NFieldsTSql,  'NVARCHAR(' & %FieldMemoSize & ')' )
           #ENDIF
         #ENDIF
+      #ENDIF
+      #!--------------------------------------------------------------------!
+      #! RA.2025.09.91 - The option has been generalized for all backends.  !
+      #! The templates consistent in their conversion of string fields.     !
+      #!--------------------------------------------------------------------!
+      #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
+      #!OF  ('MIMER')
+      #!OROF('METABASE')
+      #!OROF('MSSQL')                                                           #! RA.2018.11.10: Michael Gorman request
+        #! #SET(%NFieldsTSql,          'VARCHAR(' & %FieldMemoSize & ')' )
+        #! #IF(%optGenIntlString)
+        #!   #SET(%NFieldsTSql,        'NVARCHAR(' & %FieldMemoSize & ')' )
+        #! #ENDIF
       #OF  ('MYSQL')
         #! RA.2018.07.16.MON: TINYTEXT (255), TEXT (65,535), MEDIUMTEXT (16,777,215), LONGTEXT (4,294,967,295)
         #!#IF   (%FieldMemoSize < 256)
@@ -2625,7 +2631,8 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
         #!#ELSIF(%FieldMemoSize < 4294967296)
         #!  #SET(%NFieldsTSql,        'LONGTEXT')
         #!#ENDIF
-        #! RA.2018.07.16.MON: CHAR(<255),  VARHAR(>255)
+        #! RA.2025.09.01.MON: Do we want to put above back into play for Ms. Kristina?
+        #! RA.2018.07.16.MON: CHAR(<256),  VARCHAR(>256)
         #IF   (%FieldMemoSize < 256)
           #SET(%NFieldsTSql,        'CHAR(' & %FieldMemoSize & ')')
         #ELSE
@@ -2650,7 +2657,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
   #OROF('PSTRING')
       #SET(%CStringLen, %FieldMemoSize - 1)
       #SET(%NFieldsTSql,            'VARCHAR(' & %CStringLen & ')' )
-      #!
+      #! RA.2025.09.01: Might need to test 'PSTRING' some more.
       #CASE(%pBaseName)                                                         #! BACKEND EXCEPTIONS
       #OF  ('MIMER')
       #!OROF('METABASE')
