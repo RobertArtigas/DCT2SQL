@@ -2573,12 +2573,12 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
         #IF(%optGenClobFields)
           #SET(%NFieldsTSql,        'CLOB(' & %FieldMemoSize & ')' )
           #IF(%optGenIntlString)
-            #SET(%NFieldsTSql,      'NCLOB(' & %FieldMemoSize & ')' )
+            #SET(%NFieldsTSql,     'NCLOB(' & %FieldMemoSize & ')' )
           #ENDIF
         #ELSE
-          #SET(%NFieldsTSql,        'VARCHAR(' & %FieldMemoSize & ')' )
+          #SET(%NFieldsTSql,     'VARCHAR(' & %FieldMemoSize & ')' )
           #IF(%optGenIntlString)
-            #SET(%NFieldsTSql,      'NVARCHAR(' & %FieldMemoSize & ')' )
+            #SET(%NFieldsTSql,  'NVARCHAR(' & %FieldMemoSize & ')' )
           #ENDIF
         #ENDIF
       #ENDCASE                                                                  #! BACKEND EXCEPTIONS
@@ -2636,7 +2636,7 @@ REVOKE SELECT, INSERT, DELETE, UPDATE, ALTER, REFERENCES
         #IF   (%FieldMemoSize < 256)
           #SET(%NFieldsTSql,        'CHAR(' & %FieldMemoSize & ')')
         #ELSE
-          #SET(%NFieldsTSql,        'VARCHAR(' & %FieldMemoSize & ')' )
+          #SET(%NFieldsTSql,     'VARCHAR(' & %FieldMemoSize & ')' )
         #ENDIF
         #! RA.2019.07.20.SAT: Identify primary key for function default.
         #! RA.2019.07.04.THU: Set up for UUID primary key (Need 16 bytes)

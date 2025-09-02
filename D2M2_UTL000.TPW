@@ -265,7 +265,16 @@
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%VariablesUtility000)
 #PREPARE
+#!DECLARE(%NextLine)
+#IF(VAREXISTS(%NextLine)=0)
 #DECLARE(%NextLine)
+#ENDIF
+#IF(VAREXISTS(%WorkLine)=0)
+#DECLARE(%WorkLine)
+#ENDIF
+#IF(VAREXISTS(%WorkType)=0)
+#DECLARE(%WorkType)
+#ENDIF
 #DECLARE(%KeyFieldList)
 #DECLARE(%KeyFieldID)
 #DECLARE(%AuditLines)
@@ -295,19 +304,22 @@
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%AuditFieldsAndKeys000)
     #IF(ITEMS(%Field) AND %opt000AuditFields)
--- %[05]NULL FIELD-NAME %[40]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[25]NULL FIELD-OPTIONS  
--- %[05]NULL ========== %[40]NULL ============= %[37]NULL ============= %[25]NULL =============  
+-- %[05]NULL FIELD-NAME %[20]NULL FIELD-TYPE %[8]NULL EXTERNAL-NAME %[37]NULL INITIAL-VALUE %[25]NULL FIELD-OPTIONS  
+-- %[05]NULL ========== %[20]NULL ========== %[8]NULL ============= %[37]NULL ============= %[25]NULL =============  
       #FOR(%Field)
         #!
-        #CASE(%FieldType)                                                       #! 2025.08.05 RA: (NA) Added
+        #CASE(%FieldType)                                                       #! 2025.08.05 RAYS: (NA) Added
         #OF  ('GROUP')
         #OROF('END')
           #CYCLE
         #ENDCASE
         #!
+        #SET(%WorkLine, %FieldType)
+        #CALL(%GetFieldType,%WorkType,%FieldType,%FieldMemoSize,%FieldPlaces)   #! 2025.09.02 RAYS: (NA) Added
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
--- %[05]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[38]FieldInitial %[0]NULL %FieldUserOptions  
+#!-- %[05]NULL %[50]FieldID %[0]NULL %[50]NextLine %[0]NULL %[38]FieldInitial %[0]NULL %FieldUserOptions  
+-- %[05]NULL %[30]FieldID %[0]NULL %[18]WorkType %[0]NULL %[50]NextLine %[0]NULL %[38]FieldInitial %[0]NULL %FieldUserOptions  
       #ENDFOR
     #ENDIF
     #!
