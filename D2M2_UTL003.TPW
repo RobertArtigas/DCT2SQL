@@ -268,7 +268,16 @@
 #!---------------------------------------------------------------------         #! RA.2019.07.25: Added
 #GROUP(%VariablesUtility003)
 #PREPARE
+#!DECLARE(%NextLine)
+#IF(VAREXISTS(%NextLine)=0)
 #DECLARE(%NextLine)
+#ENDIF
+#IF(VAREXISTS(%WorkLine)=0)
+#DECLARE(%WorkLine)
+#ENDIF
+#IF(VAREXISTS(%WorkType)=0)
+#DECLARE(%WorkType)
+#ENDIF
 #DECLARE(%KeyFieldList)
 #DECLARE(%KeyFieldID)
 #DECLARE(%AuditLines)
@@ -303,19 +312,22 @@
 -- %[05]NULL %[2]NFilesCountGUID-%[2]NFilesOptionGUID %[0]NULL %[2]NFilesCountTS-%[2]NFilesOptionTS %[0]NULL %[2]NFilesCountSTS-%[2]NFilesOptionSTS %[0]NULL %[2]NFilesCountDTS-%[2]NFilesOptionDTS %[0]NULL %[2]NFilesKeyGUID-%[2]NFilesFieldGUID %[0]NULL %[2]NFilesKeyTS-%[2]NFilesFieldTS %[0]NULL %[2]NFilesKeySTS-%[2]NFilesFieldSTS %[0]NULL %[2]NFilesKeyDTS-%[2]NFilesFieldDTS %[0]NULL %[2]NFilesCountEncrypt
     #ENDIF
     #IF(ITEMS(%Field) AND %opt003AuditFields)
--- %[05]NULL FIELD-NAME %[20]NULL EXTERNAL-NAME %[17]NULL INITIAL-VALUE %[16]NULL FIELD-OPTIONS  
--- %[05]NULL ========== %[20]NULL ============= %[17]NULL ============= %[16]NULL =============  
+-- %[05]NULL FIELD-NAME %[15]NULL FIELD-TYPE %[6]NULL EXTERNAL-NAME %[9]NULL INITIAL-VALUE %[11]NULL FIELD-OPTIONS  
+-- %[05]NULL ========== %[15]NULL ========== %[6]NULL ============= %[9]NULL ============= %[11]NULL =============  
       #FOR(%Field)
         #!
-        #CASE(%FieldType)                                                       #! 2025.08.07 RA: (NA) Added
+        #CASE(%FieldType)                                                       #! 2025.08.07 RAYS: (NA) Added
         #OF  ('GROUP')
         #OROF('END')
           #CYCLE
         #ENDCASE
         #!
+        #SET(%WorkLine, %FieldType)
+        #CALL(%GetFieldType,%WorkType,%FieldType,%FieldMemoSize,%FieldPlaces)   #! 2025.09.05 RAYS: (NA) Added
         #SET(%NextLine, EXTRACT(%FieldStatement,'NAME'))
         #SET(%NextLine, SUB(%NextLine,7,LEN(%NextLine)-8))
--- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
+#!-- %[05]NULL %[30]FieldID %[0]NULL %[30]NextLine %[0]NULL %[29]FieldInitial %[0]NULL %FieldUserOptions  
+-- %[05]NULL %[25]FieldID %[0]NULL %[16]WorkType %[0]NULL %[22]NextLine %[0]NULL %[24]FieldInitial %[0]NULL %FieldUserOptions  
       #ENDFOR
     #ENDIF
     #!

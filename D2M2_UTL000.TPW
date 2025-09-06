@@ -324,6 +324,8 @@
     #ENDIF
     #!
     #IF(ITEMS(%Key) AND %opt000AuditKeys)               
+#!-- %[05]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[64]NULL KEY-OPTIONS  
+#!-- %[05]NULL ======== %[22]NULL ============= %[17]NULL ============== %[64]NULL ===========  
 -- %[05]NULL KEY-NAME %[22]NULL EXTERNAL-NAME %[17]NULL KEY-FIELD-LIST %[64]NULL KEY-OPTIONS  
 -- %[05]NULL ======== %[22]NULL ============= %[17]NULL ============== %[64]NULL ===========  
       #FOR(%Key)
